@@ -1,0 +1,16 @@
+{
+  "generated_at_utc": "2026-03-20T21:15:00.302745+00:00",
+  "source": "awesome-ai-agents/README.md",
+  "totals": {
+    "repos": 120,
+    "repos_with_workflows": 77,
+    "repos_without_workflows": 40,
+    "repos_failed": 3,
+    "workflow_files": 479
+  },
+  "artifacts": {
+    "repos_csv": "output/repos_from_awesome_ai_agents.csv",
+    "report_csv": "output/workflows_extraction_report.csv",
+    "workflows_dir": "output/workflows"
+  }
+}
