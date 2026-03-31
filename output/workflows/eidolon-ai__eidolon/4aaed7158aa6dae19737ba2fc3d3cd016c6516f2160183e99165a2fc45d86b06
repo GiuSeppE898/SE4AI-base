@@ -1,0 +1,84 @@
+name: Bump Version and Release K8 Operator
+on:
+  workflow_run:
+    workflows: [ "Test K8 Operator" ]
+    types:
+      - completed
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+
+jobs:
+  rev_and_release:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Wait for tests to succeed
+        uses: lewagon/wait-on-check-action@v1.3.4
+        with:
+          check-name: 'Test Python'
+          ref: ${{ github.ref }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Generate token
+        id: generate_token
+        uses: tibdex/github-app-token@v1
+        with:
+          app_id: ${{ secrets.PUSH_APP_ID }}
+          private_key: ${{ secrets.PUSH_APP_PRIVATE_KEY }}
+      - name: Get current version
+        id: get_version
+        run: echo "version=$(cat k8s-operator/VERSION)" >> $GITHUB_OUTPUT
+
+      - name: Increment version
+        uses: anothrNick/github-tag-action@1.35.0
+        id: increment_version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEFAULT_BUMP: patch
+          WITH_V: false
+          RELEASE_BRANCHES: main
+          CUSTOM_TAG: ${{ steps.get_version.outputs.version }}
+      - name: Update version in file
+        run: |
+          new_version=${{ steps.increment_version.outputs.new_tag }}
+          echo "$new_version" > k8s-operator/VERSION
+      - name: Commit changes
+        run: |
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add k8s-operator/VERSION
+          git commit -m "Bump version to ${{ steps.increment_version.outputs.new_tag }}"
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ steps.generate_token.outputs.token }}
+          branch: ${{ github.ref }}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21.x'
+          cache-dependency-path: k8s-operator/go.sum
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: "build"
+        run: make build docker-buildx
+        working-directory: k8s-operator
+      - name: "bundle"
+        run: make bundle bundle-buildx
+        working-directory: k8s-operator
+      - name: "catalog"
+        run: make catalog-build catalog-push
+        working-directory: k8s-operator

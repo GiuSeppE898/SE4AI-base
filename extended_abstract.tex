@@ -1,0 +1,67 @@
+
+\documentclass[a4paper,11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[italian]{babel}
+\usepackage{geometry}
+\geometry{a4paper, margin=2.5cm}
+\usepackage{hyperref}
+\usepackage{titlesec}
+\usepackage{enumitem}
+
+\title{\textbf{Evoluzione delle Pipeline CI/CD verso l'AgentOps: Un'Analisi Empirica sui Repository di AI Agent}}
+\author{Nome del Gruppo / Membri}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+L'automazione dei processi di sviluppo tramite strumenti di Continuous Integration e Continuous Deployment (CI/CD), come GitHub Actions (GA), è una pratica consolidata nell'ingegneria del software per garantire efficienza e qualità. Tuttavia, lo sviluppo di sistemi basati sull'Intelligenza Artificiale (AI) e, più recentemente, su Agenti Autonomi LLM, introduce nuove sfide legate al Technical Debt e alla sicurezza (AI Safety). Questo progetto mira a quantificare e analizzare l'evoluzione delle pipeline CI/CD in contesti "agent-enabled". Estraendo le cronologie dei workflow di GitHub Actions da una raccolta di repository open-source di agenti AI, confronteremo le metriche strutturali e le tipologie di modifiche con quelle dei progetti software tradizionali e AI-based. L'obiettivo è comprendere come le pratiche MLOps si stiano adattando per integrare pattern emergenti di AgentOps, come l'osservabilità, la valutazione delle traiettorie e i guardrail.
+\end{abstract}
+
+\section{Introduzione e Obiettivi (Cosa si vuole studiare)}
+L'uso di GitHub Actions (GA) è diventato lo standard di fatto per l'automazione dei workflow nei repository GitHub, riducendo il carico di lavoro manuale per test, build e gestione delle dipendenze. La ricerca empirica ha ampiamente studiato i progetti software tradizionali, rivelando che i flussi di lavoro sono soggetti a modifiche continue, con una media di un aggiornamento ogni 159 giorni per file. In contesti tradizionali, l'ecosistema è altamente standardizzato, con il 98,48\% dei singoli step (task) che si affida ad "Actions" pubbliche prelevate dal Marketplace.
+
+Tuttavia, i sistemi basati su Machine Learning (ML) presentano caratteristiche uniche che generano un "AI Technical Debt" (AITD). Tra i sintomi più comuni vi sono i "Pipeline Jungles", ovvero flussi di preparazione dati disordinati e difficili da mantenere, e un uso eccessivo di "Glue Code" per far comunicare pacchetti ML generici. Con l'avvento degli Agenti LLM, la natura non deterministica e autonoma dei modelli ha richiesto un ulteriore cambio di paradigma, portando all'emergere dell'AgentOps. Questo paradigma enfatizza l'osservabilità, necessaria per tracciare ragionamento, pianificazione e chiamate a tool esterni da parte degli agenti.
+
+\textbf{Obiettivi del progetto:}
+L'obiettivo primario di questo studio è analizzare empiricamente se e come le pipeline di CI/CD si differenzino in contesti "agent-enabled". Nello specifico, si intende:
+\begin{itemize}
+    \item Quantificare la complessità strutturale dei workflow (numero di job, step e dipendenze esterne) nei progetti AI agent open-source rispetto alle baseline del software tradizionale.
+    \item Identificare la presenza di antipattern tipici dell'AITD nelle pipeline analizzate.
+    \item Rilevare l'integrazione di pratiche specifiche dell'AgentOps, come l'inserimento di step di CI/CD dedicati al tracing logico, all'A/B testing dei prompt e ai guardrail di sicurezza.
+\end{itemize}
+
+\section{Raccolta Dati}
+Per la raccolta dei dati, il progetto prenderà in esame i repository open-source di agenti AI elencati nella directory \textit{awesome-ai-agents}. Questa selezione garantirà un campione rappresentativo di sistemi agentici allo stato dell'arte. 
+
+Piuttosto che analizzare solo l'ultima versione disponibile delle pipeline, si procederà con l'estrazione dell'intera evoluzione storica dei workflow. Per automatizzare questo processo, verranno utilizzati strumenti sviluppati dalla letteratura scientifica:
+\begin{enumerate}
+    \item \textbf{Estrazione dei file storici:} Utilizzeremo \texttt{gigawork} (Give me GitHub Actions Workflows), uno strumento open-source in Python progettato per estrarre l'intera cronologia dei commit che hanno interessato i file YAML situati nella cartella \texttt{.github/workflows}. Questo permetterà di raccogliere sia i workflow validi che i relativi metadati.
+    \item \textbf{Estrazione delle differenze (Changesets):} Per comprendere la natura delle singole modifiche nel tempo, ci affideremo a \texttt{gawd} (GitHub Actions Workflow Differ). Questo tool Python consente di calcolare le differenze sintattiche tra una versione e la precedente del workflow, categorizzando automaticamente le modifiche in aggiunte, rimozioni, ridenominazioni o alterazioni di entità (come job e step).
+\end{enumerate}
+
+\section{Analisi dei Dati}
+L'analisi dei dati si articolerà in una fase quantitativa (estrazione di metriche) e una fase qualitativa/testuale (ricerca di pattern), confrontando i risultati ottenuti con le baseline fornite dalla letteratura empirica sui progetti tradizionali.
+
+\subsection{Analisi Quantitativa delle Metriche di Base}
+Inizieremo mappando la struttura media delle pipeline CI/CD dei progetti Agent-based. Calcoleremo:
+\begin{itemize}
+    \item Il numero medio di workflow per repository, di job per workflow e di step per job. Valuteremo se questi numeri si discostano significativamente dalla media dei progetti tradizionali (che si attesta su 2,8 workflow, 1,8 job e 4,7 step).
+    \item La frequenza di modifica (change rate) per determinare se la volatilità dei prompt o l'instabilità dei framework LLM portino a un tasso di aggiornamento dei workflow superiore alla media standard (aggiornati in media ogni 159 giorni).
+    \item La percentuale di riutilizzo di Actions esterne dal Marketplace rispetto alla scrittura di script personalizzati diretti (direttiva \texttt{run}), per quantificare un'eventuale propensione al "Glue Code".
+\end{itemize}
+
+\subsection{Analisi Qualitativa: MLOps e AgentOps}
+I cambiamenti estratti tramite \texttt{gawd} e i file YAML grezzi verranno analizzati tramite espressioni regolari e text mining per cercare evidenze di pratiche o "smell" specifici:
+\begin{itemize}
+    \item \textbf{Debito Tecnico AI (AITD):} Identificheremo la presenza di file di configurazione massicci o di \textit{Pipeline Jungles} intrecciati (script complessi di data-preparation nidificati direttamente all'interno dei file YAML).
+    \item \textbf{Tracce di AgentOps:} Cercheremo chiamate specifiche a librerie di \textit{Observability} (es. Langfuse, Traceloop, AgentOps, Arize) che permettono il tracciamento degli \textit{span} di ragionamento e uso dei tool.
+    \item \textbf{Trajectory Evaluation e Guardrails:} Verificheremo se gli step di test (tipicamente concentrati sulla "Task Configuration") si sono evoluti per includere valutazioni step-by-step o valutazioni delle traiettorie decisionali dell'agente, o se vi sono step specifici per l'attivazione e il testing dei \textit{guardrail} per la sicurezza AI.
+\end{itemize}
+
+L'esito di questa metodologia ibrida fornirà un quadro dettagliato di come l'avvento degli AI Agent stia ridefinendo lo standard dell'automazione software e rivelerà quanto le pipeline open-source attuali siano pronte a supportare il paradigma emergente dell'AgentOps.
+
+\end{document}

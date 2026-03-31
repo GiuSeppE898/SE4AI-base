@@ -1,0 +1,37 @@
+name: cd-ui
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - "apps/browser/**"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js 18.15
+      uses: actions/setup-node@v1
+      with:
+        node-version: 18.15
+
+    - name: Install dependencies
+      working-directory: ./apps/browser
+      run: yarn
+
+    - name: Build
+      run: yarn build && mv ./apps/browser/CNAME ./apps/browser/build
+
+    - name: Deploy
+      uses: JamesIves/github-pages-deploy-action@v4
+      with:
+        branch: gh-pages
+        folder: ./apps/browser/build

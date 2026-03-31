@@ -7,6 +7,7 @@ import shutil
 import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
+from collections import defaultdict
 
 ROOT = Path(__file__).resolve().parent
 SOURCE_REPO_DIR = ROOT / "awesome-ai-agents"
@@ -17,26 +18,11 @@ REPORT_CSV = OUTPUT_DIR / "workflows_extraction_report.csv"
 REPOS_CSV = OUTPUT_DIR / "repos_from_awesome_ai_agents.csv"
 SUMMARY_JSON = OUTPUT_DIR / "extraction_summary.json"
 TMP_DIR = ROOT / ".tmp_clones"
+TMP_REPORTS_DIR = ROOT / ".tmp_reports"
 
 REPO_PATTERN = re.compile(r"https://github.com/([A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+)")
 VALID_WORKFLOW_EXTENSIONS = {".yml", ".yaml"}
 INVALID_REPO_OWNERS = {"orgs", "features"}
-
-
-def run_cmd(cmd, cwd=None, env=None):
-    merged_env = os.environ.copy()
-    if env:
-        merged_env.update(env)
-
-    result = subprocess.run(
-        cmd,
-        cwd=cwd,
-        env=merged_env,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        text=True,
-    )
-    return result.returncode, result.stdout.strip(), result.stderr.strip()
 
 
 def extract_repositories(readme_text):
@@ -74,84 +60,107 @@ def write_repos_csv(repos):
 
 
 def clone_and_extract_workflows(repo):
-    clone_dir = TMP_DIR / safe_repo_dir_name(repo)
+    """
+    Extract workflows from a repository using gigawork.
+    Returns metadata about the extraction including workflow count and file locations.
+    """
+    safe_name = safe_repo_dir_name(repo)
+    clone_dir = TMP_DIR / safe_name
+    workflows_output_dir = WORKFLOWS_DIR / safe_name
+    gigawork_report = TMP_REPORTS_DIR / f"{safe_name}.csv"
+
+    # Clean directories
     if clone_dir.exists():
         shutil.rmtree(clone_dir)
+    if workflows_output_dir.exists():
+        shutil.rmtree(workflows_output_dir)
+    
+    workflows_output_dir.mkdir(parents=True, exist_ok=True)
+    TMP_REPORTS_DIR.mkdir(parents=True, exist_ok=True)
 
     clone_url = f"https://github.com/{repo}.git"
-    rc, out, err = run_cmd(
-        [
-            "git",
-            "clone",
-            "--depth",
-            "1",
-            "--filter=blob:none",
-            "--sparse",
-            clone_url,
-            str(clone_dir),
-        ],
-        env={"GIT_LFS_SKIP_SMUDGE": "1"},
-    )
-    if rc != 0:
-        return {
-            "repo": repo,
-            "status": "clone_failed",
-            "error": (err or out)[:500],
-            "workflow_count": 0,
-            "files": [],
-        }
-
-    rc, out, err = run_cmd(["git", "sparse-checkout", "set", ".github/workflows"], cwd=clone_dir)
-    if rc != 0:
-        return {
-            "repo": repo,
-            "status": "sparse_checkout_failed",
-            "error": (err or out)[:500],
-            "workflow_count": 0,
-            "files": [],
-        }
-
-    repo_workflow_dir = clone_dir / ".github" / "workflows"
-    if not repo_workflow_dir.exists():
-        return {
-            "repo": repo,
-            "status": "no_workflows",
-            "error": "",
-            "workflow_count": 0,
-            "files": [],
-        }
-
-    destination_repo_dir = WORKFLOWS_DIR / safe_repo_dir_name(repo)
-    destination_repo_dir.mkdir(parents=True, exist_ok=True)
-
-    copied_files = []
-    for p in sorted(repo_workflow_dir.rglob("*")):
-        if not p.is_file():
-            continue
-        if p.suffix.lower() not in VALID_WORKFLOW_EXTENSIONS:
-            continue
-
-        rel_path = p.relative_to(repo_workflow_dir)
-        dest_file = destination_repo_dir / rel_path
-        dest_file.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(p, dest_file)
-
-        copied_files.append(
-            {
-                "workflow_file": str(rel_path).replace("\\", "/"),
-                "destination_path": str(dest_file.relative_to(ROOT)).replace("\\", "/"),
-                "size_bytes": dest_file.stat().st_size,
-            }
+    
+    # Run gigawork
+    cmd = [
+        "gigawork",
+        clone_url,
+        "-w", str(workflows_output_dir),
+        "-o", str(gigawork_report),
+        "-s", str(clone_dir),
+        "-n", repo,
+        "--no-headers",
+    ]
+    
+    try:
+        result = subprocess.run(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            timeout=300,
         )
-
-    status = "ok" if copied_files else "no_workflow_yaml"
-    return {
-        "repo": repo,
-        "status": status,
-        "error": "",
-        "workflow_count": len(copied_files),
-        "files": copied_files,
-    }
+        
+        if result.returncode != 0:
+            return {
+                "repo": repo,
+                "status": "gigawork_failed",
+                "error": (result.stderr or result.stdout)[:500],
+                "workflow_count": 0,
+                "files": [],
+            }
+        
+        # Count extracted workflow files
+        if not workflows_output_dir.exists():
+            return {
+                "repo": repo,
+                "status": "no_workflows",
+                "error": "",
+                "workflow_count": 0,
+                "files": [],
+            }
+        
+        # Collect workflow files
+        copied_files = []
+        for p in sorted(workflows_output_dir.rglob("*")):
+            if not p.is_file():
+                continue
+            if p.suffix.lower() not in VALID_WORKFLOW_EXTENSIONS:
+                continue
+            
+            copied_files.append(
+                {
+                    "workflow_file": str(p.relative_to(workflows_output_dir)).replace("\\", "/"),
+                    "destination_path": str(p.relative_to(ROOT)).replace("\\", "/"),
+                    "size_bytes": p.stat().st_size,
+                }
+            )
+        
+        status = "ok" if copied_files else "no_workflow_yaml"
+        return {
+            "repo": repo,
+            "status": status,
+            "error": "",
+            "workflow_count": len(copied_files),
+            "files": copied_files,
+            "gigawork_report": str(gigawork_report) if gigawork_report.exists() else None,
+        }
+    
+    except subprocess.TimeoutExpired:
+        return {
+            "repo": repo,
+            "status": "timeout",
+            "error": "Extraction timeout (>5 min)",
+            "workflow_count": 0,
+            "files": [],
+        }
+    except Exception as e:
+        return {
+            "repo": repo,
+            "status": "error",
+            "error": str(e)[:500],
+            "workflow_count": 0,
+            "files": [],
+        }
 
 
 def write_report_csv(results):
@@ -237,24 +246,27 @@ def main():
     ensure_clean_dir(OUTPUT_DIR)
     ensure_clean_dir(WORKFLOWS_DIR)
     ensure_clean_dir(TMP_DIR)
+    ensure_clean_dir(TMP_REPORTS_DIR)
 
     write_repos_csv(repos)
 
     results = []
     for idx, repo in enumerate(repos, start=1):
-        print(f"[{idx}/{len(repos)}] Estrazione workflows da {repo}")
+        print(f"[{idx}/{len(repos)}] Estrazione workflows da {repo} (con gigawork)")
         result = clone_and_extract_workflows(repo)
         results.append(result)
 
     write_report_csv(results)
     write_summary(results)
 
+    # Cleanup
     shutil.rmtree(TMP_DIR, ignore_errors=True)
+    shutil.rmtree(TMP_REPORTS_DIR, ignore_errors=True)
 
     total_workflows = sum(r["workflow_count"] for r in results)
-    print("\nEstrazione completata")
+    print("\nEstrazione completata (gigawork)")
     print(f"Repository processati: {len(results)}")
-    print(f"File workflow estratti: {total_workflows}")
+    print(f"Workflow files estratti: {total_workflows}")
     print(f"Report CSV: {REPORT_CSV}")
     print(f"Summary JSON: {SUMMARY_JSON}")
 

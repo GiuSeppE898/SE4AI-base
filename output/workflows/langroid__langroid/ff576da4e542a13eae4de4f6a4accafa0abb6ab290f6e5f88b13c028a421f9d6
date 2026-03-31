@@ -1,0 +1,55 @@
+name: Pytest
+
+on:
+  push:
+    branches:
+      - main  # Replace with your default branch name
+  pull_request:
+    branches:
+      - main  # Replace with your default branch name
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_KEY }}
+      GITHUB_ACCESS_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }}
+
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.11  # Replace with your desired Python version
+
+    - name: Install Poetry
+      uses: snok/install-poetry@v1
+
+#    - name: Install Poetry
+#      run: |
+#        curl -sSL https://install.python-poetry.org | python3 -
+
+    - name: Install dependencies
+      run: |
+        echo "$HOME/.local/bin" >> $GITHUB_PATH
+        poetry install
+
+#    - name: Run pytest
+#      run: |
+#        poetry run pytest
+
+    - name: Run tests with coverage
+      run: |
+        coverage run --source=llmagent -m pytest
+        coverage report
+    - name: Generate HTML coverage report
+      run: |
+        coverage html
+    - name: Upload coverage report as artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: htmlcov
+        path: htmlcov/
+

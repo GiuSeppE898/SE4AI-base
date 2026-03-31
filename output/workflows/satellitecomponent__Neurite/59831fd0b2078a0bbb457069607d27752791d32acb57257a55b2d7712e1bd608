@@ -1,0 +1,84 @@
+name: Localhost Servers Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: "'draft' (default) or 'final'"
+        required: false
+        default: draft
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 20
+
+
+    - name: Generate version & tag
+      id: version
+      run: |
+        timestamp=$(date +'%Y.%m.%d.%H%M%S')
+        echo "timestamp=$timestamp"   >> "$GITHUB_OUTPUT"
+        echo "tag=servers-$timestamp" >> "$GITHUB_OUTPUT"
+
+    - name: npm install (root localhost_servers)
+      run: |
+        echo "→ npm install --omit=dev in localhost_servers/"
+        npm install --omit=dev --prefix localhost_servers
+
+    - name: npm install in each service dir
+      run: |
+        set -e
+        srv_json="localhost_servers/servers.json"
+
+        mapfile -t DIRS < <(
+          jq -r '.[] | select(.startNeurite|not) | .dir' "$srv_json"
+        )
+
+        for dir in "${DIRS[@]}"; do
+          echo "→ npm install --omit=dev in localhost_servers/$dir"
+          npm install --omit=dev --prefix "localhost_servers/$dir"
+        done
+
+    - name: Archive localhost_servers
+      run: |
+        mkdir -p release
+        zip -r release/servers.zip localhost_servers \
+          -x "*.git*" ".gitignore"
+
+    - name: Auth GH CLI
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: gh auth login --with-token <<<"${GH_TOKEN}"
+
+    - name: Create GitHub release
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        if [ "${{ github.event.inputs.release_type }}" = "draft" ]; then
+          gh release create "${{ steps.version.outputs.tag }}" release/servers.zip \
+            --draft \
+            --title "Localhost Servers ${{ steps.version.outputs.timestamp }}" \
+            --notes "Draft bundle of Neurite localhost servers (pre-installed node_modules)."
+        else
+          gh release create "${{ steps.version.outputs.tag }}" release/servers.zip \
+            --title "Localhost Servers ${{ steps.version.outputs.timestamp }}" \
+            --notes "Production bundle of Neurite localhost servers (pre-installed node_modules)."
+        fi
+    - name: Delete old servers-* releases
+      if: ${{ github.event.inputs.release_type != 'draft' }}
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh release list --limit 100 --json tagName,createdAt \
+        | jq -r '.[] | select(.tagName | startswith("servers-")) | "\(.createdAt) \(.tagName)"' \
+        | sort -r \
+        | tail -n +2 \
+        | awk '{print $2}' \
+        | xargs -r -n 1 gh release delete -y

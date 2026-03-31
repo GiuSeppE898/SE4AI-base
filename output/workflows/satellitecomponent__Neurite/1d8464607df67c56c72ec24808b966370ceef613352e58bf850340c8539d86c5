@@ -1,0 +1,95 @@
+name: Localhost Servers Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: 'Release type (draft or final)'
+        required: false
+        default: 'draft'
+
+permissions:
+  contents: write
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      timestamp: ${{ steps.setver.outputs.timestamp }}
+      tag: ${{ steps.setver.outputs.tag }}
+      draft: ${{ steps.setver.outputs.draft }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Set timestamped version
+        id: setver
+        run: |
+          timestamp=$(date +'%Y.%m.%d.%H%M%S')
+          echo "timestamp=$timestamp" >> $GITHUB_OUTPUT
+          echo "tag=servers-$timestamp" >> $GITHUB_OUTPUT
+
+          if [[ "${{ github.event.inputs.release_type }}" == "final" ]]; then
+            echo "draft=false" >> $GITHUB_OUTPUT
+          else
+            echo "draft=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Install root dependencies
+        run: npm install
+        working-directory: ./localhost_servers
+
+      - name: Read servers.json and install per server
+        run: |
+          jq -c '.[]' localhost_servers/servers.json | while read -r server; do
+            dir=$(echo "$server" | jq -r '.dir')
+            skip=$(echo "$server" | jq -r '.startNeurite')
+            if [[ "$skip" != "true" ]]; then
+              echo "Installing $dir"
+              npm install --prefix "localhost_servers/$dir"
+            else
+              echo "Skipping $dir (startNeurite=true)"
+            fi
+          done
+
+      - name: Create servers.zip
+        run: |
+          mkdir release
+          zip -r release/servers.zip localhost_servers -x '*.DS_Store'
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: localhost-servers
+          path: release/servers.zip
+
+  release:
+    needs: prepare
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: localhost-servers
+          path: dist
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ needs.prepare.outputs.tag }}
+          name: Localhost Servers ${{ needs.prepare.outputs.timestamp }}
+          body: |
+            Pre-built localhost servers for Neurite (${{
+              needs.prepare.outputs.timestamp }}).
+
+            All dependencies installed (including root).
+          draft: ${{ needs.prepare.outputs.draft }}
+          files: dist/servers.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

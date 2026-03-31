@@ -1,0 +1,59 @@
+name: Server Unit Tests
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "flake.*"
+      - "server/**"
+      - ".github/workflows/server**"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  clippy-test:
+    runs-on: nixos
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create LFS file list
+        run: git lfs ls-files --long | cut -d ' ' -f1 | sort > .lfs-assets-id
+
+      - name: LFS Cache
+        uses: actions/cache@v3
+        with:
+          path: .git/lfs/objects
+          key: ${{ runner.os }}-lfs-${{ hashFiles('.lfs-assets-id') }}
+          restore-keys: |
+            ${{ runner.os }}-lfs-
+
+      - name: Git LFS Pull
+        run: git lfs install && git lfs pull
+
+      - name: Load PATH changes
+        run: direnv allow && direnv exec . sh -c 'echo $PATH' > "$GITHUB_PATH"
+
+      - name: Load other environment changes
+        run: direnv export gha >> "$GITHUB_ENV"        
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Rustfmt
+        run: cargo --locked fmt -p bleep -- --check
+
+      - name: Clippy
+        run: cargo --locked clippy -p bleep --features=ee-pro,ee-cloud
+
+      - name: Tests
+        run: cargo --locked test -p bleep --release
+
+      - name: Sccache stats
+        run: sccache --show-stats

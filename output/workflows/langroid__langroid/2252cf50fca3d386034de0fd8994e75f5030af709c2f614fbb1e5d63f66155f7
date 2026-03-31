@@ -1,0 +1,60 @@
+name: Pytest
+
+on:
+  push:
+    branches:
+      - main  # Replace with your default branch name 
+  pull_request:
+    branches:
+      - main  # Replace with your default branch name
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_KEY }}
+      GITHUB_ACCESS_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }}
+      REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+      REDIS_HOST: ${{ secrets.REDIS_HOST }}
+      REDIS_PORT: ${{ secrets.REDIS_PORT }}
+      QDRANT_API_KEY: ${{ secrets.QDRANT_API_KEY }}
+      QDRANT_API_URL: ${{ secrets.QDRANT_API_URL }}
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.11  # Replace with your desired Python version
+
+    - name: Install Poetry
+      uses: Gr1N/setup-poetry@v8
+
+    - name: Install Poetry dependencies
+      run: |
+        poetry --version
+        echo "$HOME/.local/bin" >> $GITHUB_PATH
+        python -m pip install --upgrade pip
+        
+        poetry install
+
+    - name: Run tests with coverage
+      run: |
+        poetry run coverage run --source=langroid -m pytest tests/main
+        poetry run coverage report
+    - name: Generate XML coverage report
+      run: |
+        poetry run coverage xml
+    - name: Upload coverage to Codecov
+      uses: actions/codecov-action@v2
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
