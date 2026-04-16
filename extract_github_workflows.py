@@ -7,7 +7,6 @@ import shutil
 import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
-from collections import defaultdict
 
 ROOT = Path(__file__).resolve().parent
 SOURCE_REPO_DIR = ROOT / "awesome-ai-agents"
@@ -21,7 +20,6 @@ TMP_DIR = ROOT / ".tmp_clones"
 TMP_REPORTS_DIR = ROOT / ".tmp_reports"
 
 REPO_PATTERN = re.compile(r"https://github.com/([A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+)")
-VALID_WORKFLOW_EXTENSIONS = {".yml", ".yaml"}
 INVALID_REPO_OWNERS = {"orgs", "features"}
 
 
@@ -120,11 +118,10 @@ def clone_and_extract_workflows(repo):
             }
         
         # Collect workflow files
+        # gigawork salva i file senza estensione, con nome = commit hash
         copied_files = []
         for p in sorted(workflows_output_dir.rglob("*")):
             if not p.is_file():
-                continue
-            if p.suffix.lower() not in VALID_WORKFLOW_EXTENSIONS:
                 continue
             
             copied_files.append(
@@ -135,7 +132,7 @@ def clone_and_extract_workflows(repo):
                 }
             )
         
-        status = "ok" if copied_files else "no_workflow_yaml"
+        status = "ok" if copied_files else "no_workflow_files"
         return {
             "repo": repo,
             "status": status,
