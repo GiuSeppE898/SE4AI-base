@@ -16,7 +16,8 @@ def clone_repository(repo_url, destination_folder):
         return f"SKIP già presente: {destination_folder}"
 
     try:
-        subprocess.run(["git", "clone", repo_url, destination_folder], check=True)
+        subprocess.run(["git", "clone", repo_url,
+                       destination_folder], check=True)
         return f"OK clonata: {repo_url}"
     except subprocess.CalledProcessError as e:
         return f"ERR clone {repo_url} -> {e}"
@@ -49,7 +50,8 @@ def normalize_github_repo_url(url: str) -> str | None:
     owner, repo = parts[0], parts[1]
 
     # Esclude pagine non-repository
-    excluded_first_parts = {"orgs", "features", "marketplace", "topics", "collections", "apps", "settings"}
+    excluded_first_parts = {"orgs", "features", "marketplace",
+                            "topics", "collections", "apps", "settings"}
     if owner in excluded_first_parts:
         return None
 
@@ -66,7 +68,8 @@ def extract_github_repo_urls(readme_content: str) -> list[str]:
     if not open_source_section:
         return []
 
-    markdown_links = re.findall(r"\[[^\]]+\]\((https?://[^)\s]+)\)", open_source_section)
+    markdown_links = re.findall(
+        r"\[[^\]]+\]\((https?://[^)\s]+)\)", open_source_section)
 
     repo_urls = []
     seen = set()
