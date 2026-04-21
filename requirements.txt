@@ -2,3 +2,5 @@ requests
 gigawork
 pandas
 PyGithub
+pyyaml
+matplotlib
