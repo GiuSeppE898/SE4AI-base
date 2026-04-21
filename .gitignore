@@ -4,3 +4,4 @@ gigawork/all_workflows
 output/
 repositories/
 .env
+.DS_Store
