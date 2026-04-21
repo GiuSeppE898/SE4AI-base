@@ -1,1 +1,1 @@
-RQ1: Quali sono i building blocks più comuni in progetti di agenti AI?
+RQ1: Quali sono i building blocks più comuni nei workflows degli agenti AI?
