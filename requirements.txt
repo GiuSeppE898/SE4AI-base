@@ -4,3 +4,5 @@ pandas
 PyGithub
 pyyaml
 matplotlib
+skitlearn
+seaborn
