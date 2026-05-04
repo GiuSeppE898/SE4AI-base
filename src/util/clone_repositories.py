@@ -7,8 +7,9 @@ from urllib.parse import urlparse
 import requests
 
 # link del readme con la lista delle repo
-GITHUB_README_URL = "https://raw.githubusercontent.com/e2b-dev/awesome-ai-agents/main/README.md"
-MAX_WORKERS = 5
+# GITHUB_README_URL = "https://raw.githubusercontent.com/e2b-dev/awesome-ai-agents/main/README.md"
+GITHUB_README_URL = "https://raw.githubusercontent.com/md8-habibullah/top-github-repos-list/refs/heads/main/README.md"
+MAX_WORKERS = 10
 
 
 def clone_repository(repo_url, destination_folder):
@@ -63,8 +64,12 @@ def normalize_github_repo_url(url: str) -> str | None:
     return f"https://github.com/{owner}/{repo}.git"
 
 
-def extract_github_repo_urls(readme_content: str) -> list[str]:
-    open_source_section = extract_open_source_section(readme_content)
+def extract_github_repo_urls(readme_content: str, extract_oss: bool = True) -> list[str]:
+    if extract_oss:
+        open_source_section = extract_open_source_section(readme_content)
+    else:
+        open_source_section = readme_content
+
     if not open_source_section:
         return []
 
@@ -89,11 +94,11 @@ def repo_destination_folder(repo_url: str) -> str:
     owner = parts[0]
     repo = parts[1].replace(".git", "")
     # evita collisioni tra owner diversi con stesso nome repo
-    return os.path.join("repositories", f"{owner}__{repo}")
+    return os.path.join("non_agentic_repositories", f"{owner}__{repo}")
 
 
 def main():
-    os.makedirs("repositories", exist_ok=True)
+    os.makedirs("non_agentic_repositories", exist_ok=True)
 
     response = requests.get(GITHUB_README_URL, timeout=30)
     if response.status_code != 200:
@@ -101,7 +106,7 @@ def main():
         return
 
     readme_content = response.text
-    repo_urls = extract_github_repo_urls(readme_content)
+    repo_urls = extract_github_repo_urls(readme_content, extract_oss=False)
 
     print(f"Repository trovate: {len(repo_urls)}")
 

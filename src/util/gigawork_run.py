@@ -2,8 +2,8 @@ import os
 import subprocess
 import pandas as pd
 
-REPO_FOLDER = "C:\\dev\\SE4AI-base\\repositories"
-BASE_OUTPUT_DIR = "gigawork"
+REPO_FOLDER = "C:\\dev\\SE4AI-base\\non_agentic_repositories"
+BASE_OUTPUT_DIR = "gigawork_non_agentic_results"
 ALL_WORKFLOWS_DIR = os.path.join(BASE_OUTPUT_DIR, "all_workflows")
 
 os.makedirs(ALL_WORKFLOWS_DIR, exist_ok=True)

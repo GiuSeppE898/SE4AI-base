@@ -3,5 +3,8 @@ awesome-ai-agents/
 gigawork/all_workflows
 output/
 repositories/
+non_agentic_repositories/
+gigawork_non_agentic_results/
 .env
 .DS_Store
+results/
