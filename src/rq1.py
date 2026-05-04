@@ -8,16 +8,23 @@ import matplotlib.pyplot as plt
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-DATASET_PATH = PROJECT_ROOT / "gigawork_non_agentic_results" / "dataset_with_ids.csv"
-BASE_GIGAWORK_PATH = PROJECT_ROOT / \
-    "gigawork_non_agentic_results" / "all_workflows"
-RESULTS_FOLDER = PROJECT_ROOT / "results" / "rq1_non_agentic"
+RESULTS_FOLDER = PROJECT_ROOT / "results" / "rq1"
 
 
-def plot_pie_chart(counter, title, output_path=None):
+def build_color_map(labels):
+    cmap = plt.get_cmap("tab20")
+    colors = [cmap(i % cmap.N) for i in range(len(labels))]
+    return dict(zip(labels, colors))
+
+
+def plot_pie_chart(counter, title, output_path=None, color_map=None):
+    if not counter:
+        return
     labels, values = zip(*counter.most_common(10))
     plt.figure(figsize=(8, 8))
-    plt.pie(values, labels=labels, autopct="%1.1f%%", startangle=140)
+    colors = [color_map.get(label) for label in labels] if color_map else None
+    plt.pie(values, labels=labels, autopct="%1.1f%%",
+            startangle=140, colors=colors)
     plt.title(title)
     plt.axis("equal")
     if output_path:
@@ -25,18 +32,10 @@ def plot_pie_chart(counter, title, output_path=None):
     # plt.show()
 
 
-def main() -> None:
-    # RQ1: Quali sono i building blocks piu comuni nei workflows degli agenti AI?
-    # suggerimento del prof: I task/action piu usati (uses: actions/checkout@v3,
-    # uses: actions/setup-python@v4, ecc.) — capire quali sono le building block
-    # piu comuni in questi progetti
-
+def run_dataset(label, dataset_path, workflows_path):
     random.seed(69)
-
-    RESULTS_FOLDER.mkdir(parents=True, exist_ok=True)
     text_lines = []
-
-    df = pd.read_csv(DATASET_PATH)
+    df = pd.read_csv(dataset_path)
 
     repositories = df.groupby("repository")
 
@@ -80,7 +79,7 @@ def main() -> None:
         repo_actions = Counter()
 
         for file in files:
-            path = BASE_GIGAWORK_PATH / repo / file
+            path = workflows_path / repo / file
             try:
                 with open(path, "r", encoding="utf-8") as f:
                     data = yaml.safe_load(f)
@@ -117,33 +116,102 @@ def main() -> None:
     text_lines.append("stats_per_repo:")
     text_lines.append(repr(stats_per_repo))
 
-    # grafico a torta per total_uses_counter_unique e total_uses_counter con almeno 10 utilizzi
-    plot_pie_chart(
-        total_uses_counter_unique,
-        "Top 10 Unique Actions Used in GitHub Workflows",
-        RESULTS_FOLDER / "top_10_unique_actions.png",
-    )
-    plot_pie_chart(
-        total_uses_counter,
-        "Top 10 Actions Used in GitHub Workflows (with versions)",
-        RESULTS_FOLDER / "top_10_actions_versions.png",
-    )
+    return {
+        "label": label,
+        "text_lines": text_lines,
+        "total_uses_counter": total_uses_counter,
+        "total_uses_counter_unique": total_uses_counter_unique,
+        "most_used_languages": most_used_languages,
+        "most_used_languages_version": most_used_languages_version,
+    }
 
-    plot_pie_chart(
-        most_used_languages,
-        "Top 10 Unique Languages Used in GitHub AI Repos",
-        RESULTS_FOLDER / "top_10_languages.png",
-    )
-    plot_pie_chart(
-        most_used_languages_version,
-        "Top 10 Languages Used in GitHub AI Repos (with versions)",
-        RESULTS_FOLDER / "top_10_languages_versions.png",
-    )
 
-    (RESULTS_FOLDER / "rq1_results.txt").write_text(
-        "\n".join(text_lines),
-        encoding="utf-8",
+def main() -> None:
+    RESULTS_FOLDER.mkdir(parents=True, exist_ok=True)
+
+    configs = [
+        {
+            "label": "A",
+            "dataset_path": PROJECT_ROOT / "gigawork" / "dataset_with_ids.csv",
+            "workflows_path": PROJECT_ROOT / "gigawork" / "all_workflows",
+        },
+        {
+            "label": "N.A.",
+            "dataset_path": PROJECT_ROOT / "gigawork_non_agentic_results" / "dataset_with_ids.csv",
+            "workflows_path": PROJECT_ROOT / "gigawork_non_agentic_results" / "all_workflows",
+        },
+    ]
+
+    results = {}
+    for cfg in configs:
+        data = run_dataset(
+            cfg["label"], cfg["dataset_path"], cfg["workflows_path"])
+        results[cfg["label"]] = data
+        (RESULTS_FOLDER / f"rq1_results_({cfg['label']}).txt").write_text(
+            "\n".join(data["text_lines"]),
+            encoding="utf-8",
+        )
+
+    def top_labels(counter):
+        return [k for k, _ in counter.most_common(10)]
+
+    unique_action_labels = sorted(
+        set(
+            top_labels(results["A"]["total_uses_counter_unique"]) +
+            top_labels(results["N.A."]["total_uses_counter_unique"])
+        )
     )
+    unique_action_colors = build_color_map(unique_action_labels)
+
+    action_version_labels = sorted(
+        set(
+            top_labels(results["A"]["total_uses_counter"]) +
+            top_labels(results["N.A."]["total_uses_counter"])
+        )
+    )
+    action_version_colors = build_color_map(action_version_labels)
+
+    language_labels = sorted(
+        set(
+            top_labels(results["A"]["most_used_languages"]) +
+            top_labels(results["N.A."]["most_used_languages"])
+        )
+    )
+    language_colors = build_color_map(language_labels)
+
+    language_version_labels = sorted(
+        set(
+            top_labels(results["A"]["most_used_languages_version"]) +
+            top_labels(results["N.A."]["most_used_languages_version"])
+        )
+    )
+    language_version_colors = build_color_map(language_version_labels)
+
+    for label, data in results.items():
+        plot_pie_chart(
+            data["total_uses_counter_unique"],
+            f"Top 10 Unique Actions Used in GitHub Workflows ({label})",
+            RESULTS_FOLDER / f"top_10_unique_actions_({label}).png",
+            unique_action_colors,
+        )
+        plot_pie_chart(
+            data["total_uses_counter"],
+            f"Top 10 Actions Used in GitHub Workflows (with versions) ({label})",
+            RESULTS_FOLDER / f"top_10_actions_versions_({label}).png",
+            action_version_colors,
+        )
+        plot_pie_chart(
+            data["most_used_languages"],
+            f"Top 10 Unique Languages Used in GitHub AI Repos ({label})",
+            RESULTS_FOLDER / f"top_10_languages_({label}).png",
+            language_colors,
+        )
+        plot_pie_chart(
+            data["most_used_languages_version"],
+            f"Top 10 Languages Used in GitHub AI Repos (with versions) ({label})",
+            RESULTS_FOLDER / f"top_10_languages_versions_({label}).png",
+            language_version_colors,
+        )
 
 
 if __name__ == "__main__":

@@ -9,10 +9,7 @@ import yaml
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-DATASET_PATH = PROJECT_ROOT / "gigawork_non_agentic_results" / "dataset_with_ids.csv"
-BASE_GIGAWORK_PATH = PROJECT_ROOT / \
-    "gigawork_non_agentic_results" / "all_workflows"
-RESULTS_FOLDER = PROJECT_ROOT / "results" / "rq2_non_agentic"
+RESULTS_FOLDER = PROJECT_ROOT / "results" / "rq2"
 
 
 def get_on_section(workflow_dict):
@@ -167,7 +164,8 @@ def plot_job_category_pie(
         legend_title="Categorie",
         figsize=(10, 8),
         startangle=140,
-    output_path=None,
+        output_path=None,
+        color_map=None,
 ):
     labels = list(grouped_data.keys())
     values = [v["total"] for v in grouped_data.values()]
@@ -175,12 +173,14 @@ def plot_job_category_pie(
 
     fig, ax = plt.subplots(figsize=figsize)
 
+    colors = [color_map.get(label) for label in labels] if color_map else None
     wedges, _, _ = ax.pie(
         values,
         startangle=startangle,
         autopct=lambda p: f"{p:.1f}%",
         pctdistance=0.75,
         wedgeprops={"edgecolor": "white", "linewidth": 1},
+        colors=colors,
     )
 
     legend_labels = [
@@ -223,16 +223,15 @@ def bar_chart(ax, labels, values, color):
     ax.set_xlim(0, max(values) * 1.12)
 
 
-def main() -> None:
-    # RQ2: Trigger dei workflow (on: push, on: pull_request, on: schedule...)
-    # capire come questi sistemi AI vengono integrati e testati e in quali step di workflow
-    # nb: sostanzialmente estraendo questi dati e prendendo le top keywords,
-    # vogliamo capire QUANDO i workflows vengono triggerati in queste repositories.
+def build_color_map(labels):
+    cmap = plt.get_cmap("tab20")
+    colors = [cmap(i % cmap.N) for i in range(len(labels))]
+    return dict(zip(labels, colors))
 
-    RESULTS_FOLDER.mkdir(parents=True, exist_ok=True)
+
+def analyze_dataset(dataset_path, workflows_path):
     text_lines = []
-
-    df = pd.read_csv(DATASET_PATH)
+    df = pd.read_csv(dataset_path)
 
     repositories = df.groupby("repository")
 
@@ -270,7 +269,7 @@ def main() -> None:
         repo_triggers = Counter()
 
         for file in files:
-            path = BASE_GIGAWORK_PATH / repo / file
+            path = workflows_path / repo / file
             try:
                 with open(path, "r", encoding="utf-8") as f:
                     data = yaml.safe_load(f)
@@ -318,35 +317,6 @@ def main() -> None:
     text_lines.append("trigger_percentage_df:")
     text_lines.append(trigger_percentage_df.to_string(index=False))
 
-    # Grafici
-    TOP_N = 20
-    top_total = total_trigger_counter_unique.most_common(TOP_N)
-    labels_total, values_total = zip(*top_total)
-
-    fig, ax = plt.subplots(figsize=(16, 6))
-    fig.suptitle(
-        f"GitHub Actions - top {TOP_N} triggers (sull'ultima versione di ogni file)",
-        fontsize=15,
-        fontweight="bold",
-        y=1.02,
-    )
-
-    bar_chart(
-        ax,
-        labels_total,
-        values_total,
-        "#4C72B0",
-    )
-
-    plt.tight_layout()
-    fig.savefig(RESULTS_FOLDER / "triggers_distribution.png",
-                dpi=150, bbox_inches="tight")
-    # plt.show()
-
-    # successivamente andremo ad analizzare quali sono le azioni piu effettuate durante ciascuno
-    # dei trigger, in modo da capire meglio cosa viene effettuato e quando.
-
-    # trigger -> {total: int, jobs_counter: Counter}
     trigger_stats = defaultdict(
         lambda: {"total": 0, "jobs_counter": Counter()})
 
@@ -355,7 +325,7 @@ def main() -> None:
                                  == repo, "files"].values[0]
 
         for file in files:
-            path = BASE_GIGAWORK_PATH / repo / file
+            path = workflows_path / repo / file
 
             try:
                 with open(path, "r", encoding="utf-8") as f:
@@ -389,25 +359,16 @@ def main() -> None:
         )
     }
 
-    # analizziamo cio che succede durante uno schedule
+    grouped_by_trigger = {}
     if "schedule" in result and "most_associated_keywords" in result["schedule"]:
         text_lines.append("schedule most_associated_keywords:")
         text_lines.append(repr(result["schedule"]["most_associated_keywords"]))
-
-        # raggruppamento in categorie dei job, per capire meglio cosa viene fatto nei workflow
-        # associati a schedule
         generic_grouped = group_jobs_generic(
             result["schedule"]["most_associated_keywords"])
         text_lines.append("schedule grouped:")
         text_lines.append(repr(generic_grouped))
+        grouped_by_trigger["schedule"] = generic_grouped
 
-        plot_job_category_pie(
-            generic_grouped,
-            title="Distribuzione categorie job per trigger schedule",
-            output_path=RESULTS_FOLDER / "schedule_job_categories.png",
-        )
-
-    # analizziamo cosa succede nei push
     if "push" in result and "most_associated_keywords" in result["push"]:
         push_grouped = group_jobs_generic(
             result["push"]["most_associated_keywords"],
@@ -415,12 +376,7 @@ def main() -> None:
         )
         text_lines.append("push grouped:")
         text_lines.append(repr(push_grouped))
-
-        plot_job_category_pie(
-            push_grouped,
-            title="Distribuzione categorie job per trigger push",
-            output_path=RESULTS_FOLDER / "push_job_categories.png",
-        )
+        grouped_by_trigger["push"] = push_grouped
 
     if "pull_request" in result and "most_associated_keywords" in result["pull_request"]:
         pr_grouped = group_jobs_generic(
@@ -429,12 +385,7 @@ def main() -> None:
         )
         text_lines.append("pull_request grouped:")
         text_lines.append(repr(pr_grouped))
-
-        plot_job_category_pie(
-            pr_grouped,
-            title="Distribuzione categorie job per trigger push",
-            output_path=RESULTS_FOLDER / "pull_request_job_categories.png",
-        )
+        grouped_by_trigger["pull_request"] = pr_grouped
 
     if "workflow_dispatch" in result and "most_associated_keywords" in result["workflow_dispatch"]:
         wdispatch_grouped = group_jobs_generic(
@@ -443,17 +394,85 @@ def main() -> None:
         )
         text_lines.append("workflow_dispatch grouped:")
         text_lines.append(repr(wdispatch_grouped))
+        grouped_by_trigger["workflow_dispatch"] = wdispatch_grouped
 
-        plot_job_category_pie(
-            wdispatch_grouped,
-            title="Distribuzione categorie job per trigger workflow_dispatch",
-            output_path=RESULTS_FOLDER / "workflow_dispatch_job_categories.png",
+    return {
+        "text_lines": text_lines,
+        "total_trigger_counter_unique": total_trigger_counter_unique,
+        "trigger_percentage_df": trigger_percentage_df,
+        "grouped_by_trigger": grouped_by_trigger,
+    }
+
+
+def main() -> None:
+    RESULTS_FOLDER.mkdir(parents=True, exist_ok=True)
+
+    configs = [
+        {
+            "label": "A",
+            "dataset_path": PROJECT_ROOT / "gigawork" / "dataset_with_ids.csv",
+            "workflows_path": PROJECT_ROOT / "gigawork" / "all_workflows",
+        },
+        {
+            "label": "N.A.",
+            "dataset_path": PROJECT_ROOT / "gigawork_non_agentic_results" / "dataset_with_ids.csv",
+            "workflows_path": PROJECT_ROOT / "gigawork_non_agentic_results" / "all_workflows",
+        },
+    ]
+
+    results = {}
+    for cfg in configs:
+        data = analyze_dataset(cfg["dataset_path"], cfg["workflows_path"])
+        results[cfg["label"]] = data
+        (RESULTS_FOLDER / f"rq2_results_({cfg['label']}).txt").write_text(
+            "\n".join(data["text_lines"]),
+            encoding="utf-8",
         )
 
-    (RESULTS_FOLDER / "rq2_results.txt").write_text(
-        "\n".join(text_lines),
-        encoding="utf-8",
-    )
+    TOP_N = 20
+    for label, data in results.items():
+        if not data["total_trigger_counter_unique"]:
+            continue
+        top_total = data["total_trigger_counter_unique"].most_common(TOP_N)
+        labels_total, values_total = zip(*top_total)
+        fig, ax = plt.subplots(figsize=(16, 6))
+        fig.suptitle(
+            f"GitHub Actions - top {TOP_N} triggers (sull'ultima versione di ogni file) ({label})",
+            fontsize=15,
+            fontweight="bold",
+            y=1.02,
+        )
+        bar_chart(
+            ax,
+            labels_total,
+            values_total,
+            "#4C72B0",
+        )
+        plt.tight_layout()
+        fig.savefig(RESULTS_FOLDER / f"triggers_distribution_({label}).png",
+                    dpi=150, bbox_inches="tight")
+
+    triggers = ["schedule", "push", "pull_request", "workflow_dispatch"]
+    for trigger in triggers:
+        combined_labels = set()
+        for data in results.values():
+            grouped = data["grouped_by_trigger"].get(trigger)
+            if grouped:
+                combined_labels.update(grouped.keys())
+        if not combined_labels:
+            continue
+        color_map = build_color_map(sorted(combined_labels))
+        for label, data in results.items():
+            grouped = data["grouped_by_trigger"].get(trigger)
+            if not grouped:
+                continue
+            plot_job_category_pie(
+                grouped,
+                title=f"Distribuzione categorie job per trigger {trigger} ({label})",
+                output_path=RESULTS_FOLDER /
+                f"{trigger}_job_categories_({label}).png",
+                color_map=color_map,
+            )
 
 
 if __name__ == "__main__":
