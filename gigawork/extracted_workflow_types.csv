@@ -1145,7 +1145,7 @@ f82159009ea8e8991eabd0d2291687617da54856af43d81f6947ad6b912cbb4e,build,"{env: {P
         \ cache list --repo \""${{ github.repository }}\"" --limit 1 --json id | jq\
         \ length)\nif [ \""$REMAINING_CACHES\"" -ne 0 ]; then\n  echo \""Warning: $REMAINING_CACHES\
         \ caches remain\""\nfi""}], timeout-minutes: 10}
-",['unknown'],no_ops,HumanSignal__Adala
+",['unknown'],lint_security,HumanSignal__Adala
 4cb1eced2064c47ef84a9b4a785c00d26bc730cc49345659a7fd54c1b731fe5a,slashCommandDispatch,"{if: 'startsWith(github.event.comment.body, ''/'')', runs-on: ubuntu-latest, steps: [
     {uses: hmarr/debug-action@v3.0.0}, {name: React to comment, uses: peter-evans/create-or-update-comment@v5,
       with: {comment-id: '${{ github.event.comment.id }}', reactions: eyes, token: '${{
