@@ -18,7 +18,7 @@ file_hash,job_name,job,SUGGESTED_WORKFLOW_TYPE,workflow_type,repository
       with: {days-before-stale: 60, stale-issue-message: This issue has been automatically
           marked as stale because it has not had recent activity. It will be closed
           if no further activity occurs.}}]}
-",['unknown'],linit_security,AntonOsika__gpt-engineer
+",['unknown'],lint_security,AntonOsika__gpt-engineer
 b49b58057bd39fccb7df78f7213d805bd534811a812b78b659219256fd74f513,build,"{runs-on: ubuntu-latest, steps: [{uses: actions/checkout@v3}, {uses: actions/setup-python@v4,
       with: {python-version: '${{ matrix.python-version }}'}}, {name: Install Poetry,
       run: 'curl -sSL https://install.python-poetry.org | python3 -
@@ -52,7 +52,7 @@ b49b58057bd39fccb7df78f7213d805bd534811a812b78b659219256fd74f513,publish,"{envir
       run: cargo --locked test -p bloop --release}]}
 ",['unknown'],test,BloopAI__bloop
 37b6bb9c0904d4a136da75fce3f6d7481158fd88e6403ab2dcd5b7f995a0a173,test,"{runs-on: ubuntu-latest, steps: [{run: 'echo ""No checks required"" '}]}
-",['lint'],no ops,BloopAI__bloop
+",['lint'],no_ops,BloopAI__bloop
 37b6bb9c0904d4a136da75fce3f6d7481158fd88e6403ab2dcd5b7f995a0a173,fmt-clippy-build,"{runs-on: ubuntu-latest, steps: [{run: 'echo ""No checks required"" '}]}
 ",['lint'],no_ops,BloopAI__bloop
 37b6bb9c0904d4a136da75fce3f6d7481158fd88e6403ab2dcd5b7f995a0a173,build-client,"{runs-on: ubuntu-latest, steps: [{name: Checkout, uses: actions/checkout@v4, with: {
@@ -60,7 +60,7 @@ b49b58057bd39fccb7df78f7213d805bd534811a812b78b659219256fd74f513,publish,"{envir
         cache: npm, node-version: 16}}, {name: Install dependencies, run: npm ci},
     {name: Run lint, run: npm run lint}, {name: Run type-check, run: npm run client-type-check},
     {name: Run tests, run: npm --prefix client run test}]}
-",['lint'],"linit_security|test",BloopAI__bloop
+",['lint'],"lint_security|test",BloopAI__bloop
 5147a4948766bb4b952be4dd6b74f2a4acba2daa054479d6ee09dc002c0c5952,build-and-sign-tauri,"{env: {ORT_LIB_LOCATION: '${{ github.workspace }}/lib/${{ matrix.target }}/onnxruntime'},
   runs-on: '${{ matrix.name }}', steps: [{if: matrix.name == 'ubuntu-20.04', uses: pierotofy/set-swap-space@v1.0,
       with: {swap-size-gb: 10}}, {name: Checkout code, uses: actions/checkout@v4,
@@ -177,7 +177,7 @@ b49b58057bd39fccb7df78f7213d805bd534811a812b78b659219256fd74f513,publish,"{envir
 ",['deploy'],build,BloopAI__bloop
 6623e1e8223cc9cfc8aae480bf07788b1f5a0d763d9b847b0dc2be2471c8f1f6,validate_helm,"{secrets: {slackBuildWebhook: '${{ secrets.SLACK_BUILD_WEBHOOK }}'}, uses: BloopAI/reusable-workflows/.github/workflows/validate-helm-chart.yml@main,
   with: {path: helm/bloop}}
-",['deploy'],linit_security,BloopAI__bloop
+",['deploy'],lint_security,BloopAI__bloop
 7399a7d3650ef583781223255f318b66a1be874937cef52a2f247aa3e7daef2e,test,"{runs-on: ubuntu-latest, steps: [{run: 'echo ""No checks required"" '}]}
 ",['unknown'],no_ops,BloopAI__bloop
 7399a7d3650ef583781223255f318b66a1be874937cef52a2f247aa3e7daef2e,fmt-clippy-build,"{runs-on: ubuntu-latest, steps: [{run: 'echo ""No checks required"" '}]}
@@ -199,7 +199,7 @@ b49b58057bd39fccb7df78f7213d805bd534811a812b78b659219256fd74f513,publish,"{envir
 deploy_release",BloopAI__bloop
 cf4ca34801c11d7cecfbe94fcde8774de1f6e533575cfcfe9daa467c4277b694,debug,"{runs-on: ubuntu-latest, steps: [{env: {GITHUB_CONTEXT: '${{ toJson(github) }}'},
       name: $github, run: echo ""$GITHUB_CONTEXT""}]}
-",['unknown'],linit_security,BloopAI__bloop
+",['unknown'],lint_security,BloopAI__bloop
 cf4ca34801c11d7cecfbe94fcde8774de1f6e533575cfcfe9daa467c4277b694,permissions,"{if: 'github.event.issue.pull_request && contains(github.event.comment.body, ''/build'')',
   name: Validate user is the member of BloopAI organization, outputs: {is-member: '${{
       steps.membership.outputs.is-member }}'}, runs-on: ubuntu-latest, steps: [{env: {
@@ -210,7 +210,7 @@ cf4ca34801c11d7cecfbe94fcde8774de1f6e533575cfcfe9daa467c4277b694,permissions,"{i
         \ | jq -r \"".[] .login\"")\nfor member in $(echo ${members}); do \n  if [[\
         \ $member = $ACTOR ]]; then \n    echo \""is-member=true\"" >> $GITHUB_OUTPUT\n\
         \  fi\ndone\n""}]}
-",['unknown'],linit_security,BloopAI__bloop
+",['unknown'],lint_security,BloopAI__bloop
 cf4ca34801c11d7cecfbe94fcde8774de1f6e533575cfcfe9daa467c4277b694,build_tag,"{if: 'github.event.issue.pull_request && contains(github.event.comment.body, ''/build'')
     && needs.permissions.outputs.is-member == ''true''', name: Run container build
     on comment, needs: [permissions], outputs: {ref: '${{ steps.comment-branch.outputs.head_ref
@@ -268,7 +268,7 @@ e3663d18d528eba177f40a7d1ca8fff42987865a548155777b22726adeabc17a,clippy-test,"{r
       with: {cache-dependency-path: wren-launcher/go.sum, go-version: '1.24'}}, {
       name: golangci-lint, uses: golangci/golangci-lint-action@v8, with: {version: v2.3.1,
         working-directory: wren-launcher}}]}
-","['lint', 'test']",linit_security,Canner__WrenAI
+","['lint', 'test']",lint_security,Canner__WrenAI
 05d673f3f0818989c8f8e33d4736d3e4193080f6aeef873baaa8503026c34229,fmt-and-test,"{runs-on: ubuntu-latest, steps: [{name: Checkout repository, uses: actions/checkout@v4},
     {name: Setup Go, uses: actions/setup-go@v5, with: {cache-dependency-path: wren-launcher/go.sum,
         go-version: '1.24'}}, {name: Install goimports, run: go install golang.org/x/tools/cmd/goimports@latest},
@@ -291,7 +291,7 @@ e3663d18d528eba177f40a7d1ca8fff42987865a548155777b22726adeabc17a,clippy-test,"{r
         \(.Version)""'' | sort -u
 
         '}]}
-","['lint', 'test']",linit_security,Canner__WrenAI
+","['lint', 'test']",lint_security,Canner__WrenAI
 2102adf6be5466373c55a5fd94fa677424cdf2b209900c038d776266a15749a3,build-image,"{outputs: {tag_name: '${{ steps.tag-preparation.outputs.TAG_NAME }}'}, runs-on: '${{
     matrix.arch.runner }}', steps: [{uses: actions/checkout@v4}, {name: Login to GitHub
         Container Registry, uses: docker/login-action@v3, with: {password: '${{ secrets.GITHUB_TOKEN
@@ -458,7 +458,7 @@ e3663d18d528eba177f40a7d1ca8fff42987865a548155777b22726adeabc17a,clippy-test,"{r
         != ''true'' }}', name: List the state of node modules, run: yarn list}, {
       name: Install Node.js dependencies, run: yarn install}, {name: Run lint, run: yarn
         lint}]}
-",['lint'],linit_security,Canner__WrenAI
+",['lint'],lint_security,Canner__WrenAI
 8a97da004dfb4e76e9156cc2fdcffeede96a1f98c14d798669c0115efc6c68eb,build-image,"{outputs: {tag_name: '${{ steps.tag-preparation.outputs.TAG_NAME }}'}, runs-on: '${{
     matrix.arch.runner }}', steps: [{uses: actions/checkout@v4}, {name: Login to GitHub
         Container Registry, uses: docker/login-action@v3, with: {password: '${{ secrets.GITHUB_TOKEN
@@ -551,7 +551,7 @@ e3663d18d528eba177f40a7d1ca8fff42987865a548155777b22726adeabc17a,clippy-test,"{r
           \ context.issue.number,\n    labels: Array.from(labels)\n  });\n  \n  console.log(`Added\
           \ labels: ${Array.from(labels).join(', ')}`);\n} else {\n  console.log('No\
           \ matching directories or milestone found');\n}\n""}}]}
-",['unknown'],linit_security,Canner__WrenAI
+",['unknown'],lint_security,Canner__WrenAI
 9b490f066d0a3f6573e57afc8f07985e4ee725e77fd24872ce7651fd8f025a5b,build-image,"{runs-on: '${{ matrix.arch.runner }}', steps: [{uses: actions/checkout@v4}, {name: Login
         to GitHub Container Registry, uses: docker/login-action@v3, with: {password: '${{
           secrets.GITHUB_TOKEN }}', registry: ghcr.io, username: '${{ github.actor
@@ -762,7 +762,7 @@ d511b214da69f08fe7b2f8e43ffe8ced525d8e28abef8ab7236b35ae8f65e33c,release,"{if: '
 dbfd68b7e980319a779e2e22dac325a31802afbe2cff161fbea9f3e3b85cab0d,validator,"{name: validate-pull-request-title, runs-on: ubuntu-latest, steps: [{name: validate
         pull request title, uses: kontrolplane/pull-request-title-validator@v1.3.1,
       with: {scopes: wren-ai-service, types: 'fix,feat,chore'}}]}
-",['unknown'],linit_security,Canner__WrenAI
+",['unknown'],lint_security,Canner__WrenAI
 eccf8d6a0fc725f9c722d3a826d53ff64caccd41def09c05ca69314cb9021385,build-image,"{outputs: {tag_name: '${{ steps.tag-preparation.outputs.TAG_NAME }}'}, runs-on: '${{
     matrix.arch.runner }}', steps: [{uses: actions/checkout@v4}, {name: Login to GitHub
         Container Registry, uses: docker/login-action@v3, with: {password: '${{ secrets.GITHUB_TOKEN
@@ -842,7 +842,7 @@ ac63f8d85e9147345d07c01cfadd97d2e697ede97c50c1b370d02a3949228ef1,pre-commit,"{ru
       with: {python-version: '3.11'}}, {run: pip install pre-commit}, {run: 'pip install
         -e ''.[all]'''}, {run: pre-commit --version}, {run: pre-commit install}, {
       run: pre-commit run --all-files}]}
-",['lint'],linit_security,Farama-Foundation__chatarena
+",['lint'],lint_security,Farama-Foundation__chatarena
 bd04506a2c7bf0f318a0da23613f99ccbb9c1d3aeb933ea91f4eb78436b8788c,macos-test,"{runs-on: macos-11, steps: [{uses: actions/checkout@v4}, {name: 'Set up Python ${{
         matrix.python-version }}', uses: actions/setup-python@v4, with: {python-version: '${{
           matrix.python-version }}'}}, {name: Install dependencies, run: 'pip install
@@ -944,7 +944,7 @@ ef764dc4085a0f4608726da323ecb7d4ca2e9c450ab7e2f7d6be9fa9bbf0234d,linux-test,"{ru
         exit 1
 
         '}]}
-",['unknown'],Vito,FlowiseAI__Flowise
+",['unknown'],lint_security,FlowiseAI__Flowise
 7adecc865f7499325d783300d4a1b67f241a1839963db2980b69e56c800c9c7c,dry-run,"{outputs: {version: '${{ steps.resolve-version.outputs.version }}'}, permissions: {
     contents: read}, runs-on: ubuntu-latest, steps: [{uses: actions/checkout@v6},
     {uses: pnpm/action-setup@v4, with: {version: 10.26.0}}, {uses: actions/setup-node@v6,
