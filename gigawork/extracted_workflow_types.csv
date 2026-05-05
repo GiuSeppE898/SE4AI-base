@@ -886,7 +886,7 @@ d73017db77118d1eb8abafad71390e51ac44ae2fe4c965f9cf6fea0cd12beb0e,publish,"{if: g
     build-wheels], runs-on: ubuntu-latest, steps: [{name: Download dists, uses: actions/download-artifact@v3,
       with: {name: artifact, path: dist}}, {name: Publish, uses: pypa/gh-action-pypi-publish@release/v1,
       with: {password: '${{ secrets.PYPI_API_TOKEN }}'}}]}
-",['build'],Vito,Farama-Foundation__chatarena
+",['build'],deploy_release,Farama-Foundation__chatarena
 ef764dc4085a0f4608726da323ecb7d4ca2e9c450ab7e2f7d6be9fa9bbf0234d,linux-test,"{runs-on: ubuntu-latest, steps: [{uses: actions/checkout@v4}, {name: 'Set up Python
         ${{ matrix.python-version }}', uses: actions/setup-python@v4, with: {python-version: '${{
           matrix.python-version }}'}}, {name: Install dependencies, run: 'sudo apt-get
@@ -905,7 +905,7 @@ ef764dc4085a0f4608726da323ecb7d4ca2e9c450ab7e2f7d6be9fa9bbf0234d,linux-test,"{ru
         -v -n auto tests/
 
         '}], strategy: {matrix: {python-version: ['3.8', '3.9', '3.10', '3.11']}}}
-",['test'],Vito,Farama-Foundation__chatarena
+",['test'],test,Farama-Foundation__chatarena
 10e75b79bd87ec915486dca1641919a1189df1844c7d882f1e1038859d8ebe67,check-proprietary-paths,"{if: github.repository == 'FlowiseAI/Flowise', name: Check for Proprietary Paths,
   runs-on: ubuntu-latest, steps: [{name: Checkout repository, uses: actions/checkout@v6,
       with: {fetch-depth: 0}}, {id: check-paths, name: Check for proprietary paths,
@@ -974,7 +974,7 @@ ef764dc4085a0f4608726da323ecb7d4ca2e9c450ab7e2f7d6be9fa9bbf0234d,linux-test,"{ru
         --dry-run}, {env: {NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}'}, name: Dry
         run publish, run: 'pnpm --filter @flowiseai/agentflow publish --no-git-checks
         --dry-run --tag ${{ inputs.tag }}'}]}
-",['unknown'],Vito,FlowiseAI__Flowise
+",['unknown'],deploy_release,FlowiseAI__Flowise
 7adecc865f7499325d783300d4a1b67f241a1839963db2980b69e56c800c9c7c,publish,"{environment: npm-publish, needs: dry-run, permissions: {contents: write, pull-requests: write},
   runs-on: ubuntu-latest, steps: [{uses: actions/checkout@v6}, {uses: pnpm/action-setup@v4,
       with: {version: 10.26.0}}, {uses: actions/setup-node@v6, with: {node-version: 18.15.0,
@@ -1002,7 +1002,7 @@ ef764dc4085a0f4608726da323ecb7d4ca2e9c450ab7e2f7d6be9fa9bbf0234d,linux-test,"{ru
         \ to ${VERSION}\"" \\\n  --body \""Automated version bump after publishing \\\
         `@flowiseai/agentflow@${VERSION}\\` to npm with tag \\`${{ inputs.tag }}\\\
         `.\"" \\\n  --base main \\\n  --head \""$BRANCH\""\n""}]}
-",['unknown'],Vito,FlowiseAI__Flowise
+",['unknown'],deploy_release,FlowiseAI__Flowise
 8ca87f61ded0df671a2d315911846602d29a7d1767deb562bf064c57fc453c81,docker,"{environment: '${{ github.event.inputs.environment }}', runs-on: ubuntu-latest, steps: [
     {id: defaults, name: Set default values, run: 'echo ""node_version=${{ github.event.inputs.node_version
         || ''20'' }}"" >> $GITHUB_OUTPUT
@@ -1026,7 +1026,7 @@ ef764dc4085a0f4608726da323ecb7d4ca2e9c450ab7e2f7d6be9fa9bbf0234d,linux-test,"{ru
           ', context: ., file: Dockerfile, platforms: 'linux/amd64,linux/arm64', push: true,
         tags: ""${{ format('{0}.dkr.ecr.{1}.amazonaws.com/flowise:{2}', \n    secrets.AWS_ACCOUNT_ID,\
           \ \n    secrets.AWS_REGION, \n    steps.defaults.outputs.tag_version) }}\n""}}]}
-","['build', 'deploy']",Vito,FlowiseAI__Flowise
+","['build', 'deploy']",deploy_release,FlowiseAI__Flowise
 96dbe0c38daa76a21e6390de30fa0a53d47799b7f16cee52766481c3abd8bc34,docker,"{runs-on: ubuntu-latest, steps: [{id: defaults, name: Set default values, run: 'echo
         ""node_version=${{ github.event.inputs.node_version || ''20'' }}"" >> $GITHUB_OUTPUT
 
@@ -1052,10 +1052,10 @@ ef764dc4085a0f4608726da323ecb7d4ca2e9c450ab7e2f7d6be9fa9bbf0234d,linux-test,"{ru
           }}
 
           '}}]}
-",['build'],Vito,FlowiseAI__Flowise
+",['build'],deploy_release,FlowiseAI__Flowise
 f22ee4829b3ed911dd3d8a9b5e811ce9b5339bdb8d8a93640cb73d74e94495a8,build,"{env: {PUPPETEER_SKIP_DOWNLOAD: true}, runs-on: ubuntu-latest, steps: [{uses: actions/checkout@v6},
     {run: docker build --no-cache -t flowise .}]}
-",['build'],Vito,FlowiseAI__Flowise
+",['build'],build,FlowiseAI__Flowise
 f82159009ea8e8991eabd0d2291687617da54856af43d81f6947ad6b912cbb4e,build,"{env: {PUPPETEER_SKIP_DOWNLOAD: true}, runs-on: '${{ matrix.platform }}', steps: [
     {uses: actions/checkout@v6}, {uses: pnpm/action-setup@v4, with: {version: 10.26.0}},
     {name: 'Use Node.js ${{ matrix.node-version }}', uses: actions/setup-node@v6,
@@ -1068,7 +1068,7 @@ f82159009ea8e8991eabd0d2291687617da54856af43d81f6947ad6b912cbb4e,build,"{env: {P
       with: {browser: chrome, install: false, start: pnpm start, wait-on: 'http://localhost:3000',
         wait-on-timeout: 120, working-directory: packages/server}}], strategy: {matrix: {
       node-version: [18.15.0], platform: [ubuntu-latest]}}}
-","['lint', 'test', 'build']",Vito,FlowiseAI__Flowise
+","['lint', 'test', 'build']",build|test|lint_security,FlowiseAI__Flowise
 02b57a0bfd1f02f3d1d04e399696e5cffdf8711ed525d0f92c8632cff14c7704,gitleaks,"{name: Gitleaks, runs-on: ubuntu-latest, steps: [{uses: hmarr/debug-action@v3.0.0},
     {name: install, run: ""set -euo pipefail\narch=\""$(uname)_$(uname -m)\""\nplatform=$(echo\
         \ $arch | tr '[:upper:]' '[:lower:]' )\necho \""PLATFORM=$platform\"" >> $GITHUB_ENV\n\
@@ -1091,13 +1091,13 @@ f82159009ea8e8991eabd0d2291687617da54856af43d81f6947ad6b912cbb4e,build,"{env: {P
         \ \\\n  --log-level=debug \\\n  --log-opts='${{ inputs.base_sha }}..${{ inputs.head_sha\
         \ }}'\n""}, {if: failure(), name: Upload test results, uses: actions/upload-artifact@v7,
       with: {name: GitLeaks results, path: results.sarif}}]}
-","['build', 'security', 'eval']",Vito,HumanSignal__Adala
+","['build', 'security', 'eval']",lint_security,HumanSignal__Adala
 0b50e22d810c17bf92adf4d09d5f1484ca80064c3b693cfd7d9bb1cd9f5b2184,run_black,"{name: Code formatting, runs-on: ubuntu-latest, steps: [{uses: actions/checkout@v6},
     {name: Install poetry, run: 'pipx install ""poetry==${{ env.POETRY_VERSION }}""'},
     {id: setup_python, name: Set up Python, uses: actions/setup-python@v6, with: {
         cache: poetry, python-version: '3.13'}}, {name: Install Python dependencies,
       run: poetry install}, {name: Run black, run: poetry run black --check .}]}
-","['lint', 'test']",Vito,HumanSignal__Adala
+","['lint', 'test']",lint_security,HumanSignal__Adala
 0b50e22d810c17bf92adf4d09d5f1484ca80064c3b693cfd7d9bb1cd9f5b2184,run_pytest,"{defaults: {run: {shell: bash}}, name: 'pytest ${{ matrix.os }} | ${{ matrix.python-version
     }}', runs-on: '${{ matrix.os }}', steps: [{uses: actions/checkout@v6}, {name: Install
         poetry, run: 'pipx install ""poetry==${{ env.POETRY_VERSION }}""'}, {id: setup_python,
@@ -1118,7 +1118,7 @@ f82159009ea8e8991eabd0d2291687617da54856af43d81f6947ad6b912cbb4e,build,"{env: {P
         files: tests/coverage.xml, token: '${{ secrets.CODECOV_TOKEN }}'}}], strategy: {
     fail-fast: false, matrix: {os: [ubuntu-latest, windows-latest], python-version: [
         '3.13']}}}
-","['lint', 'test']",Vito,HumanSignal__Adala
+","['lint', 'test']",test,HumanSignal__Adala
 0b50e22d810c17bf92adf4d09d5f1484ca80064c3b693cfd7d9bb1cd9f5b2184,dependabot-auto-merge,"{if: 'always() &&
 
     needs.run_pytest.result == ''success'' &&
@@ -1134,7 +1134,7 @@ f82159009ea8e8991eabd0d2291687617da54856af43d81f6947ad6b912cbb4e,build,"{env: {P
   steps: [{env: {GITHUB_TOKEN: '${{ secrets.GIT_PAT }}', PR_URL: '${{ github.event.pull_request.html_url
           }}'}, name: Enable auto-merge for Dependabot PRs, run: 'gh pr merge --admin
         --squash ""${PR_URL}""'}]}
-","['lint', 'test']",Vito,HumanSignal__Adala
+","['lint', 'test']",lint_security,HumanSignal__Adala
 35d4c30cb5189e2f93dd2b5661e07a84cb7a6f3c0160518a58cf4abc951f020e,delete-cache,"{runs-on: ubuntu-latest, steps: [{env: {GH_TOKEN: '${{ secrets.GITHUB_TOKEN }}'},
       name: Delete all caches, run: ""while true; do\n  CACHE_IDS=$(gh cache list --repo\
         \ \""${{ github.repository }}\"" --limit 100 --json id --jq '.[].id' | tr '\\\
@@ -1145,7 +1145,7 @@ f82159009ea8e8991eabd0d2291687617da54856af43d81f6947ad6b912cbb4e,build,"{env: {P
         \ cache list --repo \""${{ github.repository }}\"" --limit 1 --json id | jq\
         \ length)\nif [ \""$REMAINING_CACHES\"" -ne 0 ]; then\n  echo \""Warning: $REMAINING_CACHES\
         \ caches remain\""\nfi""}], timeout-minutes: 10}
-",['unknown'],Vito,HumanSignal__Adala
+",['unknown'],no_ops,HumanSignal__Adala
 4cb1eced2064c47ef84a9b4a785c00d26bc730cc49345659a7fd54c1b731fe5a,slashCommandDispatch,"{if: 'startsWith(github.event.comment.body, ''/'')', runs-on: ubuntu-latest, steps: [
     {uses: hmarr/debug-action@v3.0.0}, {name: React to comment, uses: peter-evans/create-or-update-comment@v5,
       with: {comment-id: '${{ github.event.comment.id }}', reactions: eyes, token: '${{
@@ -1171,7 +1171,7 @@ f82159009ea8e8991eabd0d2291687617da54856af43d81f6947ad6b912cbb4e,build,"{env: {P
 
           ', comment-id: '${{ github.event.comment.id }}', reactions: confused, token: '${{
           secrets.GIT_PAT }}'}}], timeout-minutes: 1}
-",['unknown'],Vito,HumanSignal__Adala
+",['unknown'],no_ops,HumanSignal__Adala
 59a3885897181e0e847474c600d3599460d7ad5c540d337fcfd1eb9513bfbe51,version,"{name: Poetry Lock Change Size, runs-on: ubuntu-latest, steps: [{uses: hmarr/debug-action@v3.0.0},
     {env: {BASE_REF: '${{ github.event.merge_group.base_sha || github.event.pull_request.base.sha
           || github.event.before }}', HEAD_REF: '${{ github.event.merge_group.head_sha
@@ -1188,7 +1188,7 @@ f82159009ea8e8991eabd0d2291687617da54856af43d81f6947ad6b912cbb4e,build,"{env: {P
           \    if (poetry_lock.changes > 50) {\n      core.setFailed(`${poetry_lock.filename}\
           \ has too many changes: ${poetry_lock.changes}`);\n    }\n    core.endGroup();\n\
           \  }\n}\n""}}]}
-",['unknown'],Vito,HumanSignal__Adala
+",['unknown'],lint_security,HumanSignal__Adala
 5a26e53b0531df74988c58b897440d0355d8ec13c9f3d17e3c8def93e448d971,details,"{name: Details, outputs: {membership: '${{ steps.membership.outputs.membership }}'},
   runs-on: ubuntu-latest, steps: [{env: {ACTOR: '${{ github.actor }}'}, id: membership,
       name: Check user's membership, uses: actions/github-script@v8, with: {github-token: '${{
@@ -1197,15 +1197,15 @@ f82159009ea8e8991eabd0d2291687617da54856af43d81f6947ad6b912cbb4e,build,"{env: {P
           \ owner,\n  username: actor,\n})\n  .then(response => core.setOutput(\""\
           membership\"", true))\n  .catch(reason => core.setOutput(\""membership\"",\
           \ false));\n""}}]}
-",['security'],Vito,HumanSignal__Adala
+",['security'],no_ops,HumanSignal__Adala
 5a26e53b0531df74988c58b897440d0355d8ec13c9f3d17e3c8def93e448d971,gitleaks,"{if: github.event_name == 'pull_request', name: Linter, uses: ./.github/workflows/gitleaks.yml,
   with: {base_sha: '${{ github.event.pull_request.base.sha || github.event.before
       }}', head_sha: '${{ github.sha }}'}}
-",['security'],Vito,HumanSignal__Adala
+",['security'],lint_security,HumanSignal__Adala
 5a26e53b0531df74988c58b897440d0355d8ec13c9f3d17e3c8def93e448d971,build,"{name: Build, permissions: {checks: write, contents: read}, secrets: inherit, uses: ./.github/workflows/docker-build.yml,
   with: {branch_name: '${{ github.event.pull_request.head.ref || github.ref_name }}',
     sha: '${{ github.event.pull_request.head.sha || github.event.after }}'}}
-",['security'],Vito,HumanSignal__Adala
+",['security'],build,HumanSignal__Adala
 611b8da82774685f4d625fd6842ec59bc28a3f35dbfeff4db8d27b11484709c8,ReleaseNotification,"{name: PyPI, runs-on: ubuntu-latest, steps: [{uses: hmarr/debug-action@v3.0.0}, {
       name: Checkout, uses: actions/checkout@v6, with: {ref: '${{ inputs.ref }}'}},
     {env: {PROVIDED_VERSION: '${{ inputs.version }}'}, name: Manage version, run: 'set
@@ -1236,15 +1236,15 @@ f82159009ea8e8991eabd0d2291687617da54856af43d81f6947ad6b912cbb4e,build,"{env: {P
           \      data: await fs.readFileSync(`./dist/${file}`)\n   });\n}\n""}}, {
       if: always(), name: Upload to artifact, uses: actions/upload-artifact@v7, with: {
         name: Dist, path: dist/}}]}
-",['build'],Vito,HumanSignal__Adala
+",['build'],deploy_release,HumanSignal__Adala
 6a7cf053cc2cf3a27577b06c72606e5513bc6a2c3e34b9c5cd5a5146bb583568,cancel,"{runs-on: ubuntu-latest, steps: [{uses: hmarr/debug-action@v3.0.0}, {run: 'echo CI/CD
         Pipeline-${{ github.event.pull_request.number || github.event.pull_request.head.ref
         || github.ref_name }}'}]}
-",['unknown'],Vito,HumanSignal__Adala
+",['unknown'],no_ops,HumanSignal__Adala
 70758d51fce149de43bdf6ddf78c7159008afcb5eb77b3135526ef581924eb7b,build-pypi,"{name: Build, permissions: {contents: write}, secrets: inherit, uses: ./.github/workflows/build_pypi.yml,
   with: {ref: '${{ github.ref_name }}', release-id: '${{ github.event.release.id }}',
     upload_to_pypi: true, version: '${{ github.ref_name }}'}}
-",['unknown'],Vito,HumanSignal__Adala
+",['unknown'],build|deploy_release,HumanSignal__Adala
 87a6f34104e1b3a90675c7bfe289836f7497296afc833db31ca75fa9a476db45,sync,"{if: 'startsWith(github.head_ref, ''fb-'') || startsWith(github.head_ref, ''revert-'')
     || startsWith(github.head_ref, ''cursor'')', name: Sync, runs-on: ubuntu-latest,
   steps: [{uses: hmarr/debug-action@v3.0.0}, {id: check-membership, name: Check user's
@@ -1265,7 +1265,7 @@ f82159009ea8e8991eabd0d2291687617da54856af43d81f6947ad6b912cbb4e,build,"{env: {P
           secrets.GIT_PAT }}'}}, {name: Dispatch label-studio-enterprise Follow Merge,
       uses: ./.github/actions-hub/actions/follow-merge-dispatch, with: {downstream_repository: label-studio-enterprise,
         github_token: '${{ secrets.GIT_PAT }}'}}]}
-",['unknown'],Vito,HumanSignal__Adala
+",['unknown'],no_ops,HumanSignal__Adala
 8d3282eaf953206fb4221316b02334fea722235b84ec38d6af6a4ebe725e34ca,calculate_version,"{name: Calculate version, outputs: {build_version: '${{ steps.version.outputs.build_version
       }}', image_version: '${{ steps.version.outputs.image_version }}', pretty_branch_name: '${{
       steps.version.outputs.pretty_branch_name }}', sha: '${{ steps.version.outputs.sha
@@ -1286,7 +1286,7 @@ f82159009ea8e8991eabd0d2291687617da54856af43d81f6947ad6b912cbb4e,build,"{env: {P
         \ | awk '{print length}')\""\nversion=\""${current_time}$(echo $branch | cut\
         \ -c1-$((50 - short_sha_length - current_time_length)))-${short_sha}\""\necho\
         \ \""build_version=$version\"" >> $GITHUB_OUTPUT\n""}]}
-",['build'],Vito,HumanSignal__Adala
+",['build'],deploy_release,HumanSignal__Adala
 8d3282eaf953206fb4221316b02334fea722235b84ec38d6af6a4ebe725e34ca,docker_build,"{name: 'Docker image (${{ matrix.platform }})', needs: calculate_version, runs-on: '${{
     matrix.runner }}', steps: [{uses: hmarr/debug-action@v3.0.0}, {name: Prepare,
       run: 'platform=${{ matrix.platform }}
@@ -1317,7 +1317,7 @@ f82159009ea8e8991eabd0d2291687617da54856af43d81f6947ad6b912cbb4e,build,"{env: {P
         retention-days: 1}}], strategy: {fail-fast: false, matrix: {include: [{platform: linux/amd64,
           runner: ubuntu-latest}, {platform: linux/arm64, runner: ubuntu-24.04-arm}]}},
   timeout-minutes: 15}
-",['build'],Vito,HumanSignal__Adala
+",['build'],build|deploy_release,HumanSignal__Adala
 8d3282eaf953206fb4221316b02334fea722235b84ec38d6af6a4ebe725e34ca,merge_docker_manifest,"{needs: [docker_build, calculate_version], runs-on: ubuntu-latest, steps: [{name: Download
         digests, uses: actions/download-artifact@v8, with: {merge-multiple: true,
         path: '${{ runner.temp }}/digests', pattern: digests-*}}, {name: Login to
@@ -1336,7 +1336,7 @@ f82159009ea8e8991eabd0d2291687617da54856af43d81f6947ad6b912cbb4e,build,"{env: {P
         inspect ${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.version }}
 
         '}]}
-",['build'],Vito,HumanSignal__Adala
+",['build'],deploy_release,HumanSignal__Adala
 8d3282eaf953206fb4221316b02334fea722235b84ec38d6af6a4ebe725e34ca,create_check,"{if: success(), name: Create Docker image tag Check, needs: [calculate_version, docker_build,
     merge_docker_manifest], runs-on: ubuntu-latest, steps: [{name: Create Docker image
         tag Check, uses: actions/github-script@v8, with: {script: ""const { repo, owner\
@@ -1350,7 +1350,7 @@ f82159009ea8e8991eabd0d2291687617da54856af43d81f6947ad6b912cbb4e,build,"{env: {P
           \ }}',\n    summary: JSON.stringify(details)\n  }\n});\nawait github.rest.checks.update({\n\
           \  owner,\n  repo,\n  check_run_id: check.id,\n  status: 'completed',\n\
           \  conclusion: 'success'\n});\n""}}]}
-",['build'],Vito,HumanSignal__Adala
+",['build'],deploy_release,HumanSignal__Adala
 8f0ac75d1d3caf2cc02c11eef2bc6b6db3cad6e0c18a9e0febe638e8cee4f90a,convert_stale_prs,"{runs-on: ubuntu-latest, steps: [{uses: hmarr/debug-action@v3.0.0}, {id: get_timestamp,
       name: Get timestamp, run: 'echo ""ts=$(date -d ''10 hours ago'' +""%Y-%m-%dT%H:%M:%S"")""
         >> $GITHUB_OUTPUT', shell: bash}, {env: {GITHUB_TOKEN: '${{ secrets.GIT_PAT
@@ -1376,7 +1376,7 @@ f82159009ea8e8991eabd0d2291687617da54856af43d81f6947ad6b912cbb4e,build,"{env: {P
         steps.mutation_step.outputs.exec == ''true'' }}', name: Post to a Slack channel,
       uses: slackapi/slack-github-action@v2.1, with: {channel-id: C02LMULF4NA, payload: '{
           ""type"": ""mrkdwn"", ""text"": ""${{ env.SLACK_MESSAGE }}"" }'}}], timeout-minutes: 2}
-",['unknown'],Vito,HumanSignal__Adala
+",['unknown'],no_ops,HumanSignal__Adala
 92e7af04fdd41e4a35d3aca1b272e246586d65609a5208f2ca47de4905ef6962,merge,"{if: '${{ github.event.client_payload.slash_command.args.unnamed.arg1 == ''merge''
     }}', runs-on: ubuntu-latest, steps: [{uses: hmarr/debug-action@v3.0.0}, {name: Add
         Workflow link to command comment, uses: peter-evans/create-or-update-comment@v5,
@@ -1404,7 +1404,7 @@ f82159009ea8e8991eabd0d2291687617da54856af43d81f6947ad6b912cbb4e,build,"{env: {P
           }}', reactions: '${{ steps.merge.outputs.reaction || ''-1'' }}', repository: '${{
           github.event.client_payload.github.payload.repository.full_name }}', token: '${{
           secrets.GIT_PAT }}'}}], timeout-minutes: 10}
-",['unknown'],Vito,HumanSignal__Adala
+",['unknown'],lint_security,HumanSignal__Adala
 92e7af04fdd41e4a35d3aca1b272e246586d65609a5208f2ca47de4905ef6962,help,"{if: '${{ github.event.client_payload.slash_command.args.unnamed.arg1 == ''help''
     || !contains(fromJson(''[""merge""]''), github.event.client_payload.slash_command.args.unnamed.arg1)
     }}', runs-on: ubuntu-latest, steps: [{name: Update comment, uses: peter-evans/create-or-update-comment@v5,
@@ -1417,7 +1417,7 @@ f82159009ea8e8991eabd0d2291687617da54856af43d81f6947ad6b912cbb4e,build,"{env: {P
           ', comment-id: '${{ github.event.client_payload.github.payload.comment.id
           }}', reactions: hooray, repository: '${{ github.event.client_payload.github.payload.repository.full_name
           }}', token: '${{ secrets.GIT_PAT }}'}}], timeout-minutes: 1}
-",['unknown'],Vito,HumanSignal__Adala
+",['unknown'],no_ops,HumanSignal__Adala
 ae0b5018edd71818d4700763a13bdb1b0ffba52ab20e766570f86665fd9b0cc2,create,"{if: '${{ github.event.client_payload.slash_command.args.unnamed.arg1 == ''create''
     }}', runs-on: ubuntu-latest, steps: [{uses: hmarr/debug-action@v3.0.0}, {name: Add
         Workflow link to command comment, uses: peter-evans/create-or-update-comment@v5,
@@ -1459,7 +1459,7 @@ ae0b5018edd71818d4700763a13bdb1b0ffba52ab20e766570f86665fd9b0cc2,create,"{if: '$
           ', comment-id: '${{ github.event.client_payload.github.payload.comment.id
           }}', reactions: '-1', repository: '${{ github.event.client_payload.github.payload.repository.full_name
           }}', token: '${{ secrets.GIT_PAT }}'}}], timeout-minutes: 3}
-",['unknown'],Vito,HumanSignal__Adala
+",['unknown'],no_ops,HumanSignal__Adala
 ae0b5018edd71818d4700763a13bdb1b0ffba52ab20e766570f86665fd9b0cc2,help,"{if: 'github.event.client_payload.slash_command.args.unnamed.arg1 == ''help'' || !contains(fromJson(''[""create""]''),
     github.event.client_payload.slash_command.args.unnamed.arg1)', runs-on: ubuntu-latest,
   steps: [{name: Update comment, uses: peter-evans/create-or-update-comment@v5, with: {
@@ -1473,7 +1473,7 @@ ae0b5018edd71818d4700763a13bdb1b0ffba52ab20e766570f86665fd9b0cc2,help,"{if: 'git
           ', comment-id: '${{ github.event.client_payload.github.payload.comment.id
           }}', reaction-type: hooray, repository: '${{ github.event.client_payload.github.payload.repository.full_name
           }}', token: '${{ secrets.GIT_PAT }}'}}], timeout-minutes: 1}
-",['unknown'],Vito,HumanSignal__Adala
+",['unknown'],no_ops,HumanSignal__Adala
 b945549e43caf2dcf145030c2ac6eeb17fb725148f92a64978c8c44aac814e51,help,"{runs-on: ubuntu-latest, steps: [{if: '${{ github.event.client_payload.slash_command.args.all
         == '''' }}', name: Update comment if empty, uses: peter-evans/create-or-update-comment@v5,
       with: {body: '> Command | Description
@@ -1489,7 +1489,7 @@ b945549e43caf2dcf145030c2ac6eeb17fb725148f92a64978c8c44aac814e51,help,"{runs-on:
           ', comment-id: '${{ github.event.client_payload.github.payload.comment.id
           }}', reaction-type: hooray, repository: '${{ github.event.client_payload.github.payload.repository.full_name
           }}', token: '${{ secrets.GIT_PAT }}'}}], timeout-minutes: 1}
-",['unknown'],Vito,HumanSignal__Adala
+",['unknown'],no_ops,HumanSignal__Adala
 c0254fd064608476f33118f95b730ea1dd49b29ce99ed30deb09756bce256c52,commit-version,"{permissions: {contents: write}, runs-on: ubuntu-latest, steps: [{uses: hmarr/debug-action@v3.0.0},
     {name: Checkout, uses: actions/checkout@v6, with: {fetch-depth: 1, ref: '${{ inputs.branch
           }}', token: '${{ secrets.GIT_PAT }}'}}, {env: {ACTOR_USERNAME: '${{ github.event.sender.login
@@ -1529,14 +1529,14 @@ c0254fd064608476f33118f95b730ea1dd49b29ce99ed30deb09756bce256c52,commit-version,
         echo ""commit=$(git rev-parse HEAD)"" >> $GITHUB_OUTPUT
 
         git push origin HEAD:refs/heads/${{ inputs.branch }}'}]}
-",['unknown'],Vito,HumanSignal__Adala
+",['unknown'],deploy_release,HumanSignal__Adala
 c0d3e2ca8889520924d0c4e64c871dcaa4012ba258d39bf0481595079e698221,analyze,"{name: Analyze, permissions: {actions: read, contents: read, security-events: write},
   runs-on: ubuntu-latest, steps: [{name: Checkout repository, uses: actions/checkout@v6},
     {name: Initialize CodeQL, uses: github/codeql-action/init@v4, with: {languages: '${{
           matrix.language }}'}}, {name: Perform CodeQL Analysis, uses: github/codeql-action/analyze@v4,
       with: {category: '/language:${{matrix.language}}'}}], strategy: {fail-fast: false,
     matrix: {language: [python]}}, timeout-minutes: 45}
-",['security'],Vito,HumanSignal__Adala
+",['security'],lint_security,HumanSignal__Adala
 c7e56b861f3c6667dca0bd9c61da9dcb02209c24cd046c0a3938049b8f01634c,sync,"{name: Sync PR, outputs: {label-studio-sdk: '${{ fromJSON(steps.upstream-prs.outputs.shas).label-studio-sdk
       }}'}, runs-on: ubuntu-latest, steps: [{uses: hmarr/debug-action@v3.0.0}, {if: github.event.client_payload.github.payload.comment.id
         && github.event.client_payload.github.payload.repository.full_name, name: Add
@@ -1630,7 +1630,7 @@ c7e56b861f3c6667dca0bd9c61da9dcb02209c24cd046c0a3938049b8f01634c,sync,"{name: Sy
           }}', reactions: '${{ job.status == ''success'' && ''+1'' || ''-1'' }}',
         repository: '${{ github.event.client_payload.github.payload.repository.full_name
           }}', token: '${{ secrets.GIT_PAT }}'}}]}
-",['unknown'],Vito,HumanSignal__Adala
+",['unknown'],no_ops,HumanSignal__Adala
 d894db1c6f11e4bb53376a0f721de8dc3a54a0ca558cb052063bf48a750f0b3a,draft-release,"{name: Draft Release, outputs: {id: '${{ steps.create-draft-release.outputs.id }}',
     rc-version: '${{ steps.create-draft-release.outputs.rc-version }}'}, permissions: {
     contents: write}, runs-on: ubuntu-latest, steps: [{env: {DEFAULT_BRANCH: '${{
@@ -1688,12 +1688,12 @@ d894db1c6f11e4bb53376a0f721de8dc3a54a0ca558cb052063bf48a750f0b3a,draft-release,"
           \  body: release_notes.body\n});\nconsole.log(`Draft release is updated\
           \ ${updated_release.html_url}`)\n\ncore.setOutput(\""id\"", updated_release.id);\n\
           core.setOutput(\""tag_name\"", release.tag_name);\n""}}]}
-",['unknown'],Vito,HumanSignal__Adala
+",['unknown'],deploy_release,HumanSignal__Adala
 d894db1c6f11e4bb53376a0f721de8dc3a54a0ca558cb052063bf48a750f0b3a,build-pypi,"{name: Build, needs: [draft-release], permissions: {contents: write}, secrets: inherit,
   uses: ./.github/workflows/build_pypi.yml, with: {ref: '${{ github.ref_name }}',
     release-id: '${{ needs.draft-release.outputs.id }}', version: '${{ needs.draft-release.outputs.rc-version
       }}'}}
-",['unknown'],Vito,HumanSignal__Adala
+",['unknown'],deploy_release,HumanSignal__Adala
 de007375566a5e88fff5cbced8cacaf5143990eefb0750fec05170feddff17c9,draft-new-release,"{name: Cut off release branch, outputs: {next_develop_version: '${{ steps.calculate_branch_name_and_version.outputs.next_develop_version
       }}', release_branch: '${{ steps.calculate_branch_name_and_version.outputs.release_branch
       }}', release_version: '${{ steps.calculate_branch_name_and_version.outputs.release_version
@@ -1728,17 +1728,17 @@ de007375566a5e88fff5cbced8cacaf5143990eefb0750fec05170feddff17c9,draft-new-relea
         }}
 
         ', shell: bash}]}
-",['unknown'],Vito,HumanSignal__Adala
+",['unknown'],deploy_release,HumanSignal__Adala
 de007375566a5e88fff5cbced8cacaf5143990eefb0750fec05170feddff17c9,set-version-default-branch,"{name: Set version in default branch, needs: [draft-new-release], permissions: {contents: write},
   secrets: inherit, uses: ./.github/workflows/release-set-version.yml, with: {branch: '${{
       github.event.repository.default_branch }}', version: '${{ needs.draft-new-release.outputs.next_develop_version
       }}'}}
-",['unknown'],Vito,HumanSignal__Adala
+",['unknown'],deploy_release,HumanSignal__Adala
 de007375566a5e88fff5cbced8cacaf5143990eefb0750fec05170feddff17c9,set-version-release-branch,"{name: Set version in release branch, needs: [draft-new-release], permissions: {contents: write},
   secrets: inherit, uses: ./.github/workflows/release-set-version.yml, with: {branch: '${{
       needs.draft-new-release.outputs.release_branch }}', version: '${{ needs.draft-new-release.outputs.release_version
       }}'}}
-",['unknown'],Vito,HumanSignal__Adala
+",['unknown'],deploy_release,HumanSignal__Adala
 e287a335fd35493935f762cc9c098454bb0f501f2c80e9f4f7351f4256a8d941,build,"{if: github.event_name == 'pull_request', name: Build, runs-on: ubuntu-latest, steps: [
     {uses: actions/checkout@v6}, {name: Install poetry, run: 'pipx install ""poetry==${{
         env.POETRY_VERSION }}""'}, {id: setup_python, name: Set up Python, uses: actions/setup-python@v6,
@@ -1750,7 +1750,7 @@ e287a335fd35493935f762cc9c098454bb0f501f2c80e9f4f7351f4256a8d941,build,"{if: git
         poetry run mkdocs build
 
         '}]}
-",['unknown'],Vito,HumanSignal__Adala
+",['unknown'],no_ops,HumanSignal__Adala
 e287a335fd35493935f762cc9c098454bb0f501f2c80e9f4f7351f4256a8d941,upload,"{if: github.event_name == 'push' && github.ref == 'refs/heads/master', name: Upload,
   permissions: {contents: write}, runs-on: ubuntu-latest, steps: [{uses: actions/checkout@v6},
     {name: Install poetry, run: 'pipx install ""poetry==${{ env.POETRY_VERSION }}""'},
@@ -1763,11 +1763,11 @@ e287a335fd35493935f762cc9c098454bb0f501f2c80e9f4f7351f4256a8d941,upload,"{if: gi
         poetry run mkdocs gh-deploy --force
 
         '}]}
-",['unknown'],Vito,HumanSignal__Adala
+",['unknown'],no_ops,HumanSignal__Adala
 f32ad2c0c209c27c37c0a7d0f30b802d909df9eef48cbca4dab45f6932df0e2e,sync,"{if: github.event.client_payload.slash_command.args.unnamed.arg1 == 'sync', name: 'Follow
     Merge: Sync Upstream PRs', secrets: inherit, uses: ./.github/workflows/follow-merge-upstream-repo-sync-v2.yml,
   with: {branch_name: '${{ github.event.client_payload.pull_request.head.ref }}'}}
-",['unknown'],Vito,HumanSignal__Adala
+",['unknown'],no_ops,HumanSignal__Adala
 f32ad2c0c209c27c37c0a7d0f30b802d909df9eef48cbca4dab45f6932df0e2e,help,"{if: '${{ github.event.client_payload.slash_command.args.unnamed.arg1 == ''help''
     || !contains(fromJson(''[""sync""]''), github.event.client_payload.slash_command.args.unnamed.arg1)
     }}', runs-on: ubuntu-latest, steps: [{name: Update comment, uses: peter-evans/create-or-update-comment@v5,
@@ -1780,7 +1780,7 @@ f32ad2c0c209c27c37c0a7d0f30b802d909df9eef48cbca4dab45f6932df0e2e,help,"{if: '${{
           ', comment-id: '${{ github.event.client_payload.github.payload.comment.id
           }}', reactions: hooray, repository: '${{ github.event.client_payload.github.payload.repository.full_name
           }}', token: '${{ secrets.GIT_PAT }}'}}], timeout-minutes: 1}
-",['unknown'],Vito,HumanSignal__Adala
+",['unknown'],no_ops,HumanSignal__Adala
 343e513e9e61e75076abc1819db1cd9b55cf372c78fdd9815e66f3ce7684d1ba,main,"{name: sdist + pure wheel, runs-on: ubuntu-latest, steps: [{uses: actions/checkout@v3},
     {name: Set up latest Python, uses: actions/setup-python@v4, with: {python-version: '*'}},
     {name: 'Install latest pip, build, twine', run: 'python -m pip install --upgrade
@@ -1791,7 +1791,7 @@ f32ad2c0c209c27c37c0a7d0f30b802d909df9eef48cbca4dab45f6932df0e2e,help,"{if: '${{
         '}, {name: Build wheel and source distributions, run: python -m build}, {
       env: {TWINE_PASSWORD: '${{ secrets.PYPI_TOKEN }}'}, name: Upload to PyPI via
         Twine, run: twine upload --verbose -u '__token__' dist/*}]}
-",['release'],Vito,Kav-K__GPTDiscord
+",['release'],build|deploy_release,Kav-K__GPTDiscord
 648b49a4e7df050a3bb8400f14fdbcca548ccdf4e457d24b909e3cb4655425f3,docker-push-base,"{if: '${{ github.event_name != ''pull_request'' && github.repository == ''Kav-K/GPTDiscord''
     }}', permissions: {contents: read, id-token: write, packages: write}, runs-on: ubuntu-20.04,
   steps: [{name: Checkout repository, uses: actions/checkout@v4}, {name: Install cosign,
@@ -1824,7 +1824,7 @@ f32ad2c0c209c27c37c0a7d0f30b802d909df9eef48cbca4dab45f6932df0e2e,help,"{if: '${{
         the published base Docker image, run: 'echo ""${{ steps.meta.outputs.tags }}""
         | xargs -I {} cosign sign {}@${{ steps.build-and-push-base.outputs.digest
         }}'}]}
-",['build'],Vito,Kav-K__GPTDiscord
+",['build'],build|deploy_release,Kav-K__GPTDiscord
 648b49a4e7df050a3bb8400f14fdbcca548ccdf4e457d24b909e3cb4655425f3,docker-push-full,"{if: '${{ github.event_name != ''pull_request'' && github.repository == ''Kav-K/GPTDiscord''
     }}', permissions: {contents: read, id-token: write, packages: write}, runs-on: ubuntu-20.04,
   steps: [{name: Checkout repository, uses: actions/checkout@v4}, {name: Install cosign,
@@ -1857,7 +1857,7 @@ f32ad2c0c209c27c37c0a7d0f30b802d909df9eef48cbca4dab45f6932df0e2e,help,"{if: '${{
       name: Sign the published full Docker image, run: 'echo ""${{ steps.meta.outputs.tags
         }}"" | xargs -I {} cosign sign {}@${{ steps.build-and-push-full.outputs.digest
         }}'}]}
-",['build'],Vito,Kav-K__GPTDiscord
+",['build'],build|deploy_release,Kav-K__GPTDiscord
 648b49a4e7df050a3bb8400f14fdbcca548ccdf4e457d24b909e3cb4655425f3,docker-pr,"{if: '${{ github.event_name == ''pull_request'' && github.repository == ''Kav-K/GPTDiscord''
     }}', permissions: {contents: read, id-token: write, packages: write}, runs-on: ubuntu-20.04,
   steps: [{name: Checkout repository, uses: actions/checkout@v4}, {name: Set up QEMU,
@@ -1875,7 +1875,7 @@ f32ad2c0c209c27c37c0a7d0f30b802d909df9eef48cbca4dab45f6932df0e2e,help,"{if: '${{
         cache-from: type=gha, cache-to: 'type=gha,mode=max', context: ., labels: '${{
           steps.meta.outputs.labels }}', platforms: 'linux/amd64,linux/arm64', push: false,
         tags: '${{ steps.meta.outputs.tags }}'}}]}
-",['build'],Vito,Kav-K__GPTDiscord
+",['build'],build,Kav-K__GPTDiscord
 7fd5e14209ddeb101d56b6b28ef7eef74c51b9a2d2bcf1e20017da1510a28d58,build,"{name: 'Running python ${{ matrix.python-version }} on ${{matrix.os}}', runs-on: '${{
     matrix.os }}', steps: [{uses: actions/checkout@v3}, {name: 'Set up Python ${{
         matrix.python-version }}', uses: actions/setup-python@v4, with: {python-version: '${{
@@ -1890,7 +1890,7 @@ f32ad2c0c209c27c37c0a7d0f30b802d909df9eef48cbca4dab45f6932df0e2e,help,"{if: '${{
 
         '}], strategy: {matrix: {os: [macOS-latest, ubuntu-latest, windows-latest],
       python-version: ['3.10', '3.11']}}}
-",['unknown'],Vito,Kav-K__GPTDiscord
+",['unknown'],build,Kav-K__GPTDiscord
 c9ee9c82a127e5040cd00fa6da4065f42b9397e92478fd205c761f1081ef16eb,build,"{runs-on: ubuntu-latest, steps: [{uses: actions/checkout@v3, with: {ref: '${{ github.head_ref
           }}'}}, {uses: actions/setup-python@v4}, {run: pip install black}, {run: black
         --check .}, {if: failure(), name: 'If needed, commit black changes to a new
