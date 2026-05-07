@@ -1,0 +1,1893 @@
+file_hash,job_name,job,SUGGESTED_WORKFLOW_TYPE,workflow_type,repository,LLM_LABEL,LLM_REASON
+04e8eb65ebb244bfdce18f482301c4a5cc739cdcad2a9ebcc2859c84b1db70e1,test,"{runs-on: ubuntu-latest, steps: [{name: Checkout repository, uses: actions/checkout@v3},
+    {name: 'Set up Python ${{ matrix.python-version }}', uses: actions/setup-python@v4,
+      with: {cache: pip, python-version: '${{ matrix.python-version == ''3.12'' &&
+          ''3.12.3'' || matrix.python-version }}'}}, {name: Check Python Version,
+      run: python --version}, {name: Install dependencies, run: 'python -m pip install
+        --upgrade pip
+
+        pip install tox==4.15.0 poetry
+
+        '}, {env: {OPENAI_API_KEY: '${{ secrets.OPENAI_API_KEY }}'}, name: Run tox,
+      run: tox}], strategy: {matrix: {python-version: ['3.10', '3.11', '3.12']}}}
+",['unknown'],test,AntonOsika__gpt-engineer,[test],Runs tox test suite across multiple Python versions to verify code functionality.
+24fbeb2eaafe191cda4d626104815a037e216834f345c0a9302c1d52e1c97f0f,pre-commit,"{permissions: {contents: write}, runs-on: ubuntu-latest, steps: [{uses: actions/checkout@v3},
+    {uses: actions/setup-python@v4}, {uses: pre-commit/action@v3.0.0, with: {extra_args: --all-files}}]}
+",['lint'],lint_security,AntonOsika__gpt-engineer,[lint_security],Runs pre-commit hooks for linting and code quality checks across all files.
+953a30775359908a4e420d0532b35d3c3517736afd745af591a8aa82e695ab36,mark-stale-issues,"{runs-on: ubuntu-latest, steps: [{name: Mark stale issues, uses: actions/stale@v4,
+      with: {days-before-stale: 60, stale-issue-message: This issue has been automatically
+          marked as stale because it has not had recent activity. It will be closed
+          if no further activity occurs.}}]}
+",['unknown'],lint_security,AntonOsika__gpt-engineer,[no_ops],Marks stale issues with automated labels; no functional impact on code or deployment.
+b49b58057bd39fccb7df78f7213d805bd534811a812b78b659219256fd74f513,build,"{runs-on: ubuntu-latest, steps: [{uses: actions/checkout@v3}, {uses: actions/setup-python@v4,
+      with: {python-version: '${{ matrix.python-version }}'}}, {name: Install Poetry,
+      run: 'curl -sSL https://install.python-poetry.org | python3 -
+
+        '}, {name: Add Poetry to PATH, run: echo ""$HOME/.local/bin"" >> $GITHUB_PATH},
+    {name: Set up Poetry cache, uses: actions/cache@v3, with: {key: '${{ runner.os
+          }}-poetry-${{ hashFiles(''**/poetry.lock'') }}', path: ~/.cache/pypoetry,
+        restore-keys: '${{ runner.os }}-poetry-
+
+          '}}, {name: Install dependencies, run: poetry install}, {name: Build package,
+      run: poetry build --format sdist}, {uses: actions/upload-artifact@v3, with: {
+        name: package, path: dist/}}], strategy: {matrix: {python-version: ['3.10']}}}
+",['build'],build,AntonOsika__gpt-engineer,[build],Installs Poetry dependencies and builds Python package distribution artifact (sdist).
+b49b58057bd39fccb7df78f7213d805bd534811a812b78b659219256fd74f513,publish,"{environment: {name: pypi, url: 'https://pypi.org/p/gpt-engineer'}, needs: build,
+  permissions: {id-token: write}, runs-on: ubuntu-latest, steps: [{uses: actions/download-artifact@v3,
+      with: {name: package, path: dist/}}, {name: Publish packages to PyPI, uses: pypa/gh-action-pypi-publish@release/v1,
+      with: {password: '${{ secrets.PYPI_API_TOKEN }}'}}]}
+",['build'],deploy_release,AntonOsika__gpt-engineer,[deploy_release],Downloads built package artifact and publishes to PyPI repository using authentication token.
+08902e730b8199fba694284d8392daac0b2310ad020dfd06fa37065e666b4ce1,clippy-test,"{runs-on: ubuntu-latest, steps: [{name: Checkout code, uses: actions/checkout@v4,
+      with: {lfs: true, token: '${{ secrets.GITHUB_TOKEN }}'}}, {name: Install Rust
+        stable, uses: dtolnay/rust-toolchain@stable, with: {components: 'rustfmt,
+          clippy', toolchain: 1.73.0}}, {name: Install Tauri deps, run: ""sudo apt\
+        \ update && \\\nsudo apt install libwebkit2gtk-4.0-dev \\\n  build-essential\
+        \ \\\n  curl \\\n  wget \\\n  file \\\n  libssl-dev \\\n  libgtk-3-dev \\\n\
+        \  libayatana-appindicator3-dev \\\n  librsvg2-dev\n""}, {continue-on-error: false,
+      name: Set up cargo cache, uses: actions/cache@v3, with: {key: '${{ runner.os
+          }}-cargo-${{ hashFiles(''**/Cargo.lock'') }}', path: ""~/.cargo/bin/\n~/.cargo/registry/index/\n\
+          ~/.cargo/registry/cache/\n~/.cargo/git/db/\ntarget/            \n"", restore-keys: '${{
+          runner.os }}-cargo-'}}, {name: Rustfmt, run: cargo --locked fmt -p bloop
+        -- --check}, {name: Clippy, run: cargo --locked clippy -p bloop}, {name: Tests,
+      run: cargo --locked test -p bloop --release}]}
+",['unknown'],test,BloopAI__bloop,[build|lint_security|test],"Installs dependencies and sets up Rust toolchain (build), runs rustfmt and clippy linting (lint_security), executes test suite (test)."
+37b6bb9c0904d4a136da75fce3f6d7481158fd88e6403ab2dcd5b7f995a0a173,test,"{runs-on: ubuntu-latest, steps: [{run: 'echo ""No checks required"" '}]}
+",['lint'],no_ops,BloopAI__bloop,[no_ops],Job only echoes a message with no functional impact or operations performed.
+37b6bb9c0904d4a136da75fce3f6d7481158fd88e6403ab2dcd5b7f995a0a173,fmt-clippy-build,"{runs-on: ubuntu-latest, steps: [{run: 'echo ""No checks required"" '}]}
+",['lint'],no_ops,BloopAI__bloop,[no_ops],Job only echoes a message with no functional impact or operations performed.
+37b6bb9c0904d4a136da75fce3f6d7481158fd88e6403ab2dcd5b7f995a0a173,build-client,"{runs-on: ubuntu-latest, steps: [{name: Checkout, uses: actions/checkout@v4, with: {
+        fetch-depth: 0}}, {name: Use Node.js, uses: actions/setup-node@v3, with: {
+        cache: npm, node-version: 16}}, {name: Install dependencies, run: npm ci},
+    {name: Run lint, run: npm run lint}, {name: Run type-check, run: npm run client-type-check},
+    {name: Run tests, run: npm --prefix client run test}]}
+",['lint'],lint_security|test,BloopAI__bloop,[lint_security|test],"Runs linting and type-checking (lint_security), executes test suite (test)."
+5147a4948766bb4b952be4dd6b74f2a4acba2daa054479d6ee09dc002c0c5952,build-and-sign-tauri,"{env: {ORT_LIB_LOCATION: '${{ github.workspace }}/lib/${{ matrix.target }}/onnxruntime'},
+  runs-on: '${{ matrix.name }}', steps: [{if: matrix.name == 'ubuntu-20.04', uses: pierotofy/set-swap-space@v1.0,
+      with: {swap-size-gb: 10}}, {name: Checkout code, uses: actions/checkout@v4,
+      with: {token: '${{ secrets.GITHUB_TOKEN }}'}}, {name: Create LFS file list,
+      run: git lfs ls-files --long | cut -d ' ' -f1 | sort > .lfs-assets-id}, {name: LFS
+        Cache, uses: actions/cache@v3, with: {key: '${{ runner.os }}-lfs-${{ hashFiles(''.lfs-assets-id'')
+          }}', path: .git/lfs/objects, restore-keys: '${{ runner.os }}-lfs-
+
+          '}}, {name: Git LFS Pull, run: git lfs install && git lfs pull}, {name: Install
+        Protoc, uses: arduino/setup-protoc@v2, with: {repo-token: '${{ secrets.GITHUB_TOKEN
+          }}'}}, {if: matrix.target == 'x86_64-unknown-linux-gnu', run: sudo apt-get
+        update && sudo apt-get install -y libgtk-3-dev webkit2gtk-4.0 libappindicator3-dev
+        librsvg2-dev patchelf}, {name: Use Node.js, uses: actions/setup-node@v3, with: {
+        cache: npm, node-version: 16}}, {name: Install app dependencies, run: npm
+        ci}, {name: Install Rust stable, uses: dtolnay/rust-toolchain@stable, with: {
+        target: '${{ matrix.target }}', toolchain: 1.73.0}}, {env: {analytics_fe_key: '${{
+          secrets.ANALYTICS_FE_WRITE_KEY_PROD }}', analytics_key: '${{ secrets.ANALYTICS_BE_WRITE_KEY_PROD
+          }}', sentry_dsn: '${{ secrets.SENTRY_DSN_BE }}', sentry_dsn_fe: '${{ secrets.SENTRY_DSN_FE
+          }}'}, if: '${{ env.analytics_fe_key == '''' || env.sentry_dsn_fe == ''''
+        || env.analytics_key == '''' || env.sentry_dsn == ''''}}', name: Check if
+        keys exist, run: exit 1}, {name: Set environment, run: 'echo ""{\""analytics_key\"":\""${{
+        secrets.ANALYTICS_BE_WRITE_KEY_PROD }}\"",\""analytics_data_plane\"":\""${{ secrets.ANALYTICS_DATA_PLANE_URL
+        }}\"",\""sentry_dsn_fe\"":\""${{ secrets.SENTRY_DSN_FE }}\"",\""sentry_dsn\"":\""${{
+        secrets.SENTRY_DSN_BE }}\"",\""analytics_key_fe\"":\""${{ secrets.ANALYTICS_FE_WRITE_KEY_PROD
+        }}\"",\""answer_api_url\"":\""${{ secrets.ANSWER_API_URL }}\"",\""cognito_userpool_id\"":\""${{
+        secrets.COGNITO_USERPOOL_ID }}\"",\""cognito_client_id\"":\""${{ secrets.COGNITO_CLIENT_ID
+        }}\"",\""cognito_auth_url\"":\""${{ secrets.COGNITO_AUTH_URL }}\"",\""cognito_mgmt_url\"":\""${{
+        secrets.COGNITO_MGMT_URL }}\"",\""cognito_config_url\"":\""${{ secrets.COGNITO_CONFIG_URL
+        }}\""}"" > apps/desktop/src-tauri/config/config.json'}, {name: Check environment
+        is set, run: du -h apps/desktop/src-tauri/config/config.json}, {name: Set
+        providerShortName in tauri.conf.json, uses: jossef/action-set-json-field@v2.1,
+      with: {field: tauri.bundle.macOS.providerShortName, file: apps/desktop/src-tauri/tauri.conf.json,
+        value: '${{ secrets.MAC_PROVIDER_SHORT_NAME }}'}}, {name: Set signingIdentity
+        in tauri.conf.json, uses: jossef/action-set-json-field@v2.1, with: {field: tauri.bundle.macOS.signingIdentity,
+        file: apps/desktop/src-tauri/tauri.conf.json, value: '${{ secrets.APPLE_SIGNING_IDENTITY
+          }}'}}, {if: matrix.name == 'macos-11', name: Create Signing API Key, run: 'echo
+        ""${{ secrets.APPLE_API_KEY_CONTENT }}"" > apiKey.p8'}, {if: matrix.target ==
+        'aarch64-apple-darwin', name: Remove onnxruntime from aarch64-apple-darwin
+        builds, uses: jossef/action-set-json-field@v2.1, with: {field: tauri.bundle.macOS.frameworks,
+        file: apps/desktop/src-tauri/tauri.conf.json, parse_json: true, value: '[]'}},
+    {id: release-version, name: get release version, run: echo ""RELEASE_VERSION=$(cat
+        apps/desktop/src-tauri/tauri.conf.json | jq '.package.version' | tr -d '""')""
+        >> ""$GITHUB_OUTPUT""}, {env: {APPLE_API_ISSUER: '${{ secrets.APPLE_API_ISSUER
+          }}', APPLE_API_KEY: '${{ secrets.APPLE_API_KEY }}', APPLE_API_KEY_PATH: /Users/runner/work/bloop/bloop/apiKey.p8,
+        APPLE_CERTIFICATE: '${{ secrets.APPLE_CERTIFICATE }}', APPLE_CERTIFICATE_PASSWORD: '${{
+          secrets.APPLE_CERTIFICATE_PASSWORD }}', APPLE_SIGNING_IDENTITY: '${{ secrets.APPLE_SIGNING_IDENTITY
+          }}', ENABLE_CODE_SIGNING: '${{ secrets.APPLE_CERTIFICATE }}', GITHUB_TOKEN: '${{
+          secrets.GITHUB_TOKEN }}', NODE_OPTIONS: --max-old-space-size=4096, ORT_LIB_LOCATION: '${{
+          github.workspace }}/lib/${{ matrix.target }}/onnxruntime', SENTRY_AUTH_TOKEN: '${{
+          secrets.SENTRY_AUTH_TOKEN }}', SENTRY_RELEASE_VERSION: '${{ steps.release-version.outputs.RELEASE_VERSION
+          }}', TAURI_BIN_PATH: apps/desktop/src-tauri/bin, TAURI_KEY_PASSWORD: '${{
+          secrets.TAURI_KEY_PASSWORD }}', TAURI_PRIVATE_KEY: '${{ secrets.TAURI_PRIVATE_KEY
+          }}'}, uses: tauri-apps/tauri-action@cb58ba3f65bd456ee564376585a8400bf0b71f47,
+      with: {args: '-- --target ""${{ matrix.target }}"" -v'}}, {name: Upload artifacts,
+      uses: actions/upload-artifact@v3, with: {name: '${{ matrix.target }}-app', path: 'target/${{
+          matrix.target }}/release/bundle', retention-days: 5}}, {name: Setup Sentry
+        CLI, uses: mathieu-bour/setup-sentry-cli@v1.3.0, with: {organization: '${{
+          secrets.SENTRY_ORG }}', project: '${{ secrets.SENTRY_PROJECT }}', token: '${{
+          secrets.SENTRY_AUTH_TOKEN }}', version: 2.21.2}}, {name: Create Sentry release,
+      run: 'sentry-cli releases new ""${{ steps.release-version.outputs.RELEASE_VERSION
+        }}""
+
+        sentry-cli releases set-commits ""${{ steps.release-version.outputs.RELEASE_VERSION
+        }}"" --auto
+
+        '}, {if: matrix.name == 'macos-11', name: (MacOS) Upload source maps to Sentry,
+      run: 'sentry-cli debug-files upload \
+
+        --log-level debug \
+
+        --include-sources \
+
+        target/${{ matrix.target }}/release/bloop.dSYM
+
+        '}, {if: matrix.name == 'macos-11', name: Rename tar.gz in macos, run: 'new_filename=""bloop_${{
+        steps.release-version.outputs.RELEASE_VERSION }}_$(echo ${{ matrix.target
+        }} | cut -d ''-'' -f 1).app.tar.gz""
+
+        mv ""target/${{ matrix.target }}/release/bundle/macos/bloop.app.tar.gz"" ""target/${{
+        matrix.target }}/release/bundle/macos/${new_filename}""
+
+        '}, {name: List files, run: 'ls -R target/${{ matrix.target }}/release/bundle'},
+    {name: Generate Changelog, run: 'release_version=""${{ steps.release-version.outputs.RELEASE_VERSION
+        }}""
+
+        sed ""s/VERSION/${release_version}/g"" release_description_template.txt > new_description.txt
+
+        cat new_description.txt
+
+        '}, {if: 'startsWith(github.ref, ''refs/tags/v'')', name: Upload release assets,
+      uses: softprops/action-gh-release@v1, with: {files: 'target/${{ matrix.target
+          }}/release/bundle/deb/*.deb
+
+          target/${{ matrix.target }}/release/bundle/appimage/*.AppImage
+
+          target/${{ matrix.target }}/release/bundle/appimage/*.tar.gz
+
+          target/${{ matrix.target }}/release/bundle/dmg/*.dmg
+
+          target/${{ matrix.target }}/release/bundle/macos/*.tar.gz
+
+          '}}], strategy: {fail-fast: false, matrix: {include: [{name: ubuntu-20.04,
+          target: x86_64-unknown-linux-gnu}, {name: macos-11, target: x86_64-apple-darwin},
+        {name: macos-11, target: aarch64-apple-darwin}], target: [x86_64-unknown-linux-gnu,
+        x86_64-apple-darwin, aarch64-apple-darwin]}}}
+","['build', 'release']",build|deploy_release,BloopAI__bloop,[build|deploy_release],"Compiles Rust/Node.js application with Tauri, uploads artifacts, creates Sentry release, and publishes GitHub release assets on tags."
+6623e1e8223cc9cfc8aae480bf07788b1f5a0d763d9b847b0dc2be2471c8f1f6,build_and_push,"{secrets: {awsAccountID: '${{ secrets.AWS_ACCOUNT_ID }}', awsRegion: '${{ secrets.AWS_REGION
+      }}', build-args: 'SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
+
+      SENTRY_RELEASE_VERSION=${{ github.sha }}
+
+      ', slackBuildWebhook: '${{ secrets.SLACK_BUILD_WEBHOOK }}'}, uses: BloopAI/workflows/.github/workflows/build-container.yml@main,
+  with: {repository: bloop, runner: ubuntu-latest, tag: 'build-${{ github.sha }}'}}
+",['deploy'],build,BloopAI__bloop,[build],"Builds Docker container image with specified tag and build arguments (Sentry token, release version)."
+6623e1e8223cc9cfc8aae480bf07788b1f5a0d763d9b847b0dc2be2471c8f1f6,validate_helm,"{secrets: {slackBuildWebhook: '${{ secrets.SLACK_BUILD_WEBHOOK }}'}, uses: BloopAI/reusable-workflows/.github/workflows/validate-helm-chart.yml@main,
+  with: {path: helm/bloop}}
+",['deploy'],lint_security,BloopAI__bloop,[lint_security],Validates Helm chart configuration for policy/syntax compliance.
+7399a7d3650ef583781223255f318b66a1be874937cef52a2f247aa3e7daef2e,test,"{runs-on: ubuntu-latest, steps: [{run: 'echo ""No checks required"" '}]}
+",['unknown'],no_ops,BloopAI__bloop,[no_ops],Job only echoes a message with no functional impact or operations performed.
+7399a7d3650ef583781223255f318b66a1be874937cef52a2f247aa3e7daef2e,fmt-clippy-build,"{runs-on: ubuntu-latest, steps: [{run: 'echo ""No checks required"" '}]}
+",['unknown'],no_ops,BloopAI__bloop,[no_ops],Job only echoes a message with no functional impact or operations performed.
+7399a7d3650ef583781223255f318b66a1be874937cef52a2f247aa3e7daef2e,build-client,"{runs-on: ubuntu-latest, steps: [{run: 'echo ""No checks required"" '}]}
+",['unknown'],no_ops,BloopAI__bloop,[no_ops],Job only echoes a message with no functional impact or operations performed.
+91131528408fc1aa2a66d45eb02526d1889f678ce863d5589b42e1181f5fb8b4,build_and_push,"{secrets: {awsAccountID: '${{ secrets.AWS_ACCOUNT_ID }}', awsRegion: '${{ secrets.AWS_REGION
+      }}', build-args: 'SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
+
+      SENTRY_RELEASE_VERSION=${{ github.event.release.tag_name }}
+
+      ', slackBuildWebhook: '${{ secrets.SLACK_BUILD_WEBHOOK }}'}, uses: BloopAI/workflows/.github/workflows/build-container.yml@main,
+  with: {repository: bloop, runner: ubuntu-latest, tag: '${{ github.event.release.tag_name
+      }}'}}
+",['unknown'],"
+
+
+
+deploy_release",BloopAI__bloop,[build|deploy_release],Builds Docker container with Sentry release metadata and pushes to registry on release tag.
+cf4ca34801c11d7cecfbe94fcde8774de1f6e533575cfcfe9daa467c4277b694,debug,"{runs-on: ubuntu-latest, steps: [{env: {GITHUB_CONTEXT: '${{ toJson(github) }}'},
+      name: $github, run: echo ""$GITHUB_CONTEXT""}]}
+",['unknown'],lint_security,BloopAI__bloop,[no_ops],"Echoes GitHub context to logs with no functional impact on build, test, or deployment."
+cf4ca34801c11d7cecfbe94fcde8774de1f6e533575cfcfe9daa467c4277b694,permissions,"{if: 'github.event.issue.pull_request && contains(github.event.comment.body, ''/build'')',
+  name: Validate user is the member of BloopAI organization, outputs: {is-member: '${{
+      steps.membership.outputs.is-member }}'}, runs-on: ubuntu-latest, steps: [{env: {
+        ACTOR: '${{ github.triggering_actor }}'}, id: membership, name: Validation,
+      run: ""members=$(curl -L \\\n  -H \""Accept: application/vnd.github+json\"" \\\n\
+        \  -H \""Authorization: Bearer ${{ secrets.BLOOP_DEVOPS_PAT}}\""\\\n  -H \""\
+        X-GitHub-Api-Version: 2022-11-28\"" \\\n  https://api.github.com/orgs/BloopAI/members\
+        \ | jq -r \"".[] .login\"")\nfor member in $(echo ${members}); do \n  if [[\
+        \ $member = $ACTOR ]]; then \n    echo \""is-member=true\"" >> $GITHUB_OUTPUT\n\
+        \  fi\ndone\n""}]}
+",['unknown'],lint_security,BloopAI__bloop,[no_ops],"Job only validates organization membership; performs no build, test, deploy, or security operations."
+cf4ca34801c11d7cecfbe94fcde8774de1f6e533575cfcfe9daa467c4277b694,build_tag,"{if: 'github.event.issue.pull_request && contains(github.event.comment.body, ''/build'')
+    && needs.permissions.outputs.is-member == ''true''', name: Run container build
+    on comment, needs: [permissions], outputs: {ref: '${{ steps.comment-branch.outputs.head_ref
+      }}', tag: 'build-${{ steps.comment-branch.outputs.head_sha }}'}, runs-on: ubuntu-latest,
+  steps: [{id: comment-branch, name: Get PR branch, uses: xt0rted/pull-request-comment-branch@v1},
+    {name: Checkout PR branch, uses: actions/checkout@v4, with: {ref: '${{ steps.comment-branch.outputs.head_ref
+          }}'}}]}
+",['unknown'],build,BloopAI__bloop,[build],Builds container image on PR comment trigger; outputs ref and tag for downstream build processes.
+cf4ca34801c11d7cecfbe94fcde8774de1f6e533575cfcfe9daa467c4277b694,build_and_push,"{if: needs.permissions.outputs.is-member == 'true', needs: [permissions, build_tag],
+  secrets: {awsAccountID: '${{ secrets.AWS_ACCOUNT_ID }}', awsRegion: '${{ secrets.AWS_REGION
+      }}', build-args: 'SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
+
+      SENTRY_RELEASE_VERSION=${{ needs.build_tag.outputs.tag }}
+
+      ', slackBuildWebhook: '${{ secrets.SLACK_BUILD_WEBHOOK }}'}, uses: BloopAI/workflows/.github/workflows/build-container.yml@main,
+  with: {repository: bloop, runner: ubuntu-latest, tag: '${{ needs.build_tag.outputs.tag
+      }}'}}
+",['unknown'],build,BloopAI__bloop,[build],"Builds Docker container image with specified tag and build arguments (Sentry token, release version)."
+cf4ca34801c11d7cecfbe94fcde8774de1f6e533575cfcfe9daa467c4277b694,report_status,"{if: always() && needs.permissions.outputs.is-member == 'true', name: Report status
+    of the build, needs: [permissions, build_tag, build_and_push], runs-on: ubuntu-latest,
+  steps: [{id: pr, name: pr, run: 'PR_NUMBER=$(echo $GITHUB_REF | awk ''BEGIN { FS
+        = ""/"" } ; { print $3 }'')
+
+        echo ""number=${PR_NUMBER}"" >> ${GITHUB_OUTPUT}
+
+        '}, {if: '${{ contains(needs.*.result, ''failure'') }}', name: Comment failure
+        build, uses: thollander/actions-comment-pull-request@v2, with: {message: ':red_circle:
+          Bloop container with `${{ needs.build_tag.outputs.tag }}` tag failed!
+
+          :link: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{
+          github.run_id }}
+
+          ', pr_number: '${{ steps.pr.outputs.number }}'}}, {if: '${{ !contains(needs.*.result,
+        ''failure'') }}', name: Comment success build, uses: thollander/actions-comment-pull-request@v2,
+      with: {message: ':green_circle: Bloop container with `${{ needs.build_tag.outputs.tag
+          }}` tag is ready!
+
+          :link: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{
+          github.run_id }}
+
+          ', pr_number: '${{ steps.pr.outputs.number }}'}}]}
+",['unknown'],deploy_release,BloopAI__bloop,[no_ops],"Job only reports build status via PR comments; no functional deployment, testing, or build operations."
+e3663d18d528eba177f40a7d1ca8fff42987865a548155777b22726adeabc17a,clippy-test,"{runs-on: ubuntu-latest, steps: [{name: Checkout code, uses: actions/checkout@v4,
+      with: {lfs: true, token: '${{ secrets.GITHUB_TOKEN }}'}}, {name: Install Rust
+        stable, uses: dtolnay/rust-toolchain@stable, with: {components: 'rustfmt,
+          clippy', toolchain: 1.73.0}}, {continue-on-error: false, name: Set up cargo
+        cache, uses: actions/cache@v3, with: {key: '${{ runner.os }}-cargo-${{ hashFiles(''**/Cargo.lock'')
+          }}', path: ""~/.cargo/bin/\n~/.cargo/registry/index/\n~/.cargo/registry/cache/\n\
+          ~/.cargo/git/db/\ntarget/            \n"", restore-keys: '${{ runner.os }}-cargo-'}},
+    {name: Rustfmt, run: cargo --locked fmt -p bleep -- --check}, {name: Clippy, run: cargo
+        --locked clippy -p bleep}, {name: Tests, run: cargo --locked test -p bleep
+        --release}]}
+",['unknown'],test,BloopAI__bloop,[lint_security|test],"Runs rustfmt (linting), clippy (security/linting), and cargo test suite (testing)."
+05d673f3f0818989c8f8e33d4736d3e4193080f6aeef873baaa8503026c34229,golangci,"{name: lint, runs-on: ubuntu-latest, steps: [{uses: actions/checkout@v4}, {uses: actions/setup-go@v5,
+      with: {cache-dependency-path: wren-launcher/go.sum, go-version: '1.24'}}, {
+      name: golangci-lint, uses: golangci/golangci-lint-action@v8, with: {version: v2.3.1,
+        working-directory: wren-launcher}}]}
+","['lint', 'test']",lint_security,Canner__WrenAI,[lint_security],Runs golangci-lint for Go code linting and static analysis.
+05d673f3f0818989c8f8e33d4736d3e4193080f6aeef873baaa8503026c34229,fmt-and-test,"{runs-on: ubuntu-latest, steps: [{name: Checkout repository, uses: actions/checkout@v4},
+    {name: Setup Go, uses: actions/setup-go@v5, with: {cache-dependency-path: wren-launcher/go.sum,
+        go-version: '1.24'}}, {name: Install goimports, run: go install golang.org/x/tools/cmd/goimports@latest},
+    {name: Download dependencies, run: go mod download}, {name: Run format check,
+      run: ""make fmt\n# Check if there are any formatting changes\nif [ -n \""$(git\
+        \ diff --name-only)\"" ]; then\n  echo \""Code is not formatted properly. Please\
+        \ run 'make fmt' and commit the changes.\""\n  git diff\n  exit 1\nfi\n""},
+    {name: Run go vet, run: make vet}, {name: Run tests, run: go test ./commands/dbt}]}
+","['lint', 'test']",test,Canner__WrenAI,[lint_security|test],"Runs code formatting checks (goimports, fmt), linting (go vet), and executes test suite (go test)."
+05d673f3f0818989c8f8e33d4736d3e4193080f6aeef873baaa8503026c34229,security-scan,"{needs: fmt-and-test, runs-on: ubuntu-latest, steps: [{name: Checkout repository,
+      uses: actions/checkout@v4}, {name: Setup Go, uses: actions/setup-go@v5, with: {
+        cache-dependency-path: wren-launcher/go.sum, go-version: '1.24'}}, {name: Run
+        Gosec Security Scanner, run: 'go install github.com/securego/gosec/v2/cmd/gosec@latest
+
+        gosec ./...
+
+        '}, {name: Run Go mod audit, run: 'go mod verify
+
+        go list -json -deps ./... | jq -r ''.Module | select(.Version) | ""\(.Path)
+        \(.Version)""'' | sort -u
+
+        '}]}
+","['lint', 'test']",lint_security,Canner__WrenAI,[lint_security],Runs Gosec security scanner and Go module audit for vulnerability detection.
+2102adf6be5466373c55a5fd94fa677424cdf2b209900c038d776266a15749a3,build-image,"{outputs: {tag_name: '${{ steps.tag-preparation.outputs.TAG_NAME }}'}, runs-on: '${{
+    matrix.arch.runner }}', steps: [{uses: actions/checkout@v4}, {name: Login to GitHub
+        Container Registry, uses: docker/login-action@v3, with: {password: '${{ secrets.GITHUB_TOKEN
+          }}', registry: ghcr.io, username: '${{ github.actor }}'}}, {id: tag-preparation,
+      name: Prepare tag name, run: 'tag_name=main-$(git log -1 --pretty=%h)
+
+        echo ""TAG_NAME=$tag_name"" >> $GITHUB_OUTPUT
+
+        '}, {name: Set up Docker Buildx, uses: docker/setup-buildx-action@v3}, {name: Prepare
+        platform, run: 'platform=${{ matrix.arch.platform }}
+
+        echo ""PLATFORM_PAIR=${platform//\//-}"" >> $GITHUB_ENV
+
+        '}, {id: build, name: Build and push by digest, uses: docker/build-push-action@v6,
+      with: {context: ./wren-ai-service, file: ./wren-ai-service/docker/Dockerfile,
+        labels: '${{ env.WREN_AI_SERVICE_IMAGE }}', outputs: 'type=image,name=${{
+          env.WREN_AI_SERVICE_IMAGE }},push-by-digest=true,name-canonical=true,push=true',
+        platforms: '${{ matrix.arch.platform }}'}}, {name: Export digest, run: 'mkdir
+        -p /tmp/digests
+
+        digest=""${{ steps.build.outputs.digest }}""
+
+        touch ""/tmp/digests/${digest#sha256:}""
+
+        '}, {name: Upload digest, uses: actions/upload-artifact@v4, with: {if-no-files-found: error,
+        name: 'digests-${{ env.PLATFORM_PAIR }}', path: /tmp/digests/*, retention-days: 1}}],
+  strategy: {fail-fast: false, matrix: {arch: [{platform: linux/amd64, runner: ubuntu-latest},
+        {platform: linux/arm64, runner: linux_arm64_runner}]}}}
+",['build'],build,Canner__WrenAI,[build|deploy_release],Builds Docker images with docker/build-push-action (build) and pushes to registry with push=true (deploy_release).
+2102adf6be5466373c55a5fd94fa677424cdf2b209900c038d776266a15749a3,merge,"{needs: [build-image], runs-on: ubuntu-latest, steps: [{name: Download digests, uses: actions/download-artifact@v4,
+      with: {merge-multiple: true, path: /tmp/digests, pattern: digests-*}}, {name: Set
+        up Docker Buildx, uses: docker/setup-buildx-action@v3}, {id: meta, name: Docker
+        meta, uses: docker/metadata-action@v5, with: {images: '${{ env.WREN_AI_SERVICE_IMAGE
+          }}', tags: 'type=raw,${{ needs.build-image.outputs.tag_name }}
+
+          type=raw,nightly
+
+          '}}, {name: Login to GitHub Container Registry, uses: docker/login-action@v3,
+      with: {password: '${{ secrets.GITHUB_TOKEN }}', registry: ghcr.io, username: '${{
+          github.actor }}'}}, {name: Create manifest list and push, run: ""TAGS=$(echo\
+        \ \""${{ steps.meta.outputs.tags }}\"" | awk '{printf \""--tag %s \"", $0}')\n\
+        docker buildx imagetools create $(jq -cr '.tags | map(\""-t \"" + .) | join(\""\
+        \ \"")' <<< \""$DOCKER_METADATA_OUTPUT_JSON\"") \\\n  $(printf '${{ env.WREN_AI_SERVICE_IMAGE\
+        \ }}@sha256:%s ' *) \\\n  $TAGS\n"", working-directory: /tmp/digests}]}
+",['build'],deploy_release,Canner__WrenAI,[deploy_release],Logs into container registry and pushes Docker image manifest with tags to GHCR.
+298d23e5ab0b5f3233a409b0e72e2316ca7396b9c86581802391dd66dc5448ee,pytest,"{if: '${{ contains(github.event.pull_request.labels.*.name, ''ci/ai-service'') ||
+    github.event_name == ''push'' }}', runs-on: ubuntu-22.04, steps: [{uses: actions/checkout@v4},
+    {name: Install Poetry, uses: abatilo/actions-poetry@v3, with: {poetry-version: 1.8.3}},
+    {name: Set up Python, uses: actions/setup-python@v5, with: {cache: poetry, python-version-file: ./wren-ai-service/pyproject.toml}},
+    {name: Install the project dependencies, run: poetry install --without eval},
+    {name: Install Just, uses: extractions/setup-just@v2, with: {just-version: 1.36.0}},
+    {name: Initialize the config, run: 'just init --non-dev
+
+        '}, {env: {OPENAI_API_KEY: '${{ secrets.OPENAI_API_KEY }}'}, name: Prepare
+        testing environment and Run tests, run: 'just test
+
+        '}], timeout-minutes: 10}
+",['test'],test,Canner__WrenAI,[build|test],Installs Poetry dependencies (build) and runs test suite via just command (test).
+42a57e0e9d8a4b7ad9d26f8574ebf619c43e3e3869c9244cbd69d9688e34adfd,upgrade-ai-service-version,"{runs-on: ubuntu-latest, steps: [{id: generate-token, name: Generate a token, uses: actions/create-github-app-token@v1,
+      with: {app-id: '${{ vars.CI_APP_ID }}', private-key: '${{ secrets.CI_APP_PRIVATE_KEY
+          }}'}}, {uses: actions/checkout@v4, with: {fetch-depth: 0, token: '${{ steps.generate-token.outputs.token
+          }}'}}, {name: Set up Git, run: 'git config --global user.name ""wren-ai[bot]""
+
+        git config --global user.email ""dev@cannerdata.com""
+
+        '}, {name: Set up Python 3.12.0, uses: actions/setup-python@v4, with: {python-version: 3.12.0}},
+    {name: Install Poetry, uses: abatilo/actions-poetry@v2, with: {poetry-version: 1.8.3}},
+    {id: changelog, name: Generate and Save Change Log, run: ""echo \""Generating change\
+        \ log...\""\nPREVIOUS_VERSION=release/ai-service/$(poetry version -s)\necho\
+        \ \""Previous version: $PREVIOUS_VERSION\""\n\n# Get the change log from the\
+        \ previous version to the current HEAD\n# If there is no change log, the command\
+        \ will return an error, so we use || true to ignore the error\nCHANGE_LOG=$(git\
+        \ log --pretty=format:\""%s\"" $PREVIOUS_VERSION..HEAD | grep wren-ai-service\
+        \ || true)\n\n# Separate the change log into categories\nFEATURES=$(echo \""\
+        $CHANGE_LOG\"" | grep \""^feat\"" | sed 's/^/- /')\nFIXES_AND_CHORES=$(echo \""\
+        $CHANGE_LOG\"" | grep -E \""^(fix|chore)\"" | sed 's/^/- /')\n\n# Create the\
+        \ full change log\nFULL_CHANGE_LOG=\""\\nChangelog for the version\\n\""\nif\
+        \ [ -n \""$FEATURES\"" ]; then\n  FULL_CHANGE_LOG+=\""\\nFeature and Enhancement\\\
+        n$FEATURES\""\nfi\nif [ -n \""$FIXES_AND_CHORES\"" ]; then\n  FULL_CHANGE_LOG+=\""\
+        \\n\\nFixes and Chores\\n$FIXES_AND_CHORES\""\nfi\n\n{\n  echo \""CHANGE_LOG<<EOF\""\
+        \n  echo -e \""$FULL_CHANGE_LOG\""\n  echo EOF\n} >> $GITHUB_ENV\n""}, {name: Upgrade
+        AI Service version, run: 'version=${{ github.event.inputs.version }}
+
+        poetry version --next-phase $version
+
+        git add pyproject.toml
+
+        git commit -m ""Upgrade AI Service version to $version""
+
+        git push
+
+        git tag -a ""release/ai-service/$version"" -m ""${{ env.CHANGE_LOG }}""
+
+        git push origin ""release/ai-service/$version""
+
+        '}]}
+",['build'],deploy_release,Canner__WrenAI,[deploy_release],"Creates GitHub App token, generates changelog, upgrades version, commits, and pushes git tags for release."
+42a57e0e9d8a4b7ad9d26f8574ebf619c43e3e3869c9244cbd69d9688e34adfd,build-image,"{needs: upgrade-ai-service-version, runs-on: '${{ matrix.arch.runner }}', steps: [
+    {uses: actions/checkout@v4, with: {ref: '${{ github.ref }}'}}, {name: Login to
+        GitHub Container Registry, uses: docker/login-action@v3, with: {password: '${{
+          secrets.GITHUB_TOKEN }}', registry: ghcr.io, username: '${{ github.actor
+          }}'}}, {name: Set up Docker Buildx, uses: docker/setup-buildx-action@v3},
+    {name: Prepare platform, run: 'platform=${{ matrix.arch.platform }}
+
+        echo ""PLATFORM_PAIR=${platform//\//-}"" >> $GITHUB_ENV
+
+        '}, {id: build, name: Build and push by digest, uses: docker/build-push-action@v6,
+      with: {context: ./wren-ai-service, file: ./wren-ai-service/docker/Dockerfile,
+        labels: '${{ env.WREN_AI_SERVICE_IMAGE }}', outputs: 'type=image,name=${{
+          env.WREN_AI_SERVICE_IMAGE }},push-by-digest=true,name-canonical=true,push=true',
+        platforms: '${{ matrix.arch.platform }}'}}, {name: Export digest, run: 'mkdir
+        -p /tmp/digests
+
+        digest=""${{ steps.build.outputs.digest }}""
+
+        touch ""/tmp/digests/${digest#sha256:}""
+
+        '}, {name: Upload digest, uses: actions/upload-artifact@v4, with: {if-no-files-found: error,
+        name: 'digests-${{ env.PLATFORM_PAIR }}', path: /tmp/digests/*, retention-days: 1}}],
+  strategy: {fail-fast: false, matrix: {arch: [{platform: linux/amd64, runner: ubuntu-latest},
+        {platform: linux/arm64, runner: linux_arm64_runner}]}}}
+",['build'],build|deploy_release,Canner__WrenAI,[deploy_release],Builds Docker images and pushes to registry (push=true) for multiple architectures.
+42a57e0e9d8a4b7ad9d26f8574ebf619c43e3e3869c9244cbd69d9688e34adfd,merge,"{needs: [build-image], runs-on: ubuntu-latest, steps: [{name: Download digests, uses: actions/download-artifact@v4,
+      with: {merge-multiple: true, path: /tmp/digests, pattern: digests-*}}, {name: Set
+        up Docker Buildx, uses: docker/setup-buildx-action@v3}, {id: meta, name: Docker
+        meta, uses: docker/metadata-action@v5, with: {images: '${{ env.WREN_AI_SERVICE_IMAGE
+          }}', tags: 'type=raw,${{ github.event.inputs.version }}
+
+          type=raw,latest
+
+          '}}, {name: Login to GitHub Container Registry, uses: docker/login-action@v3,
+      with: {password: '${{ secrets.GITHUB_TOKEN }}', registry: ghcr.io, username: '${{
+          github.actor }}'}}, {name: Create manifest list and push, run: ""TAGS=$(echo\
+        \ \""${{ steps.meta.outputs.tags }}\"" | awk '{printf \""--tag %s \"", $0}')\n\
+        docker buildx imagetools create $(jq -cr '.tags | map(\""-t \"" + .) | join(\""\
+        \ \"")' <<< \""$DOCKER_METADATA_OUTPUT_JSON\"") \\\n  $(printf '${{ env.WREN_AI_SERVICE_IMAGE\
+        \ }}@sha256:%s ' *) \\\n  $TAGS\n"", working-directory: /tmp/digests}]}
+",['build'],deploy_release,Canner__WrenAI,[deploy_release],Creates and pushes Docker manifest list to container registry with version tags.
+7a97eb0db5a8d2791b2b3d360a7c268ef6be23cd59da55a7d6b0964a6635de80,unit-test,"{if: '${{ github.event.label.name == ''ci/ui''}}', runs-on: ubuntu-latest, steps: [
+    {uses: actions/checkout@v4}, {name: Set up Node.js, uses: actions/setup-node@v2,
+      with: {node-version: '18'}}, {id: yarn-cache-dir-path, name: Get yarn cache
+        directory path, run: 'echo ""::set-output name=dir::$(yarn cache dir)""'}, {
+      id: yarn-cache, uses: actions/cache@v2, with: {key: '${{ runner.os }}-yarn-${{
+          hashFiles(''**/yarn.lock'') }}', path: '${{ steps.yarn-cache-dir-path.outputs.dir
+          }}
+
+          ', restore-keys: '${{ runner.os }}-yarn-
+
+          '}}, {continue-on-error: true, if: '${{ steps.yarn-cache.cache-hit != ''true''
+        }}', name: List the state of node modules, run: yarn list}, {name: Install
+        dependencies, run: yarn}, {name: Run tests, run: yarn test}]}
+",['test'],test,Canner__WrenAI,[build|test],Installs Node.js dependencies via yarn (build) and executes test suite (test).
+88cdf6b00d86ed806397597c975fa46f1e4172aa518de22c5548a194abab2768,eslint,"{if: '${{ github.event.label.name == ''ci/ui'' }}', runs-on: ubuntu-latest, steps: [
+    {uses: actions/checkout@v3}, {name: Set up Node.js, uses: actions/setup-node@v2,
+      with: {node-version: '18'}}, {id: yarn-cache-dir-path, name: Get yarn cache
+        directory path, run: 'echo ""::set-output name=dir::$(yarn cache dir)""'}, {
+      id: yarn-cache, uses: actions/cache@v2, with: {key: '${{ runner.os }}-yarn-${{
+          hashFiles(''**/yarn.lock'') }}', path: '${{ steps.yarn-cache-dir-path.outputs.dir
+          }}
+
+          ', restore-keys: '${{ runner.os }}-yarn-
+
+          '}}, {continue-on-error: true, if: '${{ steps.yarn-cache.outputs.cache-hit
+        != ''true'' }}', name: List the state of node modules, run: yarn list}, {
+      name: Install Node.js dependencies, run: yarn install}, {name: Run lint, run: yarn
+        lint}]}
+",['lint'],lint_security,Canner__WrenAI,[lint_security],"Sets up Node.js environment, installs dependencies, and runs linting checks on codebase."
+8a97da004dfb4e76e9156cc2fdcffeede96a1f98c14d798669c0115efc6c68eb,build-image,"{outputs: {tag_name: '${{ steps.tag-preparation.outputs.TAG_NAME }}'}, runs-on: '${{
+    matrix.arch.runner }}', steps: [{uses: actions/checkout@v4}, {name: Login to GitHub
+        Container Registry, uses: docker/login-action@v3, with: {password: '${{ secrets.GITHUB_TOKEN
+          }}', registry: ghcr.io, username: '${{ github.actor }}'}}, {id: tag-preparation,
+      name: Prepare tag name, run: ""if [ -n \""${{ github.event.inputs.docker_image_tag_name\
+        \ }}\"" ]; then\n  tag_name=${{ github.event.inputs.docker_image_tag_name }}\n\
+        else\n  tag_name=$(echo ${{ github.ref_name }} | sed 's/[^a-zA-Z0-9]/-/g')-$(git\
+        \ log -1 --pretty=%h)\nfi\necho \""TAG_NAME=$tag_name\"" >> $GITHUB_OUTPUT\n""},
+    {name: Set up Docker Buildx, uses: docker/setup-buildx-action@v3}, {name: Prepare
+        platform, run: 'platform=${{ matrix.arch.platform }}
+
+        echo ""PLATFORM_PAIR=${platform//\//-}"" >> $GITHUB_ENV
+
+        '}, {id: build, name: Build and push by digest, uses: docker/build-push-action@v6,
+      with: {context: ./wren-ui, labels: '${{ env.WREN_UI_IMAGE }}', outputs: 'type=image,name=${{
+          env.WREN_UI_IMAGE }},push-by-digest=true,name-canonical=true,push=true',
+        platforms: '${{ matrix.arch.platform }}'}}, {name: Export digest, run: 'mkdir
+        -p /tmp/digests
+
+        digest=""${{ steps.build.outputs.digest }}""
+
+        touch ""/tmp/digests/${digest#sha256:}""
+
+        '}, {name: Upload digest, uses: actions/upload-artifact@v4, with: {if-no-files-found: error,
+        name: 'digests-${{ env.PLATFORM_PAIR }}', path: /tmp/digests/*, retention-days: 1}}],
+  strategy: {fail-fast: false, matrix: {arch: [{platform: linux/amd64, runner: ubuntu-latest},
+        {platform: linux/arm64, runner: linux_arm64_runner}]}}}
+",['build'],deploy_release,Canner__WrenAI,[build|deploy_release],Builds Docker images with push=true and logs into container registry for deployment.
+8a97da004dfb4e76e9156cc2fdcffeede96a1f98c14d798669c0115efc6c68eb,merge,"{needs: [build-image], runs-on: ubuntu-latest, steps: [{name: Download digests, uses: actions/download-artifact@v4,
+      with: {merge-multiple: true, path: /tmp/digests, pattern: digests-*}}, {name: Set
+        up Docker Buildx, uses: docker/setup-buildx-action@v3}, {id: meta, name: Docker
+        meta, uses: docker/metadata-action@v5, with: {images: '${{ env.WREN_UI_IMAGE
+          }}', tags: '${{ needs.build-image.outputs.tag_name }}
+
+          '}}, {name: Login to GitHub Container Registry, uses: docker/login-action@v3,
+      with: {password: '${{ secrets.GITHUB_TOKEN }}', registry: ghcr.io, username: '${{
+          github.actor }}'}}, {name: Create manifest list and push, run: ""TAGS=$(echo\
+        \ \""${{ steps.meta.outputs.tags }}\"" | awk '{printf \""--tag %s \"", $0}')\n\
+        docker buildx imagetools create $(jq -cr '.tags | map(\""-t \"" + .) | join(\""\
+        \ \"")' <<< \""$DOCKER_METADATA_OUTPUT_JSON\"") \\\n  $(printf '${{ env.WREN_UI_IMAGE\
+        \ }}@sha256:%s ' *) \\\n  $TAGS\n"", working-directory: /tmp/digests}]}
+",['build'],deploy_release,Canner__WrenAI,[deploy_release],Authenticates to container registry and pushes Docker image manifest with tags.
+8c7e8343ecea27938dc3807b9c716145342866bb64da75783a24764c786fdff1,tag-pr,"{permissions: {pull-requests: write}, runs-on: ubuntu-latest, steps: [{name: Checkout
+        code, uses: actions/checkout@v3, with: {fetch-depth: 0}}, {id: changed-files,
+      name: Get changed files, uses: tj-actions/changed-files@v46}, {name: Tag PR
+        based on changed files and title, uses: actions/github-script@v6, with: {
+        github-token: '${{ secrets.GITHUB_TOKEN }}', script: ""const changedFiles =\
+          \ '${{ steps.changed-files.outputs.all_changed_files }}'.split(' ');\nconst\
+          \ labels = new Set();\n\n// Define label colors\nconst labelColors = {\n\
+          \  'wren-ui': 'f29513',        // Orange\n  'launcher': 'f29513',      \
+          \ // Orange (same as wren-ui)\n  'wren-ai-service': 'f29513', // Orange\
+          \ (same as wren-ui)\n  'deployment': '0075ca',     // Blue\n  'ai-env-changed':\
+          \ 'd73a4a',  // Red\n  'ui-env-changed': 'd73a4a'   // Red\n};\n\n\n// Check\
+          \ for files in specific directories\nfor (const file of changedFiles) {\n\
+          \  if (file.startsWith('wren-ui/src/')) {\n    labels.add('wren-ui');\n\
+          \  } else if (file.startsWith('deployment/')) {\n    labels.add('deployment');\n\
+          \  } else if (file.startsWith('wren-launcher/')) {\n    labels.add('launcher');\n\
+          \  } else if (file.startsWith('wren-ai-service/')) {\n    labels.add('wren-ai-service');\n\
+          \  } \n  if (file.startsWith('docker/') && file.includes('.example')) {\n\
+          \    labels.add('ai-env-changed'); \n  }\n  if (file.startsWith('wren-ui/src/apollo/server/config.ts'))\
+          \ {\n    labels.add('ui-env-changed');\n  }\n}\n\n// Extract milestone from\
+          \ PR title\nconst prTitle = context.payload.pull_request.title;\nconst milestoneMatch\
+          \ = prTitle.match(/\\(milestone:\\s*([^)]+)\\)/i);\n\nif (milestoneMatch\
+          \ && milestoneMatch[1]) {\n  const milestone = milestoneMatch[1].trim();\n\
+          \  if (milestone) {\n    labels.add(milestone);\n    console.log(`Found\
+          \ milestone in PR title: ${milestone}`);\n  }\n}\n\n// Append env changed\
+          \ label to PR title\nif (labels.has('ai-env-changed')) {\n  // check if\
+          \ pr title contains \""ai-env-changed\""\n  if (!prTitle.includes('ai-env-changed'))\
+          \ {\n    const newTitle = `${prTitle} (ai-env-changed)`;\n    await github.rest.issues.update({\n\
+          \      owner: context.repo.owner,\n      repo: context.repo.repo,\n    \
+          \  issue_number: context.issue.number,\n      title: newTitle\n    });\n\
+          \  }\n}\n\nif (labels.has('ui-env-changed')) {\n  // check if pr title contains\
+          \ \""ui-env-changed\""\n  if (!prTitle.includes('ui-env-changed')) {\n   \
+          \ const newTitle = `${prTitle} (ui-env-changed)`;\n    await github.rest.issues.update({\n\
+          \      owner: context.repo.owner,\n      repo: context.repo.repo,\n    \
+          \  issue_number: context.issue.number,\n      title: newTitle\n    });\n\
+          \  }\n}\n\nif (labels.size > 0) {\n  // Create or update labels with colors\n\
+          \  for (const label of labels) {\n    try {\n      // Try to create the\
+          \ label with color\n      if (labelColors[label]) {\n        await github.rest.issues.createLabel({\n\
+          \          owner: context.repo.owner,\n          repo: context.repo.repo,\n\
+          \          name: label,\n          color: labelColors[label]\n        });\n\
+          \      }\n    } catch (error) {\n      // Label already exists, update its\
+          \ color if needed\n      if (labelColors[label]) {\n        try {\n    \
+          \      await github.rest.issues.updateLabel({\n            owner: context.repo.owner,\n\
+          \            repo: context.repo.repo,\n            name: label,\n      \
+          \      color: labelColors[label]\n          });\n        } catch (updateError)\
+          \ {\n          console.log(`Could not update color for label ${label}: ${updateError.message}`);\n\
+          \        }\n      }\n    }\n  }\n  \n  // Add labels to PR\n  await github.rest.issues.addLabels({\n\
+          \    owner: context.repo.owner,\n    repo: context.repo.repo,\n    issue_number:\
+          \ context.issue.number,\n    labels: Array.from(labels)\n  });\n  \n  console.log(`Added\
+          \ labels: ${Array.from(labels).join(', ')}`);\n} else {\n  console.log('No\
+          \ matching directories or milestone found');\n}\n""}}]}
+",['unknown'],lint_security,Canner__WrenAI,[no_ops],Automatically tags PRs based on changed files and title; no functional impact on code or deployment.
+9b490f066d0a3f6573e57afc8f07985e4ee725e77fd24872ce7651fd8f025a5b,build-image,"{runs-on: '${{ matrix.arch.runner }}', steps: [{uses: actions/checkout@v4}, {name: Login
+        to GitHub Container Registry, uses: docker/login-action@v3, with: {password: '${{
+          secrets.GITHUB_TOKEN }}', registry: ghcr.io, username: '${{ github.actor
+          }}'}}, {name: Set up Docker Buildx, uses: docker/setup-buildx-action@v3},
+    {name: Prepare platform, run: 'platform=${{ matrix.arch.platform }}
+
+        echo ""PLATFORM_PAIR=${platform//\//-}"" >> $GITHUB_ENV
+
+        '}, {id: build, name: Build and push by digest, uses: docker/build-push-action@v6,
+      with: {context: ./wren-ui, labels: '${{ env.WREN_UI_IMAGE }}', outputs: 'type=image,name=${{
+          env.WREN_UI_IMAGE }},push-by-digest=true,name-canonical=true,push=true',
+        platforms: '${{ matrix.arch.platform }}'}}, {name: Export digest, run: 'mkdir
+        -p /tmp/digests
+
+        digest=""${{ steps.build.outputs.digest }}""
+
+        touch ""/tmp/digests/${digest#sha256:}""
+
+        '}, {name: Upload digest, uses: actions/upload-artifact@v4, with: {if-no-files-found: error,
+        name: 'digests-${{ env.PLATFORM_PAIR }}', path: /tmp/digests/*, retention-days: 1}}],
+  strategy: {fail-fast: false, matrix: {arch: [{platform: linux/amd64, runner: ubuntu-latest},
+        {platform: linux/arm64, runner: linux_arm64_runner}]}}}
+",['build'],build|deploy_release,Canner__WrenAI,[build|deploy_release],Builds Docker images with multi-platform support and pushes to registry (push=true).
+9b490f066d0a3f6573e57afc8f07985e4ee725e77fd24872ce7651fd8f025a5b,merge,"{needs: [build-image], runs-on: ubuntu-latest, steps: [{name: Download digests, uses: actions/download-artifact@v4,
+      with: {merge-multiple: true, path: /tmp/digests, pattern: digests-*}}, {name: Set
+        up Docker Buildx, uses: docker/setup-buildx-action@v3}, {id: meta, name: Docker
+        meta, uses: docker/metadata-action@v5, with: {images: '${{ env.WREN_UI_IMAGE
+          }}', tags: '${{ github.event.inputs.version }}
+
+          '}}, {name: Login to GitHub Container Registry, uses: docker/login-action@v3,
+      with: {password: '${{ secrets.GITHUB_TOKEN }}', registry: ghcr.io, username: '${{
+          github.actor }}'}}, {name: Create manifest list and push, run: ""TAGS=$(echo\
+        \ \""${{ steps.meta.outputs.tags }}\"" | awk '{printf \""--tag %s \"", $0}')\n\
+        docker buildx imagetools create $(jq -cr '.tags | map(\""-t \"" + .) | join(\""\
+        \ \"")' <<< \""$DOCKER_METADATA_OUTPUT_JSON\"") \\\n  $(printf '${{ env.WREN_UI_IMAGE\
+        \ }}@sha256:%s ' *) \\\n  $TAGS\n"", working-directory: /tmp/digests}]}
+",['build'],deploy_release,Canner__WrenAI,[deploy_release],Logs into container registry and pushes Docker image manifest with version tags.
+9b490f066d0a3f6573e57afc8f07985e4ee725e77fd24872ce7651fd8f025a5b,tag-ui-version,"{needs: [merge], runs-on: ubuntu-latest, steps: [{id: generate-token, name: Generate
+        a token, uses: actions/create-github-app-token@v1, with: {app-id: '${{ vars.CI_APP_ID
+          }}', private-key: '${{ secrets.CI_APP_PRIVATE_KEY }}'}}, {uses: actions/checkout@v4,
+      with: {fetch-depth: 0, token: '${{ steps.generate-token.outputs.token }}'}},
+    {name: Set up Git, run: 'git config --global user.name ""wren-ai[bot]""
+
+        git config --global user.email ""dev@cannerdata.com""
+
+        '}, {id: changelog, name: Generate and Save Change Log, run: ""echo \""Generating\
+        \ change log...\""\nPREVIOUS_VERSION=release/ui/$(jq -r '.version' package.json)\n\
+        echo \""Previous version: $PREVIOUS_VERSION\""\necho \""================ change\
+        \ log ================\""\nCHANGE_LOG=$(git log --pretty=format:\""%s\"" $PREVIOUS_VERSION..HEAD\
+        \ | grep wren-ui)\necho \""================ change log ================\""\n\
+        \n# Separate the change log into categories\nFEATURES=$(echo \""$CHANGE_LOG\""\
+        \ | grep \""^feat\"" | sed 's/^/- /')\nFIXES_AND_CHORES=$(echo \""$CHANGE_LOG\""\
+        \ | grep -E \""^(fix|chore)\"" | sed 's/^/- /')\n\n# Create the full change\
+        \ log\nFULL_CHANGE_LOG=\""\\nChangelog for the version\\n\""\nif [ -n \""$FEATURES\""\
+        \ ]; then\n  FULL_CHANGE_LOG+=\""\\nFeature and Enhancement\\n$FEATURES\""\n\
+        fi\nif [ -n \""$FIXES_AND_CHORES\"" ]; then\n  FULL_CHANGE_LOG+=\""\\n\\nFixes\
+        \ and Chores\\n$FIXES_AND_CHORES\""\nfi\n\n{\n  echo \""CHANGE_LOG<<EOF\""\n\
+        \  echo -e \""$FULL_CHANGE_LOG\""\n  echo EOF\n} >> $GITHUB_ENV\n""}, {name: Update
+        Wren-UI version, run: 'version=${{ github.event.inputs.version }}
+
+        sed -i ''s/""version"": ""[^""]*""/""version"": ""''""$version""''""/'' package.json
+
+        git add package.json
+
+        git commit -m ""update wren-ui version to $version""
+
+        git push
+
+        git tag -a ""release/ui/$version"" -m ""${{ env.CHANGE_LOG }}""
+
+        git push origin ""release/ui/$version""
+
+        '}]}
+",['build'],deploy_release,Canner__WrenAI,[deploy_release],"Generates changelog, updates version, commits changes, and creates/pushes git tags for release."
+ce81b64e75daba7a9484115cf577e1f7da476b139db85413894ca926bd413e48,create-release-pr,"{runs-on: ubuntu-latest, steps: [{name: Checkout repository, uses: actions/checkout@v3},
+    {name: Setup Git Identity, run: 'git config --global user.name ""wren-ai[bot]""
+
+        git config --global user.email ""dev@cannerdata.com""
+
+        '}, {name: Update docker.go, run: 'FILE_PATH=""wren-launcher/utils/docker.go""
+
+
+        # Replace the WREN_PRODUCT_VERSION value with the new release version
+
+        sed -i ""s/WREN_PRODUCT_VERSION\s*string = \""[^\""]*\""/WREN_PRODUCT_VERSION\tstring
+        = \""${{ github.event.inputs.release_version }}\""/"" $FILE_PATH
+
+
+        # Verify the changes
+
+        grep ""WREN_PRODUCT_VERSION"" $FILE_PATH
+
+        '}, {name: Update .env.example, run: 'FILE_PATH=""docker/.env.example""
+
+
+        # Update all versions in the .env.example file
+
+        sed -i ""s/WREN_PRODUCT_VERSION=.*/WREN_PRODUCT_VERSION=${{ github.event.inputs.release_version
+        }}/"" $FILE_PATH
+
+        sed -i ""s/WREN_ENGINE_VERSION=.*/WREN_ENGINE_VERSION=${{ github.event.inputs.engine_version
+        }}/"" $FILE_PATH
+
+        sed -i ""s/IBIS_SERVER_VERSION=.*/IBIS_SERVER_VERSION=${{ github.event.inputs.engine_version
+        }}/"" $FILE_PATH
+
+        sed -i ""s/WREN_AI_SERVICE_VERSION=.*/WREN_AI_SERVICE_VERSION=${{ github.event.inputs.ai_version
+        }}/"" $FILE_PATH
+
+        sed -i ""s/WREN_UI_VERSION=.*/WREN_UI_VERSION=${{ github.event.inputs.ui_version
+        }}/"" $FILE_PATH
+
+
+        # Verify the changes
+
+        grep ""VERSION"" $FILE_PATH
+
+        '}, {name: Show git status, run: git status}, {name: Show git diff, run: 'echo
+        ""===== Git diff for changed files =====""
+
+        git diff
+
+        '}, {name: Create PR, uses: peter-evans/create-pull-request@v7, with: {base: main,
+        body: 'Release ${{ github.event.inputs.release_version }}', branch: 'release/${{
+          github.event.inputs.release_version }}', commit-message: 'release ${{ github.event.inputs.release_version
+          }}', draft: false, title: 'Release ${{ github.event.inputs.release_version
+          }}'}}]}
+",['unknown'],deploy_release,Canner__WrenAI,[deploy_release],Updates version files and creates release PR for new product version deployment.
+d511b214da69f08fe7b2f8e43ffe8ced525d8e28abef8ab7236b35ae8f65e33c,release,"{if: '${{ github.event_name == ''issue_comment'' && contains(github.event.comment.body,
+    ''/release-rc'') && startsWith(github.event.issue.title, ''Release'') }}', runs-on: macos-latest,
+  steps: [{name: Checkout repository, uses: actions/checkout@v4, with: {ref: main}},
+    {name: Set up Go, uses: actions/setup-go@v4, with: {go-version: 1.23.0}}, {name: Add
+        rocket emoji to comment, run: ""curl -X POST -H \""Authorization: token ${{\
+        \ secrets.GITHUB_TOKEN }}\"" \\\n-d '{\""body\"": \""\U0001F680 Starting the release\
+        \ process!\""}' \\\n\""https://api.github.com/repos/${{ github.repository }}/issues/${{\
+        \ github.event.issue.number }}/comments\""\n""}, {env: {GITHUB_ISSUE_TITLE: '${{
+          github.event.issue.title }}'}, id: parse_release_version, name: Parse release
+        version from PR title, run: 'release_version=$(echo ""$GITHUB_ISSUE_TITLE""
+        | sed ''s/ /\n/g'' | tail -n 1)
+
+        echo ""Release version: $release_version""
+
+        echo ""release_version=$release_version"" >> $GITHUB_OUTPUT
+
+        '}, {name: Build for macOS, run: 'mkdir -p dist
+
+        env GOARCH=amd64 GOOS=darwin CGO_ENABLED=1 go build -o dist/wren-launcher-darwin
+        main.go
+
+        cd dist && chmod +x wren-launcher-darwin && tar zcvf wren-launcher-darwin.tar.gz
+        wren-launcher-darwin
+
+        ', working-directory: ./wren-launcher}, {name: Build for macOS(arm64), run: 'mkdir
+        -p dist
+
+        env GOARCH=arm64 GOOS=darwin CGO_ENABLED=1 go build -o dist/wren-launcher-darwin-arm64
+        main.go
+
+        cd dist && chmod +x wren-launcher-darwin-arm64 && tar zcvf wren-launcher-darwin-arm64.tar.gz
+        wren-launcher-darwin-arm64
+
+        ', working-directory: ./wren-launcher}, {name: Build for Linux, run: 'mkdir
+        -p dist
+
+        env GOARCH=amd64 GOOS=linux CGO_ENABLED=0 go build -o dist/wren-launcher-linux
+        main.go
+
+        cd dist && chmod +x wren-launcher-linux && tar zcvf wren-launcher-linux.tar.gz
+        wren-launcher-linux
+
+        ', working-directory: ./wren-launcher}, {name: Build for Linux(arm64), run: 'mkdir
+        -p dist
+
+        env GOARCH=arm64 GOOS=linux CGO_ENABLED=0 go build -o dist/wren-launcher-linux-arm64
+        main.go
+
+        cd dist && chmod +x wren-launcher-linux-arm64 && tar zcvf wren-launcher-linux-arm64.tar.gz
+        wren-launcher-linux-arm64
+
+        ', working-directory: ./wren-launcher}, {name: Build for Windows, run: 'mkdir
+        -p dist
+
+        env GOARCH=amd64 GOOS=windows CGO_ENABLED=0 go build -o dist/wren-launcher-windows.exe
+        main.go
+
+        cd dist && zip wren-launcher-windows.zip wren-launcher-windows.exe
+
+        ', working-directory: ./wren-launcher}, {env: {GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN
+          }}'}, name: Create GitHub Release, uses: softprops/action-gh-release@v2,
+      with: {files: './wren-launcher/dist/wren-launcher-darwin.tar.gz
+
+          ./wren-launcher/dist/wren-launcher-linux.tar.gz
+
+          ./wren-launcher/dist/wren-launcher-windows.zip
+
+          ./wren-launcher/dist/wren-launcher-darwin-arm64.tar.gz
+
+          ./wren-launcher/dist/wren-launcher-linux-arm64.tar.gz
+
+          ', generate_release_notes: true, prerelease: true, tag_name: '${{ steps.parse_release_version.outputs.release_version
+          }}'}}, {name: Comment with release link, run: ""release_url=\""https://github.com/${{\
+        \ github.repository }}/releases/tag/${{ steps.parse_release_version.outputs.release_version\
+        \ }}\""\ncurl -X POST -H \""Authorization: token ${{ secrets.GITHUB_TOKEN }}\""\
+        \ \\\n-d \""{\\\""body\\\"": \\\""\U0001F680 A new release has been created! [View\
+        \ Release](${release_url})\\\""}\"" \\\n\""https://api.github.com/repos/${{ github.repository\
+        \ }}/issues/${{ github.event.issue.number }}/comments\""\n""}]}
+","['build', 'release']",build|deploy_release,Canner__WrenAI,[build|deploy_release],Compiles Go binaries for multiple platforms (build) and creates GitHub Release with artifacts (deploy_release).
+dbfd68b7e980319a779e2e22dac325a31802afbe2cff161fbea9f3e3b85cab0d,validator,"{name: validate-pull-request-title, runs-on: ubuntu-latest, steps: [{name: validate
+        pull request title, uses: kontrolplane/pull-request-title-validator@v1.3.1,
+      with: {scopes: wren-ai-service, types: 'fix,feat,chore'}}]}
+",['unknown'],lint_security,Canner__WrenAI,[lint_security],Validates pull request title format against defined conventions and scopes.
+eccf8d6a0fc725f9c722d3a826d53ff64caccd41def09c05ca69314cb9021385,build-image,"{outputs: {tag_name: '${{ steps.tag-preparation.outputs.TAG_NAME }}'}, runs-on: '${{
+    matrix.arch.runner }}', steps: [{uses: actions/checkout@v4}, {name: Login to GitHub
+        Container Registry, uses: docker/login-action@v3, with: {password: '${{ secrets.GITHUB_TOKEN
+          }}', registry: ghcr.io, username: '${{ github.actor }}'}}, {id: tag-preparation,
+      name: Prepare tag name, run: ""if [ -n \""${{ github.event.inputs.tag_name }}\""\
+        \ ]; then\n  tag_name=${{ github.event.inputs.tag_name }}\nelse\n  tag_name=commit-$(git\
+        \ log -1 --pretty=%h)\nfi\necho \""TAG_NAME=$tag_name\"" >> $GITHUB_OUTPUT\n""},
+    {name: Set up Docker Buildx, uses: docker/setup-buildx-action@v3}, {name: Prepare
+        platform, run: 'platform=${{ matrix.arch.platform }}
+
+        echo ""PLATFORM_PAIR=${platform//\//-}"" >> $GITHUB_ENV
+
+        '}, {id: build, name: Build and push by digest, uses: docker/build-push-action@v6,
+      with: {context: ./wren-ai-service, file: ./wren-ai-service/docker/Dockerfile,
+        labels: '${{ env.WREN_AI_SERVICE_IMAGE }}', outputs: 'type=image,name=${{
+          env.WREN_AI_SERVICE_IMAGE }},push-by-digest=true,name-canonical=true,push=true',
+        platforms: '${{ matrix.arch.platform }}'}}, {name: Export digest, run: 'mkdir
+        -p /tmp/digests
+
+        digest=""${{ steps.build.outputs.digest }}""
+
+        touch ""/tmp/digests/${digest#sha256:}""
+
+        '}, {name: Upload digest, uses: actions/upload-artifact@v4, with: {if-no-files-found: error,
+        name: 'digests-${{ env.PLATFORM_PAIR }}', path: /tmp/digests/*, retention-days: 1}}],
+  strategy: {fail-fast: false, matrix: {arch: [{platform: linux/amd64, runner: ubuntu-latest},
+        {platform: linux/arm64, runner: linux_arm64_runner}]}}}
+",['build'],build|deploy_release,Canner__WrenAI,[build|deploy_release],Builds Docker images for multiple platforms (docker/build-push-action) and pushes to registry (push=true).
+eccf8d6a0fc725f9c722d3a826d53ff64caccd41def09c05ca69314cb9021385,merge,"{needs: [build-image], runs-on: ubuntu-latest, steps: [{name: Download digests, uses: actions/download-artifact@v4,
+      with: {merge-multiple: true, path: /tmp/digests, pattern: digests-*}}, {name: Set
+        up Docker Buildx, uses: docker/setup-buildx-action@v3}, {id: meta, name: Docker
+        meta, uses: docker/metadata-action@v5, with: {images: '${{ env.WREN_AI_SERVICE_IMAGE
+          }}', tags: '${{ needs.build-image.outputs.tag_name }}
+
+          '}}, {name: Login to GitHub Container Registry, uses: docker/login-action@v3,
+      with: {password: '${{ secrets.GITHUB_TOKEN }}', registry: ghcr.io, username: '${{
+          github.actor }}'}}, {name: Create manifest list and push, run: ""TAGS=$(echo\
+        \ \""${{ steps.meta.outputs.tags }}\"" | awk '{printf \""--tag %s \"", $0}')\n\
+        docker buildx imagetools create $(jq -cr '.tags | map(\""-t \"" + .) | join(\""\
+        \ \"")' <<< \""$DOCKER_METADATA_OUTPUT_JSON\"") \\\n  $(printf '${{ env.WREN_AI_SERVICE_IMAGE\
+        \ }}@sha256:%s ' *) \\\n  $TAGS\n"", working-directory: /tmp/digests}]}
+",['build'],deploy_release,Canner__WrenAI,[deploy_release],Logs into container registry and pushes Docker manifest list with tags to GHCR.
+108516fa7d85b7008e3d66560dde46c9f5d9e3c00ca28e708c4592a1b37a877f,windows-test,"{runs-on: windows-latest, steps: [{uses: actions/checkout@v4}, {name: 'Set up Python
+        ${{ matrix.python-version }}', uses: actions/setup-python@v4, with: {python-version: '${{
+          matrix.python-version }}'}}, {name: Install dependencies, run: 'pip install
+        -e ''.[all]''
+
+        '}, {name: Source distribution test, run: 'python -m pip install --upgrade
+        build
+
+        python -m build --sdist
+
+        pip install dist/chatarena-$(python -c ""import chatarena; print(chatarena.__version__)"").tar.gz
+
+        '}, {name: Release Test, run: 'pytest -v -n auto tests
+
+        '}], strategy: {matrix: {python-version: ['3.8', '3.9', '3.10', '3.11']}}}
+",['test'],test,Farama-Foundation__chatarena,[build|test],"Installs dependencies and builds source distribution (build), then runs pytest test suite (test)."
+5835203288489b86a55fe0d1a7e477d9685949694d22e25b3284982d0fa069e1,environment-test-openai,"{runs-on: ubuntu-latest, steps: [{uses: actions/checkout@v4}, {name: 'Set up Python
+        ${{ matrix.python-version }}', uses: actions/setup-python@v4, with: {python-version: '${{
+          matrix.python-version }}'}}, {name: Install dependencies, run: 'pip install
+        -e ''.[all]''
+
+        '}, {name: Regular Environments Test, run: 'python -c ''import os; print(""OPENAI_API_KEY
+        visible in os.environ:"", os.getenv(""OPENAI_API_KEY""))''
+
+        pytest -v -n auto tests
+
+        '}, {name: Umshini Environments Test, run: 'python -c ''import os; print(""OPENAI_API_KEY
+        visible in os.environ:"", os.getenv(""OPENAI_API_KEY""))''
+
+        pytest -v -n auto tests/unit/test_umshini_environments.py
+
+        '}], strategy: {matrix: {python-version: ['3.11']}}}
+",['test'],test,Farama-Foundation__chatarena,[build|test],Installs dependencies with pip (build) and runs pytest test suites (test).
+ac63f8d85e9147345d07c01cfadd97d2e697ede97c50c1b370d02a3949228ef1,pre-commit,"{runs-on: ubuntu-latest, steps: [{uses: actions/checkout@v4}, {uses: actions/setup-python@v4,
+      with: {python-version: '3.11'}}, {run: pip install pre-commit}, {run: 'pip install
+        -e ''.[all]'''}, {run: pre-commit --version}, {run: pre-commit install}, {
+      run: pre-commit run --all-files}]}
+",['lint'],lint_security,Farama-Foundation__chatarena,[lint_security],Installs and runs pre-commit hooks for linting and code quality checks across all files.
+bd04506a2c7bf0f318a0da23613f99ccbb9c1d3aeb933ea91f4eb78436b8788c,macos-test,"{runs-on: macos-11, steps: [{uses: actions/checkout@v4}, {name: 'Set up Python ${{
+        matrix.python-version }}', uses: actions/setup-python@v4, with: {python-version: '${{
+          matrix.python-version }}'}}, {name: Install dependencies, run: 'pip install
+        -e ''.[all]''
+
+        '}, {name: Source distribution test, run: 'python -m pip install --upgrade
+        build
+
+        python -m build --sdist
+
+        pip install dist/*.tar.gz
+
+        '}, {name: Release Test, run: 'pytest -v -n auto tests/
+
+        '}], strategy: {matrix: {python-version: ['3.8', '3.9', '3.10', '3.11']}}}
+",['test'],test,Farama-Foundation__chatarena,[build|test],"Installs dependencies and builds source distribution (build), then runs pytest test suite (test)."
+ca3af7cec96c1e560a1a3b20559b24689f9ca914ee2bb74372619b2eafaf138e,environment-test-azure-openai,"{env: {AZURE_DEPLOYMENT: gpt-4, AZURE_OPENAI_ENDPOINT: '${{ secrets.AZURE_OPENAI_ENDPOINT
+      }}', OPENAI_API_KEY: '${{ secrets.AZURE_OPENAI_API_KEY }}', OPENAI_API_TYPE: azure,
+    OPENAI_API_VERSION: 2023-05-15}, runs-on: ubuntu-latest, steps: [{uses: actions/checkout@v4},
+    {name: 'Set up Python ${{ matrix.python-version }}', uses: actions/setup-python@v4,
+      with: {python-version: '${{ matrix.python-version }}'}}, {name: Install dependencies,
+      run: 'pip install -e ''.[all]''
+
+        '}, {name: Umshini Environments Test, run: 'python -c ''import os; print(""AZURE_OPENAI_API_KEY
+        visible in os.environ:"", os.getenv(""AZURE_OPENAI_API_KEY""))''
+
+        pytest -v -n auto tests/unit/test_umshini_environments.py
+
+        '}], strategy: {matrix: {python-version: ['3.11']}}}
+",['test'],test,Farama-Foundation__chatarena,[test],Installs dependencies and runs pytest unit tests for Umshini environments.
+d73017db77118d1eb8abafad71390e51ac44ae2fe4c965f9cf6fea0cd12beb0e,build-wheels,"{permissions: {contents: read}, runs-on: '${{ matrix.os }}', steps: [{uses: actions/checkout@v4},
+    {name: Set up Python, uses: actions/setup-python@v4, with: {python-version: 3.x}},
+    {name: Install dependencies, run: python -m pip install --upgrade setuptools wheel},
+    {name: Build wheels, run: python setup.py sdist bdist_wheel}, {name: Store wheels,
+      uses: actions/upload-artifact@v3, with: {path: dist}}], strategy: {matrix: {
+      include: [{os: ubuntu-latest, platform: manylinux_x86_64, python: 38}, {os: ubuntu-latest,
+          platform: manylinux_x86_64, python: 39}, {os: ubuntu-latest, platform: manylinux_x86_64,
+          python: 310}, {os: ubuntu-latest, platform: manylinux_x86_64, python: 311}]}}}
+",['build'],build,Farama-Foundation__chatarena,[build],"Installs dependencies, builds Python wheels and source distributions, stores artifacts."
+d73017db77118d1eb8abafad71390e51ac44ae2fe4c965f9cf6fea0cd12beb0e,publish,"{if: github.event_name == 'release' && github.event.action == 'published', needs: [
+    build-wheels], runs-on: ubuntu-latest, steps: [{name: Download dists, uses: actions/download-artifact@v3,
+      with: {name: artifact, path: dist}}, {name: Publish, uses: pypa/gh-action-pypi-publish@release/v1,
+      with: {password: '${{ secrets.PYPI_API_TOKEN }}'}}]}
+",['build'],deploy_release,Farama-Foundation__chatarena,[deploy_release],Downloads build artifacts and publishes Python package to PyPI using API token.
+ef764dc4085a0f4608726da323ecb7d4ca2e9c450ab7e2f7d6be9fa9bbf0234d,linux-test,"{runs-on: ubuntu-latest, steps: [{uses: actions/checkout@v4}, {name: 'Set up Python
+        ${{ matrix.python-version }}', uses: actions/setup-python@v4, with: {python-version: '${{
+          matrix.python-version }}'}}, {name: Install dependencies, run: 'sudo apt-get
+        install python3-opengl xvfb
+
+        pip install -e ''.[all]''
+
+        '}, {name: Source distribution test, run: 'python -m pip install --upgrade
+        build
+
+        python -m build --sdist
+
+        pip install dist/*.tar.gz
+
+        '}, {name: Release Test, run: 'xvfb-run -s ""-screen 0 1024x768x24"" pytest
+        -v -n auto tests/
+
+        '}], strategy: {matrix: {python-version: ['3.8', '3.9', '3.10', '3.11']}}}
+",['test'],test,Farama-Foundation__chatarena,[build|test],"Installs dependencies and builds source distribution (build), runs pytest test suite (test)."
+10e75b79bd87ec915486dca1641919a1189df1844c7d882f1e1038859d8ebe67,check-proprietary-paths,"{if: github.repository == 'FlowiseAI/Flowise', name: Check for Proprietary Paths,
+  runs-on: ubuntu-latest, steps: [{name: Checkout repository, uses: actions/checkout@v6,
+      with: {fetch-depth: 0}}, {id: check-paths, name: Check for proprietary paths,
+      run: ""echo \""\U0001F50D Checking for proprietary paths...\""\necho \""Trigger:\
+        \ ${{ github.event_name }}\""\necho \""\""\n\n# Get changed files based on event\
+        \ type\nif [ \""${{ github.event_name }}\"" = \""pull_request\"" ]; then\n  CHANGED_FILES=$(git\
+        \ diff --name-only origin/${{ github.base_ref }}...HEAD)\nelif [ \""${{ github.event.before\
+        \ }}\"" != \""0000000000000000000000000000000000000000\"" ]; then\n  # Push to\
+        \ existing branch - compare with previous commit\n  # Fall back to default\
+        \ branch comparison if before SHA is unreachable (e.g. force-push, shallow\
+        \ clone)\n  CHANGED_FILES=$(git diff --name-only ${{ github.event.before }}\
+        \ ${{ github.sha }} 2>/dev/null || git diff --name-only origin/${{ github.event.repository.default_branch\
+        \ }}...${{ github.sha }} 2>/dev/null || echo \""\"")\nelse\n  # New branch -\
+        \ compare against default branch\n  CHANGED_FILES=$(git diff --name-only origin/${{\
+        \ github.event.repository.default_branch }}...${{ github.sha }} 2>/dev/null\
+        \ || echo \""\"")\nfi\n\necho \""Files to check:\""\necho \""$CHANGED_FILES\"" |\
+        \ head -50 | sed 's/^/  /'\necho \""\""\n\n# Check for proprietary paths\nVIOLATIONS=\""\
+        \""\n\nwhile IFS= read -r file; do\n  [ -z \""$file\"" ] && continue\n\n  # Block\
+        \ all extensions/\n  if echo \""$file\"" | grep -qE \""^extensions/\""; then\n\
+        \    VIOLATIONS=\""$VIOLATIONS$file\\n\""\n    continue\n  fi\n\n  # Block all\
+        \ apps/ except apps/oss-app/\n  if echo \""$file\"" | grep -qE \""^apps/\""; then\n\
+        \    if ! echo \""$file\"" | grep -qE \""^apps/oss-app/\""; then\n      VIOLATIONS=\""\
+        $VIOLATIONS$file\\n\""\n    fi\n  fi\ndone <<< \""$CHANGED_FILES\""\n\nif [ -n\
+        \ \""$VIOLATIONS\"" ]; then\n  echo \""has_violations=true\"" >> $GITHUB_OUTPUT\n\
+        \  echo \""violations<<EOF\"" >> $GITHUB_OUTPUT\n  printf \""%s\"" \""$VIOLATIONS\""\
+        \ >> $GITHUB_OUTPUT\n  echo \""EOF\"" >> $GITHUB_OUTPUT\n\n  echo \""\u274C Files\
+        \ in proprietary paths detected!\""\n  echo \""\""\n  printf \""%s\"" \""$VIOLATIONS\""\
+        \ | sed 's/^/  \u274C /'\n  echo \""\""\n  echo \""Proprietary paths:\""\n  echo\
+        \ \""  - extensions/    (reserved for enterprise extensions)\""\n  echo \"" \
+        \ - apps/*         (only apps/oss-app/ is allowed)\""\nelse\n  echo \""has_violations=false\""\
+        \ >> $GITHUB_OUTPUT\n  echo \""\u2705 No proprietary paths detected\""\nfi\n""},
+    {if: steps.check-paths.outputs.has_violations == 'true', name: Fail if violations
+        found, run: 'echo ""::error::Files detected in proprietary paths. These paths
+        are reserved for enterprise extensions.""
+
+        exit 1
+
+        '}]}
+",['unknown'],lint_security,FlowiseAI__Flowise,[lint_security],"Checks for proprietary path violations in code changes, enforcing policy compliance."
+7adecc865f7499325d783300d4a1b67f241a1839963db2980b69e56c800c9c7c,dry-run,"{outputs: {version: '${{ steps.resolve-version.outputs.version }}'}, permissions: {
+    contents: read}, runs-on: ubuntu-latest, steps: [{uses: actions/checkout@v6},
+    {uses: pnpm/action-setup@v4, with: {version: 10.26.0}}, {uses: actions/setup-node@v6,
+      with: {node-version: 18.15.0, registry-url: 'https://registry.npmjs.org'}},
+    {env: {CUSTOM_VERSION: '${{ inputs.custom_version }}'}, if: inputs.bump == 'custom',
+      name: Validate custom version, run: ""if [ -z \""$CUSTOM_VERSION\"" ]; then\n \
+        \ echo \""::error::custom_version is required when bump is 'custom'\""\n  exit\
+        \ 1\nfi\nnpx semver \""$CUSTOM_VERSION\"" || (echo \""::error::Invalid semver:\
+        \ $CUSTOM_VERSION\"" && exit 1)\n""}, {env: {PUPPETEER_SKIP_DOWNLOAD: 'true'},
+      name: Install dependencies, run: pnpm install --frozen-lockfile}, {env: {BUMP: '${{
+          inputs.bump }}', CUSTOM_VERSION: '${{ inputs.custom_version }}'}, name: Set
+        version, run: ""CURRENT=$(npm pkg get version --prefix packages/agentflow |\
+        \ tr -d '\""')\nif [ \""$BUMP\"" = \""custom\"" ]; then\n  NEW_VERSION=\""$CUSTOM_VERSION\""\
+        \nelse\n  NEW_VERSION=$(npx semver \""$CURRENT\"" -i \""$BUMP\"" --preid dev)\n\
+        fi\nnpm pkg set version=\""$NEW_VERSION\"" --prefix packages/agentflow\necho\
+        \ \""Version set to $NEW_VERSION\""\n""}, {id: resolve-version, name: Resolve
+        version, run: 'VERSION=$(npm pkg get version --prefix packages/agentflow |
+        tr -d ''""'')
+
+        echo ""version=$VERSION"" >> ""$GITHUB_OUTPUT""
+
+        echo ""## Version to publish: \`$VERSION\`"" >> ""$GITHUB_STEP_SUMMARY""
+
+        echo ""## Tag: \`${{ inputs.tag }}\`"" >> ""$GITHUB_STEP_SUMMARY""
+
+        '}, {name: Package contents, run: pnpm --filter @flowiseai/agentflow pack
+        --dry-run}, {env: {NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}'}, name: Dry
+        run publish, run: 'pnpm --filter @flowiseai/agentflow publish --no-git-checks
+        --dry-run --tag ${{ inputs.tag }}'}]}
+",['unknown'],deploy_release,FlowiseAI__Flowise,[build],"Installs dependencies, validates and sets package version, performs dry-run publish to npm."
+7adecc865f7499325d783300d4a1b67f241a1839963db2980b69e56c800c9c7c,publish,"{environment: npm-publish, needs: dry-run, permissions: {contents: write, pull-requests: write},
+  runs-on: ubuntu-latest, steps: [{uses: actions/checkout@v6}, {uses: pnpm/action-setup@v4,
+      with: {version: 10.26.0}}, {uses: actions/setup-node@v6, with: {node-version: 18.15.0,
+        registry-url: 'https://registry.npmjs.org'}}, {env: {PUPPETEER_SKIP_DOWNLOAD: 'true'},
+      name: Install dependencies, run: pnpm install --frozen-lockfile}, {env: {BUMP: '${{
+          inputs.bump }}', CUSTOM_VERSION: '${{ inputs.custom_version }}'}, name: Set
+        version, run: ""CURRENT=$(npm pkg get version --prefix packages/agentflow |\
+        \ tr -d '\""')\nif [ \""$BUMP\"" = \""custom\"" ]; then\n  NEW_VERSION=\""$CUSTOM_VERSION\""\
+        \nelse\n  NEW_VERSION=$(npx semver \""$CURRENT\"" -i \""$BUMP\"" --preid dev)\n\
+        fi\nnpm pkg set version=\""$NEW_VERSION\"" --prefix packages/agentflow\necho\
+        \ \""Version set to $NEW_VERSION\""\n""}, {name: Log version, run: 'echo ""Publishing
+        version: ${{ needs.dry-run.outputs.version }}""
+
+        echo ""Tag: ${{ inputs.tag }}""
+
+        '}, {env: {NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}'}, name: Publish, run: 'pnpm
+        --filter @flowiseai/agentflow publish --no-git-checks --tag ${{ inputs.tag
+        }}'}, {env: {GH_TOKEN: '${{ secrets.GITHUB_TOKEN }}'}, name: Create version
+        bump PR, run: ""VERSION=\""${{ needs.dry-run.outputs.version }}\""\nBRANCH=\""\
+        chore/bump-agentflow-${VERSION}\""\ngit config user.name \""github-actions[bot]\""\
+        \ngit config user.email \""github-actions[bot]@users.noreply.github.com\""\n\
+        git checkout -b \""$BRANCH\""\ngit add packages/agentflow/package.json\ngit\
+        \ commit -m \""chore: bump @flowiseai/agentflow to ${VERSION}\""\ngit push -u\
+        \ origin \""$BRANCH\""\ngh pr create \\\n  --title \""chore: bump @flowiseai/agentflow\
+        \ to ${VERSION}\"" \\\n  --body \""Automated version bump after publishing \\\
+        `@flowiseai/agentflow@${VERSION}\\` to npm with tag \\`${{ inputs.tag }}\\\
+        `.\"" \\\n  --base main \\\n  --head \""$BRANCH\""\n""}]}
+",['unknown'],deploy_release,FlowiseAI__Flowise,[deploy_release],Publishes npm package to registry and creates version bump PR with GitHub token.
+8ca87f61ded0df671a2d315911846602d29a7d1767deb562bf064c57fc453c81,docker,"{environment: '${{ github.event.inputs.environment }}', runs-on: ubuntu-latest, steps: [
+    {id: defaults, name: Set default values, run: 'echo ""node_version=${{ github.event.inputs.node_version
+        || ''20'' }}"" >> $GITHUB_OUTPUT
+
+        echo ""tag_version=${{ github.event.inputs.tag_version || ''latest'' }}"" >>
+        $GITHUB_OUTPUT
+
+        '}, {name: Checkout, uses: actions/checkout@v6.0.2}, {name: Set up QEMU, uses: docker/setup-qemu-action@v4.0.0},
+    {name: Set up Docker Buildx, uses: docker/setup-buildx-action@v4.0.0}, {if: '${{
+        inputs.environment != ''prod'' }}', name: Configure AWS Credentials, uses: aws-actions/configure-aws-credentials@v6,
+      with: {aws-access-key-id: '${{ secrets.AWS_ACCESS_KEY_ID }}', aws-region: '${{
+          secrets.AWS_REGION }}', aws-secret-access-key: '${{ secrets.AWS_SECRET_ACCESS_KEY
+          }}'}}, {if: '${{ inputs.environment == ''prod'' }}', name: Configure AWS
+        OIDC Credentials, uses: aws-actions/configure-aws-credentials@8df5847569e6427dd6c4fb1cf565c83acfa8afa7,
+      with: {aws-region: '${{ secrets.AWS_REGION }}', mask-aws-account-id: true, role-to-assume: '${{
+          secrets.AWS_OIDC_IAM_ROLE }}', unset-current-credentials: true}}, {name: Login
+        to Amazon ECR, uses: aws-actions/amazon-ecr-login@v2}, {name: Build and push
+        main image, uses: docker/build-push-action@v6.19.2, with: {build-args: 'NODE_VERSION=${{
+          steps.defaults.outputs.node_version }}
+
+          ', context: ., file: Dockerfile, platforms: 'linux/amd64,linux/arm64', push: true,
+        tags: ""${{ format('{0}.dkr.ecr.{1}.amazonaws.com/flowise:{2}', \n    secrets.AWS_ACCOUNT_ID,\
+          \ \n    secrets.AWS_REGION, \n    steps.defaults.outputs.tag_version) }}\n""}}]}
+","['build', 'deploy']",deploy_release,FlowiseAI__Flowise,[build|deploy_release],Builds Docker image with multi-platform support and pushes to ECR registry (push
+96dbe0c38daa76a21e6390de30fa0a53d47799b7f16cee52766481c3abd8bc34,docker,"{runs-on: ubuntu-latest, steps: [{id: defaults, name: Set default values, run: 'echo
+        ""node_version=${{ github.event.inputs.node_version || ''20'' }}"" >> $GITHUB_OUTPUT
+
+        echo ""tag_version=${{ github.event.inputs.tag_version || ''latest'' }}"" >>
+        $GITHUB_OUTPUT
+
+        '}, {name: Checkout, uses: actions/checkout@v6.0.2}, {name: Set up QEMU, uses: docker/setup-qemu-action@v4.0.0},
+    {name: Set up Docker Buildx, uses: docker/setup-buildx-action@v4.0.0}, {name: Login
+        to Docker Hub, uses: docker/login-action@v4, with: {password: '${{ secrets.DOCKERHUB_TOKEN
+          }}', username: '${{ secrets.DOCKERHUB_USERNAME }}'}}, {name: Build and push
+        main image, uses: docker/build-push-action@v6.19.2, with: {build-args: 'NODE_VERSION=${{
+          steps.defaults.outputs.node_version }}
+
+          ', context: ., file: ./docker/Dockerfile, platforms: 'linux/amd64,linux/arm64',
+        push: true, tags: 'flowiseai/flowise:${{ steps.defaults.outputs.tag_version
+          }}
+
+          '}}, {name: Build and push worker image, uses: docker/build-push-action@v6.19.2,
+      with: {build-args: 'NODE_VERSION=${{ steps.defaults.outputs.node_version }}
+
+          ', context: ., file: docker/worker/Dockerfile, platforms: 'linux/amd64,linux/arm64',
+        push: true, tags: 'flowiseai/flowise-worker:${{ steps.defaults.outputs.tag_version
+          }}
+
+          '}}]}
+",['build'],deploy_release,FlowiseAI__Flowise,[build|deploy_release],Builds Docker images for multiple platforms and pushes to Docker Hub registry (push
+f22ee4829b3ed911dd3d8a9b5e811ce9b5339bdb8d8a93640cb73d74e94495a8,build,"{env: {PUPPETEER_SKIP_DOWNLOAD: true}, runs-on: ubuntu-latest, steps: [{uses: actions/checkout@v6},
+    {run: docker build --no-cache -t flowise .}]}
+",['build'],build,FlowiseAI__Flowise,[build],Builds Docker image from Dockerfile without caching.
+f82159009ea8e8991eabd0d2291687617da54856af43d81f6947ad6b912cbb4e,build,"{env: {PUPPETEER_SKIP_DOWNLOAD: true}, runs-on: '${{ matrix.platform }}', steps: [
+    {uses: actions/checkout@v6}, {uses: pnpm/action-setup@v4, with: {version: 10.26.0}},
+    {name: 'Use Node.js ${{ matrix.node-version }}', uses: actions/setup-node@v6,
+      with: {cache: pnpm, cache-dependency-path: pnpm-lock.yaml, node-version: '${{
+          matrix.node-version }}'}}, {run: pnpm install}, {run: pnpm lint}, {env: {
+        NODE_OPTIONS: --max_old_space_size=4096}, run: pnpm build}, {run: 'pnpm test:coverage'},
+    {name: Cypress install, run: pnpm cypress install}, {name: Install dependencies
+        (Cypress Action), uses: cypress-io/github-action@v7.1.5, with: {runTests: false,
+        working-directory: ./}}, {name: Cypress test, uses: cypress-io/github-action@v7.1.5,
+      with: {browser: chrome, install: false, start: pnpm start, wait-on: 'http://localhost:3000',
+        wait-on-timeout: 120, working-directory: packages/server}}], strategy: {matrix: {
+      node-version: [18.15.0], platform: [ubuntu-latest]}}}
+","['lint', 'test', 'build']",build|test|lint_security,FlowiseAI__Flowise,[build|test|lint_security],"Installs dependencies (build), runs linting (lint_security), builds project (build), executes test coverage and Cypress tests (test)."
+02b57a0bfd1f02f3d1d04e399696e5cffdf8711ed525d0f92c8632cff14c7704,gitleaks,"{name: Gitleaks, runs-on: ubuntu-latest, steps: [{uses: hmarr/debug-action@v3.0.0},
+    {name: install, run: ""set -euo pipefail\narch=\""$(uname)_$(uname -m)\""\nplatform=$(echo\
+        \ $arch | tr '[:upper:]' '[:lower:]' )\necho \""PLATFORM=$platform\"" >> $GITHUB_ENV\n\
+        if [[ \""${{ inputs.version }}\"" == \""latest\"" ]]; then\n  echo \""GITLEAKS_VERSION=$(curl\
+        \ -s https://api.github.com/repos/gitleaks/gitleaks/releases/latest | grep\
+        \ '\""tag_name\"":' | sed -E 's/.*\""v([^\""]+)\"".*/\\1/')\"" >> $GITHUB_ENV\n\
+        else\n  echo \""GITLEAKS_VERSION=${{ inputs.version }}\"" >> $GITHUB_ENV\nfi\n"",
+      shell: bash}, {id: cache_gitleaks, name: Cache gitleaks archive, uses: actions/cache@v5,
+      with: {key: 'gitleaks-${{ env.PLATFORM }}-${{ env.GITLEAKS_VERSION }}', path: /usr/local/bin/gitleaks}},
+    {name: Download and configure gitleaks, run: ""set -euo pipefail\nif [[ \""${{ steps.cache_gitleaks.outputs.cache-hit\
+        \ }}\"" != \""true\"" ]]; then\n  DOWNLOAD_URL=\""https://github.com/gitleaks/gitleaks/releases/download/v${{\
+        \ env.GITLEAKS_VERSION }}/gitleaks_${{ env.GITLEAKS_VERSION }}_linux_x64.tar.gz\""\
+        \n  echo \""Download Gitleaks ${{ env.GITLEAKS_VERSION }} for ${{ env.PLATFORM\
+        \ }} from ${DOWNLOAD_URL}\""\n  curl -fsSL \""$DOWNLOAD_URL\"" | tar xzf - -C\
+        \ /usr/local/bin\nfi\nchmod +x /usr/local/bin/gitleaks\n"", shell: bash}, {
+      name: Checkout, uses: actions/checkout@v6, with: {fetch-depth: 0, ref: '${{
+          inputs.head_sha }}'}}, {name: Run gitleaks, run: ""set -euo pipefail ${ACTIONS_STEP_DEBUG:+-x}\n\
+        \ngitleaks \\\n  detect \\\n  --source=\"".\"" \\\n  --redact \\\n  -v \\\n\
+        \  --exit-code=2 \\\n  --report-format=sarif \\\n  --report-path=results.sarif\
+        \ \\\n  --log-level=debug \\\n  --log-opts='${{ inputs.base_sha }}..${{ inputs.head_sha\
+        \ }}'\n""}, {if: failure(), name: Upload test results, uses: actions/upload-artifact@v7,
+      with: {name: GitLeaks results, path: results.sarif}}]}
+","['build', 'security', 'eval']",lint_security,HumanSignal__Adala,[lint_security],Runs Gitleaks to detect secrets and vulnerabilities in repository code.
+0b50e22d810c17bf92adf4d09d5f1484ca80064c3b693cfd7d9bb1cd9f5b2184,run_black,"{name: Code formatting, runs-on: ubuntu-latest, steps: [{uses: actions/checkout@v6},
+    {name: Install poetry, run: 'pipx install ""poetry==${{ env.POETRY_VERSION }}""'},
+    {id: setup_python, name: Set up Python, uses: actions/setup-python@v6, with: {
+        cache: poetry, python-version: '3.13'}}, {name: Install Python dependencies,
+      run: poetry install}, {name: Run black, run: poetry run black --check .}]}
+","['lint', 'test']",lint_security,HumanSignal__Adala,[lint_security],Runs black code formatter check to enforce code style standards.
+0b50e22d810c17bf92adf4d09d5f1484ca80064c3b693cfd7d9bb1cd9f5b2184,run_pytest,"{defaults: {run: {shell: bash}}, name: 'pytest ${{ matrix.os }} | ${{ matrix.python-version
+    }}', runs-on: '${{ matrix.os }}', steps: [{uses: actions/checkout@v6}, {name: Install
+        poetry, run: 'pipx install ""poetry==${{ env.POETRY_VERSION }}""'}, {id: setup_python,
+      name: 'Set up Python ${{ matrix.python-version }}', uses: actions/setup-python@v6,
+      with: {cache: poetry, python-version: '${{ matrix.python-version }}'}}, {name: Install
+        dependencies, run: poetry install --no-interaction --no-root}, {name: Install
+        app, run: poetry install --no-interaction}, {if: matrix.os == 'ubuntu-latest',
+      name: Run tests with coverage, run: 'poetry run pytest tests/ -vv ${{ matrix.python-version
+        == ''3.13'' && ''--cov=. --cov-report=xml'' || '''' }}
+
+        '}, {if: 'matrix.os == ''ubuntu-latest'' &&
+
+        matrix.python-version == ''3.13'' &&
+
+        github.event.pull_request.user.login != ''dependabot[bot]''
+
+        ', name: Upload to Codecov, uses: codecov/codecov-action@v5.5.2, with: {fail_ci_if_error: true,
+        files: tests/coverage.xml, token: '${{ secrets.CODECOV_TOKEN }}'}}], strategy: {
+    fail-fast: false, matrix: {os: [ubuntu-latest, windows-latest], python-version: [
+        '3.13']}}}
+","['lint', 'test']",test,HumanSignal__Adala,[test],Runs pytest test suite with coverage reporting and uploads results to Codecov.
+0b50e22d810c17bf92adf4d09d5f1484ca80064c3b693cfd7d9bb1cd9f5b2184,dependabot-auto-merge,"{if: 'always() &&
+
+    needs.run_pytest.result == ''success'' &&
+
+    github.event_name == ''pull_request'' &&
+
+    github.event.pull_request.user.login == ''dependabot[bot]'' &&
+
+    ( startsWith(github.head_ref, ''dependabot/npm_and_yarn/'') || startsWith(github.head_ref,
+    ''dependabot/pip/'') )
+
+    ', name: Auto Merge dependabot PR, needs: [run_pytest], runs-on: ubuntu-latest,
+  steps: [{env: {GITHUB_TOKEN: '${{ secrets.GIT_PAT }}', PR_URL: '${{ github.event.pull_request.html_url
+          }}'}, name: Enable auto-merge for Dependabot PRs, run: 'gh pr merge --admin
+        --squash ""${PR_URL}""'}]}
+","['lint', 'test']",lint_security,HumanSignal__Adala,[no_ops],Automatically merges dependabot PRs without functional code changes or deployments.
+35d4c30cb5189e2f93dd2b5661e07a84cb7a6f3c0160518a58cf4abc951f020e,delete-cache,"{runs-on: ubuntu-latest, steps: [{env: {GH_TOKEN: '${{ secrets.GITHUB_TOKEN }}'},
+      name: Delete all caches, run: ""while true; do\n  CACHE_IDS=$(gh cache list --repo\
+        \ \""${{ github.repository }}\"" --limit 100 --json id --jq '.[].id' | tr '\\\
+        n' ' ')\n  if [ -z \""$CACHE_IDS\"" ]; then\n    echo \""No more caches to delete.\""\
+        \n    break\n  fi\n  echo \""$CACHE_IDS\"" | xargs -n 1 -P 10 gh cache delete\
+        \ --repo \""${{ github.repository }}\""\n  sleep 1\ndone\n""}, {env: {GH_TOKEN: '${{
+          secrets.GITHUB_TOKEN }}'}, name: Verify cache deletion, run: ""REMAINING_CACHES=$(gh\
+        \ cache list --repo \""${{ github.repository }}\"" --limit 1 --json id | jq\
+        \ length)\nif [ \""$REMAINING_CACHES\"" -ne 0 ]; then\n  echo \""Warning: $REMAINING_CACHES\
+        \ caches remain\""\nfi""}], timeout-minutes: 10}
+",['unknown'],lint_security,HumanSignal__Adala,[no_ops],"Deletes GitHub Actions caches with no functional impact on build, test, or deployment processes."
+4cb1eced2064c47ef84a9b4a785c00d26bc730cc49345659a7fd54c1b731fe5a,slashCommandDispatch,"{if: 'startsWith(github.event.comment.body, ''/'')', runs-on: ubuntu-latest, steps: [
+    {uses: hmarr/debug-action@v3.0.0}, {name: React to comment, uses: peter-evans/create-or-update-comment@v5,
+      with: {comment-id: '${{ github.event.comment.id }}', reactions: eyes, token: '${{
+          secrets.GIT_PAT }}'}}, {env: {COMMANDS_LIST: '${{ github.event.issue.pull_request
+          && env.pull_request_commands_list }}'}, id: determine_command, name: Validate
+        command, uses: actions/github-script@v8, with: {github-token: '${{ secrets.GIT_PAT
+          }}', script: ""const body = context.payload.comment.body.toLowerCase().trim();\n\
+          const commands_list = process.env.COMMANDS_LIST.split(\""\\n\"");\nconsole.log(commands_list);\n\
+          const command = body.replace(/^\\/+/, '').split(/\\s+/)[0];\ncore.setOutput('command',\
+          \ command);            \ncore.setOutput('command-state', commands_list.includes(command)\
+          \ ? 'known' : 'unknown');\n""}}, {id: scd_issues, if: steps.determine_command.outputs.command-state
+        == 'known', name: Slash Command Dispatch, uses: peter-evans/slash-command-dispatch@v5,
+      with: {commands: '${{ github.event.issue.pull_request && env.pull_request_commands_list
+          }}', issue-type: '${{ github.event.issue.pull_request && ''pull-request''
+          || ''issue'' }}', reaction-token: '${{ secrets.GIT_PAT }}', reactions: true,
+        token: '${{ secrets.GIT_PAT }}'}}, {if: steps.determine_command.outputs.command-state
+        != 'known', name: Edit comment with error message, uses: peter-evans/create-or-update-comment@v5,
+      with: {body: '> ''/${{ steps.determine_command.outputs.command }}'' is an unknown
+          ${{ github.event.issue.pull_request && ''pull-request'' || ''issue'' }}
+          command.
+
+          > See ''/help''
+
+          ', comment-id: '${{ github.event.comment.id }}', reactions: confused, token: '${{
+          secrets.GIT_PAT }}'}}], timeout-minutes: 1}
+",['unknown'],no_ops,HumanSignal__Adala,[no_ops],"Processes slash commands in comments; no build, test, deploy, or security operations performed."
+59a3885897181e0e847474c600d3599460d7ad5c540d337fcfd1eb9513bfbe51,version,"{name: Poetry Lock Change Size, runs-on: ubuntu-latest, steps: [{uses: hmarr/debug-action@v3.0.0},
+    {env: {BASE_REF: '${{ github.event.merge_group.base_sha || github.event.pull_request.base.sha
+          || github.event.before }}', HEAD_REF: '${{ github.event.merge_group.head_sha
+          || github.event.pull_request.head.sha || github.event.after }}'}, name: Validate,
+      uses: actions/github-script@v8, with: {github-token: '${{ secrets.GIT_PAT }}',
+        script: ""const {repo, owner} = context.repo;\nconst base_ref = process.env.BASE_REF;\n\
+          const head_ref = process.env.HEAD_REF;\n\nconst {data: compare} = await\
+          \ github.rest.repos.compareCommits({\n  owner,\n  repo,\n  base: base_ref,\n\
+          \  head: head_ref,\n});\nconst poetry_locks = compare.files.filter(e =>\
+          \ e.filename.endsWith('poetry.lock'));\nif (poetry_locks.length === 0) {\n\
+          \  core.notice('No poetry.lock changes');\n\n} else {\n  for (const poetry_lock\
+          \ of poetry_locks) {\n    core.startGroup(`${poetry_lock.filename}`);\n\
+          \    core.info(`${poetry_lock.filename} changed`);\n    console.log(poetry_lock);\n\
+          \    if (poetry_lock.changes > 50) {\n      core.setFailed(`${poetry_lock.filename}\
+          \ has too many changes: ${poetry_lock.changes}`);\n    }\n    core.endGroup();\n\
+          \  }\n}\n""}}]}
+",['unknown'],lint_security,HumanSignal__Adala,[lint_security],Validates poetry.lock file changes to enforce dependency management policies and prevent excessive modifications.
+5a26e53b0531df74988c58b897440d0355d8ec13c9f3d17e3c8def93e448d971,details,"{name: Details, outputs: {membership: '${{ steps.membership.outputs.membership }}'},
+  runs-on: ubuntu-latest, steps: [{env: {ACTOR: '${{ github.actor }}'}, id: membership,
+      name: Check user's membership, uses: actions/github-script@v8, with: {github-token: '${{
+          secrets.GIT_PAT }}', script: ""const { owner } = context.repo;\nconst actor\
+          \ = process.env.ACTOR;\ngithub.rest.orgs.getMembershipForUser({\n  org:\
+          \ owner,\n  username: actor,\n})\n  .then(response => core.setOutput(\""\
+          membership\"", true))\n  .catch(reason => core.setOutput(\""membership\"",\
+          \ false));\n""}}]}
+",['security'],no_ops,HumanSignal__Adala,[no_ops],"Checks user membership status without performing build, test, deploy, or security operations."
+5a26e53b0531df74988c58b897440d0355d8ec13c9f3d17e3c8def93e448d971,gitleaks,"{if: github.event_name == 'pull_request', name: Linter, uses: ./.github/workflows/gitleaks.yml,
+  with: {base_sha: '${{ github.event.pull_request.base.sha || github.event.before
+      }}', head_sha: '${{ github.sha }}'}}
+",['security'],lint_security,HumanSignal__Adala,[lint_security],Runs gitleaks to scan for secrets and security vulnerabilities in pull requests.
+5a26e53b0531df74988c58b897440d0355d8ec13c9f3d17e3c8def93e448d971,build,"{name: Build, permissions: {checks: write, contents: read}, secrets: inherit, uses: ./.github/workflows/docker-build.yml,
+  with: {branch_name: '${{ github.event.pull_request.head.ref || github.ref_name }}',
+    sha: '${{ github.event.pull_request.head.sha || github.event.after }}'}}
+",['security'],build,HumanSignal__Adala,[build],Calls reusable workflow for Docker image building with branch and commit SHA parameters.
+611b8da82774685f4d625fd6842ec59bc28a3f35dbfeff4db8d27b11484709c8,ReleaseNotification,"{name: PyPI, runs-on: ubuntu-latest, steps: [{uses: hmarr/debug-action@v3.0.0}, {
+      name: Checkout, uses: actions/checkout@v6, with: {ref: '${{ inputs.ref }}'}},
+    {env: {PROVIDED_VERSION: '${{ inputs.version }}'}, name: Manage version, run: 'set
+        -x
+
+        version=$(sed ""s/^v//g"" <<< ${PROVIDED_VERSION})
+
+        sed -i ""s/^version[ ]*=.*/version = \""${version}\""/g"" ${{ env.PYTHON_VERSION_FILE
+        }}
+
+        '}, {name: Install poetry, run: 'pipx install ""poetry==${{ env.POETRY_VERSION
+        }}""'}, {id: setup_python, name: Set up Python, uses: actions/setup-python@v6,
+      with: {cache: poetry, python-version: '3.13'}}, {name: Install dependencies,
+      run: 'poetry install --without dev
+
+        '}, {name: Package, run: poetry build}, {env: {POETRY_PYPI_TOKEN_PYPI: '${{
+          secrets.PYPI_APIKEY }}'}, if: inputs.upload_to_pypi, name: Upload to PYPI,
+      run: 'poetry config pypi-token.pypi ""${POETRY_PYPI_TOKEN_PYPI}""
+
+        poetry publish --no-interaction
+
+        '}, {if: inputs.release-id, name: Attach artifacts to release, uses: actions/github-script@v8,
+      with: {github-token: '${{ secrets.GIT_PAT }}', script: ""const { repo, owner\
+          \ } = context.repo;\nconst fs = require('fs');\nconst release_id = '${{\
+          \ inputs.release-id }}';\nfor (let file of await fs.readdirSync('./dist/'))\
+          \ {\n   console.log('uploadReleaseAsset', file);\n   await github.rest.repos.uploadReleaseAsset({\n\
+          \      owner,\n      repo,\n      release_id: release_id,\n      name: file,\n\
+          \      data: await fs.readFileSync(`./dist/${file}`)\n   });\n}\n""}}, {
+      if: always(), name: Upload to artifact, uses: actions/upload-artifact@v7, with: {
+        name: Dist, path: dist/}}]}
+",['build'],deploy_release,HumanSignal__Adala,[build|deploy_release],Builds Python package with poetry (build) and publishes to PyPI/attaches to GitHub Release (deploy_release).
+6a7cf053cc2cf3a27577b06c72606e5513bc6a2c3e34b9c5cd5a5146bb583568,cancel,"{runs-on: ubuntu-latest, steps: [{uses: hmarr/debug-action@v3.0.0}, {run: 'echo CI/CD
+        Pipeline-${{ github.event.pull_request.number || github.event.pull_request.head.ref
+        || github.ref_name }}'}]}
+",['unknown'],no_ops,HumanSignal__Adala,[no_ops],"Debug action and echo statement with no functional impact on build, test, or deployment."
+70758d51fce149de43bdf6ddf78c7159008afcb5eb77b3135526ef581924eb7b,build-pypi,"{name: Build, permissions: {contents: write}, secrets: inherit, uses: ./.github/workflows/build_pypi.yml,
+  with: {ref: '${{ github.ref_name }}', release-id: '${{ github.event.release.id }}',
+    upload_to_pypi: true, version: '${{ github.ref_name }}'}}
+",['unknown'],build|deploy_release,HumanSignal__Adala,[build|deploy_release],Builds PyPI package and uploads to PyPI (upload_to_pypi
+87a6f34104e1b3a90675c7bfe289836f7497296afc833db31ca75fa9a476db45,sync,"{if: 'startsWith(github.head_ref, ''fb-'') || startsWith(github.head_ref, ''revert-'')
+    || startsWith(github.head_ref, ''cursor'')', name: Sync, runs-on: ubuntu-latest,
+  steps: [{uses: hmarr/debug-action@v3.0.0}, {id: check-membership, name: Check user's
+        membership, uses: actions/github-script@v8, with: {github-token: '${{ secrets.GIT_PAT
+          }}', script: ""const { repo, owner } = context.repo;\ntry {\n  return (await\
+          \ github.rest.orgs.getMembershipForUser({\n    org: owner,\n    username:\
+          \ '${{ github.actor }}',\n  }))?.data?.state == \""active\"";\n} catch (error)\
+          \ {\n  return false;\n}\n""}}, {if: steps.check-membership.outputs.result
+        == 'false', name: Notify user on failure, uses: actions/github-script@v8,
+      with: {github-token: '${{ secrets.GIT_PAT }}', script: ""const { repo, owner\
+          \ } = context.repo;\nconst result = await github.rest.issues.createComment({\n\
+          \  owner,\n  repo,\n  issue_number: '${{ github.event.number }}',\n  body:\
+          \ [\n    'Hi @${{ github.actor }}!',\n    '',\n    `Unfortunately you don't\
+          \ have membership in ${owner} organization, Follow Merge dispatch is skipped.`\n\
+          \  ].join('\\n')\n});\nthrow `${{ github.actor }} don't have membership\
+          \ in ${owner} organization`\n""}}, {name: Checkout Actions Hub, uses: actions/checkout@v6,
+      with: {path: ./.github/actions-hub, repository: HumanSignal/actions-hub, token: '${{
+          secrets.GIT_PAT }}'}}, {name: Dispatch label-studio-enterprise Follow Merge,
+      uses: ./.github/actions-hub/actions/follow-merge-dispatch, with: {downstream_repository: label-studio-enterprise,
+        github_token: '${{ secrets.GIT_PAT }}'}}]}
+",['unknown'],no_ops,HumanSignal__Adala,[no_ops],"Checks user membership and dispatches follow-merge event; no functional code changes, builds, tests, or deployments."
+8d3282eaf953206fb4221316b02334fea722235b84ec38d6af6a4ebe725e34ca,calculate_version,"{name: Calculate version, outputs: {build_version: '${{ steps.version.outputs.build_version
+      }}', image_version: '${{ steps.version.outputs.image_version }}', pretty_branch_name: '${{
+      steps.version.outputs.pretty_branch_name }}', sha: '${{ steps.version.outputs.sha
+      }}'}, runs-on: ubuntu-latest, steps: [{uses: hmarr/debug-action@v3.0.0}, {name: Checkout,
+      uses: actions/checkout@v6, with: {ref: '${{ inputs.sha }}'}}, {env: {BRANCH_NAME: '${{
+          inputs.branch_name }}'}, id: version, name: Calculate version, run: ""set\
+        \ -x\nsha=\""$(git rev-parse HEAD)\""\necho \""sha=$sha\"" >> $GITHUB_OUTPUT\n\
+        \ \npretty_branch_name=\""$(echo -n \""${BRANCH_NAME#refs/heads/}\"" | sed -E\
+        \ 's#[/_\\.-]+#-#g' | tr '[:upper:]' '[:lower:]' | cut -c1-25 | sed -E 's#-$##g')\""\
+        \necho \""pretty_branch_name=${pretty_branch_name}\"" >> \""${GITHUB_OUTPUT}\""\
+        \n\nregexp='^ls-release\\/(.*)$';\nif [[ \""$BRANCH_NAME\"" =~ $regexp ]]; then\n\
+        \  image_version=\""${BASH_REMATCH[1]}rc${sha}\""\nelse\n  image_version=\""\
+        ${pretty_branch_name}\""\nfi\necho \""image_version=${image_version}\"" >> $GITHUB_OUTPUT\n\
+        \ncurrent_time=\""$(date +'%Y%m%d.%H%M%S')\""\nbranch=\""-${pretty_branch_name}\""\
+        \nshort_sha=\""$(git rev-parse --short HEAD)\""\nlong_sha=\""$(git rev-parse\
+        \ HEAD)\""\necho \""sha=$long_sha\"" >> $GITHUB_OUTPUT\nshort_sha_length=\""$(echo\
+        \ $short_sha | awk '{print length}')\""\ncurrent_time_length=\""$(echo $current_time\
+        \ | awk '{print length}')\""\nversion=\""${current_time}$(echo $branch | cut\
+        \ -c1-$((50 - short_sha_length - current_time_length)))-${short_sha}\""\necho\
+        \ \""build_version=$version\"" >> $GITHUB_OUTPUT\n""}]}
+",['build'],deploy_release,HumanSignal__Adala,[no_ops],"Calculates and outputs version strings; no functional build, test, or deployment impact."
+8d3282eaf953206fb4221316b02334fea722235b84ec38d6af6a4ebe725e34ca,docker_build,"{name: 'Docker image (${{ matrix.platform }})', needs: calculate_version, runs-on: '${{
+    matrix.runner }}', steps: [{uses: hmarr/debug-action@v3.0.0}, {name: Prepare,
+      run: 'platform=${{ matrix.platform }}
+
+        echo ""PLATFORM_PAIR=${platform//\//-}"" >> $GITHUB_ENV
+
+        '}, {name: Checkout, uses: actions/checkout@v6, with: {ref: '${{ inputs.sha
+          }}'}}, {name: Set up Docker Buildx, uses: docker/setup-buildx-action@v4},
+    {name: Login to DockerHub, uses: docker/login-action@v4, with: {password: '${{
+          secrets.DOCKERHUB_TOKEN }}', username: '${{ vars.DOCKERHUB_USERNAME }}'}},
+    {id: meta, name: Docker meta, uses: docker/metadata-action@v5, with: {images: '${{
+          env.IMAGE_NAME }}'}}, {id: docker_build_and_push, name: 'Push Docker image
+        (${{ matrix.platform }})', uses: docker/build-push-action@v7.0.0, with: {
+        build-args: 'POETRY_VERSION=${{ env.POETRY_VERSION }}
+
+          ', cache-from: type=gha, cache-to: 'type=gha,mode=min', context: ., file: Dockerfile.app,
+        labels: '${{ steps.meta.outputs.labels }}', outputs: 'type=image,push-by-digest=true,name-canonical=true,push=true',
+        platforms: '${{ matrix.platform }}', provenance: true, sbom: true, tags: '${{
+          env.IMAGE_NAME }}'}}, {name: Export digest, run: 'mkdir -p ${{ runner.temp
+        }}/digests
+
+        digest=""${{ steps.docker_build_and_push.outputs.digest }}""
+
+        touch ""${{ runner.temp }}/digests/${digest#sha256:}""
+
+        '}, {name: Upload digest, uses: actions/upload-artifact@v7, with: {if-no-files-found: error,
+        name: 'digests-${{ env.PLATFORM_PAIR }}', path: '${{ runner.temp }}/digests/*',
+        retention-days: 1}}], strategy: {fail-fast: false, matrix: {include: [{platform: linux/amd64,
+          runner: ubuntu-latest}, {platform: linux/arm64, runner: ubuntu-24.04-arm}]}},
+  timeout-minutes: 15}
+",['build'],build|deploy_release,HumanSignal__Adala,[build|deploy_release],Builds Docker images with multi-platform support and pushes to registry (push=true).
+8d3282eaf953206fb4221316b02334fea722235b84ec38d6af6a4ebe725e34ca,merge_docker_manifest,"{needs: [docker_build, calculate_version], runs-on: ubuntu-latest, steps: [{name: Download
+        digests, uses: actions/download-artifact@v8, with: {merge-multiple: true,
+        path: '${{ runner.temp }}/digests', pattern: digests-*}}, {name: Login to
+        Docker Hub, uses: docker/login-action@v4, with: {password: '${{ secrets.DOCKERHUB_TOKEN
+          }}', username: '${{ vars.DOCKERHUB_USERNAME }}'}}, {name: Set up Docker
+        Buildx, uses: docker/setup-buildx-action@v4}, {id: meta, name: Docker meta,
+      uses: docker/metadata-action@v5, with: {images: '${{ env.IMAGE_NAME }}', tags: 'type=raw,value=${{
+          needs.calculate_version.outputs.image_version }}
+
+          type=raw,value=${{ needs.calculate_version.outputs.build_version }}
+
+          '}}, {name: Create manifest list and push, run: ""docker buildx imagetools\
+        \ create $(jq -cr '.tags | map(\""-t \"" + .) | join(\"" \"")' <<< \""$DOCKER_METADATA_OUTPUT_JSON\""\
+        ) \\\n  $(printf '${{ env.IMAGE_NAME }}@sha256:%s ' *)\n"", working-directory: '${{
+        runner.temp }}/digests'}, {name: Inspect image, run: 'docker buildx imagetools
+        inspect ${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.version }}
+
+        '}]}
+",['build'],deploy_release,HumanSignal__Adala,[deploy_release],Creates Docker manifest list and pushes multi-platform images to registry with versioned tags.
+8d3282eaf953206fb4221316b02334fea722235b84ec38d6af6a4ebe725e34ca,create_check,"{if: success(), name: Create Docker image tag Check, needs: [calculate_version, docker_build,
+    merge_docker_manifest], runs-on: ubuntu-latest, steps: [{name: Create Docker image
+        tag Check, uses: actions/github-script@v8, with: {script: ""const { repo, owner\
+          \ } = context.repo;\nconst details = {\n  \""branch\"": \""${{ inputs.branch_name\
+          \ }}\"",\n  \""pretty_branch_name\"": \""${{ needs.calculate_version.outputs.pretty_branch_name\
+          \ }}\"",\n  \""image_version\"": \""${{ needs.calculate_version.outputs.build_version\
+          \ }}\"",\n  \""sha\"": \""${{ needs.calculate_version.outputs.sha }}\""\n}\n\
+          const { data: check } = await github.rest.checks.create({\n  owner,\n  repo,\n\
+          \  name: '${{ env.DOCKER_IMAGE_TAG_CHECK_NAME }}',\n  head_sha: '${{ needs.calculate_version.outputs.sha\
+          \ }}',\n  status: 'in_progress',\n  output: {\n    title: '${{ env.DOCKER_IMAGE_TAG_CHECK_NAME\
+          \ }}',\n    summary: JSON.stringify(details)\n  }\n});\nawait github.rest.checks.update({\n\
+          \  owner,\n  repo,\n  check_run_id: check.id,\n  status: 'completed',\n\
+          \  conclusion: 'success'\n});\n""}}]}
+",['build'],deploy_release,HumanSignal__Adala,[no_ops],Creates a GitHub check run with build metadata; no functional impact on deployment or testing.
+8f0ac75d1d3caf2cc02c11eef2bc6b6db3cad6e0c18a9e0febe638e8cee4f90a,convert_stale_prs,"{runs-on: ubuntu-latest, steps: [{uses: hmarr/debug-action@v3.0.0}, {id: get_timestamp,
+      name: Get timestamp, run: 'echo ""ts=$(date -d ''10 hours ago'' +""%Y-%m-%dT%H:%M:%S"")""
+        >> $GITHUB_OUTPUT', shell: bash}, {env: {GITHUB_TOKEN: '${{ secrets.GIT_PAT
+          }}'}, id: get_stale_prs, name: Get PR older than 10 hours, uses: octokit/graphql-action@v3.0.2,
+      with: {query: ""{\n  search(query: \""repo:${{ github.repository }} is:pr is:open\
+          \ draft:false -label:${{ env.DRAFT_PROTECT_LABEL }} updated:<=${{ steps.get_timestamp.outputs.ts\
+          \ }}\"", type: ISSUE, first: 100) {\n    issueCount\n    edges {\n      node\
+          \ {\n        ... on PullRequest {\n          number\n          url\n   \
+          \       id\n          updatedAt\n        }\n      }\n    }\n  }\n}\n""}},
+    {name: Stale PRs data, run: 'echo ''${{ steps.get_stale_prs.outputs.data }}'''},
+    {env: {GIT_PAT: '${{ secrets.GIT_PAT }}'}, id: mutation_step, name: Convert to
+        draft, run: ""set -eux\necho '${{ steps.get_stale_prs.outputs.data }}' > /tmp/stale_pr.json\n\
+        _pr_list=$(jq -r '.search.edges | map(.node.url) | join(\""\\\\n\"")' < /tmp/stale_pr.json)\n\
+        if [ -n \""$_pr_list\"" ]; then\n  echo \""pr_list=$_pr_list\"" >> $GITHUB_OUTPUT\n\
+        \  echo \""exec=true\"" >> $GITHUB_OUTPUT\n  echo \""$GIT_PAT\"" | gh auth login\
+        \ --with-token\n  for pr_id in $(jq -r '.search.edges[].node.id' < /tmp/stale_pr.json);\
+        \ do\n    gh api graphql -F id=\""${pr_id}\"" -f query='\n      mutation($id:\
+        \ ID!) {\n        convertPullRequestToDraft(input: { pullRequestId: $id })\
+        \ {\n          pullRequest {\n            id\n            number\n       \
+        \     isDraft\n          }\n        }\n      }\n    '\n  done\nfi\n"", shell: bash},
+    {env: {SLACK_BOT_TOKEN: '${{ secrets.SLACK_LSE_BOT_TOKEN }}', SLACK_MESSAGE: '*Drafted
+          PR''s*\n ${{ steps.mutation_step.outputs.pr_list }}'}, id: slack, if: '${{
+        steps.mutation_step.outputs.exec == ''true'' }}', name: Post to a Slack channel,
+      uses: slackapi/slack-github-action@v2.1, with: {channel-id: C02LMULF4NA, payload: '{
+          ""type"": ""mrkdwn"", ""text"": ""${{ env.SLACK_MESSAGE }}"" }'}}], timeout-minutes: 2}
+",['unknown'],no_ops,HumanSignal__Adala,[no_ops],Automated maintenance task that converts stale PRs to draft status and posts notifications with no functional code impact.
+92e7af04fdd41e4a35d3aca1b272e246586d65609a5208f2ca47de4905ef6962,merge,"{if: '${{ github.event.client_payload.slash_command.args.unnamed.arg1 == ''merge''
+    }}', runs-on: ubuntu-latest, steps: [{uses: hmarr/debug-action@v3.0.0}, {name: Add
+        Workflow link to command comment, uses: peter-evans/create-or-update-comment@v5,
+      with: {body: '> [Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{
+          github.run_id }})
+
+          ', comment-id: '${{ github.event.client_payload.github.payload.comment.id
+          }}', repository: '${{ github.event.client_payload.github.payload.repository.full_name
+          }}', token: '${{ secrets.GIT_PAT }}'}}, {name: Checkout, uses: actions/checkout@v6,
+      with: {ref: '${{ github.event.client_payload.pull_request.head.ref }}', repository: '${{
+          github.event.client_payload.pull_request.head.repo.full_name }}', token: '${{
+          secrets.GIT_PAT }}'}}, {name: Checkout Actions Hub, uses: actions/checkout@v6,
+      with: {path: ./.github/actions-hub, repository: HumanSignal/actions-hub, token: '${{
+          secrets.GIT_PAT }}'}}, {name: Git Configure, uses: ./.github/actions-hub/actions/git-configure,
+      with: {username: '${{ github.event.client_payload.github.actor }}'}}, {id: merge,
+      name: Git Merge, uses: ./.github/actions-hub/actions/git-merge, with: {base_branch: '${{
+          github.event.client_payload.slash_command.args.unnamed.arg2 || github.event.client_payload.pull_request.base.ref
+          }}', our_files: pyproject.toml poetry.lock}}, {if: steps.merge.outputs.result
+        == 'true', name: Git Push, uses: ./.github/actions-hub/actions/git-push},
+    {if: always(), name: Add reaction to command comment, uses: peter-evans/create-or-update-comment@v5,
+      with: {body: '> ${{ steps.merge.outputs.message || ''**Error**: Workflow failed''
+          }}
+
+          ', comment-id: '${{ github.event.client_payload.github.payload.comment.id
+          }}', reactions: '${{ steps.merge.outputs.reaction || ''-1'' }}', repository: '${{
+          github.event.client_payload.github.payload.repository.full_name }}', token: '${{
+          secrets.GIT_PAT }}'}}], timeout-minutes: 10}
+",['unknown'],lint_security,HumanSignal__Adala,[no_ops],"Job performs git merge and comment updates with no build, test, deploy, or security impact."
+92e7af04fdd41e4a35d3aca1b272e246586d65609a5208f2ca47de4905ef6962,help,"{if: '${{ github.event.client_payload.slash_command.args.unnamed.arg1 == ''help''
+    || !contains(fromJson(''[""merge""]''), github.event.client_payload.slash_command.args.unnamed.arg1)
+    }}', runs-on: ubuntu-latest, steps: [{name: Update comment, uses: peter-evans/create-or-update-comment@v5,
+      with: {body: '> Command | Description
+
+          > --- | ---
+
+          > /git merge `branch` | Merge branch `branch` into current branch
+
+          ', comment-id: '${{ github.event.client_payload.github.payload.comment.id
+          }}', reactions: hooray, repository: '${{ github.event.client_payload.github.payload.repository.full_name
+          }}', token: '${{ secrets.GIT_PAT }}'}}], timeout-minutes: 1}
+",['unknown'],no_ops,HumanSignal__Adala,[no_ops],Updates a GitHub comment with help text; no functional impact on code or deployment.
+ae0b5018edd71818d4700763a13bdb1b0ffba52ab20e766570f86665fd9b0cc2,create,"{if: '${{ github.event.client_payload.slash_command.args.unnamed.arg1 == ''create''
+    }}', runs-on: ubuntu-latest, steps: [{uses: hmarr/debug-action@v3.0.0}, {name: Add
+        Workflow link to command comment, uses: peter-evans/create-or-update-comment@v5,
+      with: {body: '> [Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{
+          github.run_id }})
+
+          ', comment-id: '${{ github.event.client_payload.github.payload.comment.id
+          }}', repository: '${{ github.event.client_payload.github.payload.repository.full_name
+          }}', token: '${{ secrets.GIT_PAT }}'}}, {env: {ACTOR: '${{ github.actor
+          }}'}, id: check-membership, name: Check user's membership, uses: actions/github-script@v8,
+      with: {github-token: '${{ secrets.GIT_PAT }}', script: ""const { repo, owner\
+          \ } = context.repo;\nconst actor = process.env.ACTOR;\nconst { data: membership\
+          \ } = await github.rest.orgs.getMembershipForUser({\n  org: owner,\n  username:\
+          \ actor,\n});\nif (membership.state != \""active\"") {\n  const error = `Unfortunately\
+          \ you don't have membership in ${owner} organization, Jira Issue was not\
+          \ created`;\n  core.setOutput(\""error\"", error);\n  core.setFailed(error);\n\
+          }\n""}}, {name: Checkout Actions Hub, uses: actions/checkout@v6, with: {
+        path: ./.github/actions-hub, repository: HumanSignal/actions-hub, token: '${{
+          secrets.GIT_PAT }}'}}, {id: jira-create-issue, name: Jira Create Issue,
+      uses: ./.github/actions-hub/actions/jira-create-issue, with: {description: '${{
+          github.event.client_payload.github.payload.issue.body }}', jira_server: '${{
+          vars.JIRA_SERVER }}', jira_token: '${{ secrets.JIRA_TOKEN }}', jira_username: '${{
+          secrets.JIRA_USERNAME }}', project: '${{ github.event.client_payload.slash_command.args.unnamed.arg3
+          || ''TRIAG'' }}', summary: '${{ github.event.client_payload.github.payload.issue.title
+          }}', type: '${{ github.event.client_payload.slash_command.args.unnamed.arg2
+          || ''task'' }}'}}, {name: Add reaction to command comment on success, uses: peter-evans/create-or-update-comment@v5,
+      with: {body: '> Jira issue [${{ steps.jira-create-issue.outputs.key }}](${{
+          steps.jira-create-issue.outputs.link }}) is created
+
+          ', comment-id: '${{ github.event.client_payload.github.payload.comment.id
+          }}', reactions: '+1', repository: '${{ github.event.client_payload.github.payload.repository.full_name
+          }}', token: '${{ secrets.GIT_PAT }}'}}, {if: failure(), name: Add reaction
+        to command comment on failure, uses: peter-evans/create-or-update-comment@v5,
+      with: {body: '> **Error**: failed to execute ""${{ github.event.client_payload.slash_command.args.unnamed.arg1
+          }}"" command
+
+          > ${{ steps.check-membership.outputs.error }}
+
+          ', comment-id: '${{ github.event.client_payload.github.payload.comment.id
+          }}', reactions: '-1', repository: '${{ github.event.client_payload.github.payload.repository.full_name
+          }}', token: '${{ secrets.GIT_PAT }}'}}], timeout-minutes: 3}
+",['unknown'],no_ops,HumanSignal__Adala,[no_ops],"Job creates Jira issues from GitHub comments with no deployment, testing, or build impact."
+ae0b5018edd71818d4700763a13bdb1b0ffba52ab20e766570f86665fd9b0cc2,help,"{if: 'github.event.client_payload.slash_command.args.unnamed.arg1 == ''help'' || !contains(fromJson(''[""create""]''),
+    github.event.client_payload.slash_command.args.unnamed.arg1)', runs-on: ubuntu-latest,
+  steps: [{name: Update comment, uses: peter-evans/create-or-update-comment@v5, with: {
+        body: '> Command | Description
+
+          > --- | ---
+
+          > /jira create [task|bug|story] `PROJECT` | Create a Jira issue in project
+          `PROJECT`
+
+          ', comment-id: '${{ github.event.client_payload.github.payload.comment.id
+          }}', reaction-type: hooray, repository: '${{ github.event.client_payload.github.payload.repository.full_name
+          }}', token: '${{ secrets.GIT_PAT }}'}}], timeout-minutes: 1}
+",['unknown'],no_ops,HumanSignal__Adala,[no_ops],Updates GitHub comment with help text; no functional impact on code or deployment.
+b945549e43caf2dcf145030c2ac6eeb17fb725148f92a64978c8c44aac814e51,help,"{runs-on: ubuntu-latest, steps: [{if: '${{ github.event.client_payload.slash_command.args.all
+        == '''' }}', name: Update comment if empty, uses: peter-evans/create-or-update-comment@v5,
+      with: {body: '> Command | Description
+
+          > --- | ---
+
+          > /git [\<args\> ...] | Actions with git. Type `/git help` for an additional
+          help.
+
+          > /jira [\<args\> ...] | Actions with JIRA. Type `/jira help` for an additional
+          help.
+
+          ', comment-id: '${{ github.event.client_payload.github.payload.comment.id
+          }}', reaction-type: hooray, repository: '${{ github.event.client_payload.github.payload.repository.full_name
+          }}', token: '${{ secrets.GIT_PAT }}'}}], timeout-minutes: 1}
+",['unknown'],no_ops,HumanSignal__Adala,[no_ops],"Updates GitHub comment with help text; no functional impact on build, test, or deployment."
+c0254fd064608476f33118f95b730ea1dd49b29ce99ed30deb09756bce256c52,commit-version,"{permissions: {contents: write}, runs-on: ubuntu-latest, steps: [{uses: hmarr/debug-action@v3.0.0},
+    {name: Checkout, uses: actions/checkout@v6, with: {fetch-depth: 1, ref: '${{ inputs.branch
+          }}', token: '${{ secrets.GIT_PAT }}'}}, {env: {ACTOR_USERNAME: '${{ github.event.sender.login
+          }}'}, id: get-github-user, name: Get GitHub user details, uses: actions/github-script@v8,
+      with: {github-token: '${{ secrets.GIT_PAT }}', script: ""const actor_username\
+          \ = process.env.ACTOR_USERNAME;\n\nlet user_name = 'robot-ci-heartex';\n\
+          let user_email = 'robot-ci-heartex@users.noreply.github.com';\n\ntry {\n\
+          \  const {data: user} = await github.rest.users.getByUsername({\n    username:\
+          \ actor_username,\n  });\n  user_name = user.login;\n  user_email = user.email;\n\
+          } catch (e) {\n  console.log(e)\n}\n\ncore.setOutput('user_name', user_name);\n\
+          core.setOutput('user_email', user_email);\n""}}, {name: Configure git, run: 'set
+        -xeuo pipefail
+
+        git config --global user.name ''${{ steps.get-github-user.outputs.user_name
+        }}''
+
+        git config --global user.email ''${{ steps.get-github-user.outputs.user_email
+        }}''
+
+        ', shell: bash}, {id: validate-user-input, name: Validate user input, run: ""set\
+        \ -xeuo pipefail\n\nregexp='^[v]?([0-9]+)\\.([0-9]+)\\.([0-9]+)(\\.dev[0-9]*)?$'\n\
+        \nif [[ \""${{ inputs.version }}\"" =~ $regexp ]]; then\n    echo \""${{ inputs.version\
+        \ }} does match the regexp ${regexp}\""\nelse\n    echo \""${{ inputs.version\
+        \ }} does not match the regexp ${regexp}\""\n    exit 1\nfi\n"", shell: bash},
+    {id: make-commit, name: Commit version file, run: 'set -euo pipefail
+
+
+        sed -i ""s/^version[ ]*=.*/version = \""${{ inputs.version }}\""/g"" ${{ env.PYTHON_VERSION_FILE
+        }}
+
+
+        git add ${{ env.PYTHON_VERSION_FILE }}
+
+        git commit --message ""chore: Bump version to ${{ inputs.version }}""
+
+
+        echo ""commit=$(git rev-parse HEAD)"" >> $GITHUB_OUTPUT
+
+        git push origin HEAD:refs/heads/${{ inputs.branch }}'}]}
+",['unknown'],deploy_release,HumanSignal__Adala,[no_ops],"Job validates input, configures git, and commits version changes with no functional deployment or testing impact."
+c0d3e2ca8889520924d0c4e64c871dcaa4012ba258d39bf0481595079e698221,analyze,"{name: Analyze, permissions: {actions: read, contents: read, security-events: write},
+  runs-on: ubuntu-latest, steps: [{name: Checkout repository, uses: actions/checkout@v6},
+    {name: Initialize CodeQL, uses: github/codeql-action/init@v4, with: {languages: '${{
+          matrix.language }}'}}, {name: Perform CodeQL Analysis, uses: github/codeql-action/analyze@v4,
+      with: {category: '/language:${{matrix.language}}'}}], strategy: {fail-fast: false,
+    matrix: {language: [python]}}, timeout-minutes: 45}
+",['security'],lint_security,HumanSignal__Adala,[lint_security],CodeQL static analysis performs vulnerability scanning and security code analysis.
+c7e56b861f3c6667dca0bd9c61da9dcb02209c24cd046c0a3938049b8f01634c,sync,"{name: Sync PR, outputs: {label-studio-sdk: '${{ fromJSON(steps.upstream-prs.outputs.shas).label-studio-sdk
+      }}'}, runs-on: ubuntu-latest, steps: [{uses: hmarr/debug-action@v3.0.0}, {if: github.event.client_payload.github.payload.comment.id
+        && github.event.client_payload.github.payload.repository.full_name, name: Add
+        Workflow link to chat ops command comment, uses: peter-evans/create-or-update-comment@v5,
+      with: {body: '> [Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{
+          github.run_id }})
+
+          ', comment-id: '${{ github.event.client_payload.github.payload.comment.id
+          }}', repository: '${{ github.event.client_payload.github.payload.repository.full_name
+          }}', token: '${{ secrets.GIT_PAT }}'}}, {name: Checkout Actions Hub, uses: actions/checkout@v6,
+      with: {path: ./.github/actions-hub, repository: HumanSignal/actions-hub, token: '${{
+          secrets.GIT_PAT }}'}}, {id: upstream-prs, name: Get Upstream PRs, uses: ./.github/actions-hub/actions/follow-merge-upstream-prs,
+      with: {branch_name: '${{ inputs.branch_name }}', github_token: '${{ secrets.GIT_PAT
+          }}', infra_repositories: '', poetry_repositories: label-studio-sdk}}, {
+      continue-on-error: true, id: team_details, name: Team details, uses: ./.github/actions-hub/actions/team-details,
+      with: {github-username: '${{ steps.upstream-prs.outputs.author_username }}',
+        github_token: '${{ secrets.GIT_PAT }}', jira-server: '${{ vars.JIRA_SERVER
+          }}', jira-token: '${{ secrets.JIRA_TOKEN }}', jira-username: '${{ secrets.JIRA_USERNAME
+          }}'}}, {name: Git Configure, uses: ./.github/actions-hub/actions/git-configure,
+      with: {username: '${{ steps.team_details.outputs.github-username }}'}}, {id: get-branch,
+      name: Find or Create branch, uses: ./.github/actions-hub/actions/github-find-or-create-branch,
+      with: {branch_name: '${{ inputs.branch_name }}', github_token: '${{ secrets.GIT_PAT
+          }}'}}, {name: Checkout, uses: actions/checkout@v6, with: {fetch-depth: 0,
+        ref: '${{ steps.get-branch.outputs.branch_name }}', token: '${{ secrets.GIT_PAT
+          }}'}}, {name: Checkout Actions Hub, uses: actions/checkout@v6, with: {path: ./.github/actions-hub,
+        repository: HumanSignal/actions-hub, token: '${{ secrets.GIT_PAT }}'}}, {
+      continue-on-error: true, id: merge, name: Git Merge, uses: ./.github/actions-hub/actions/git-merge,
+      with: {base_branch: '${{ steps.upstream-prs.outputs.base_branch_name }}', head_branch: '${{
+          steps.get-branch.outputs.branch_name }}', our_files: pyproject.toml poetry.lock
+          web/package.json web/yarn.lock}}, {name: Install poetry, run: 'pipx install
+        ""poetry==${{ env.POETRY_VERSION }}""'}, {id: setup_python, name: Set up Python,
+      uses: actions/setup-python@v6, with: {cache: poetry, python-version: '3.13'}},
+    {env: {COMMIT_MESSAGE: Sync Follow Merge dependencies, COMMIT_MESSAGE_WORKFLOW_LINK: 'Workflow
+          run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id
+          }}', SDK_SHA: '${{ fromJSON(steps.upstream-prs.outputs.shas).label-studio-sdk
+          }}'}, name: Commit submodule, run: ""set -xeuo pipefail\n\nif [[ -n \""${SDK_SHA}\""\
+        \ ]]; then\n  poetry add \""https://github.com/HumanSignal/label-studio-sdk/archive/${SDK_SHA}.zip\""\
+        \ --lock\nfi\n\npoetry lock\n\ngit diff\ngit add -A\ngit status -s\ngit commit\
+        \ --allow-empty -m \""${COMMIT_MESSAGE}\"" -m \""${COMMIT_MESSAGE_WORKFLOW_LINK}\""\
+        \n"", shell: bash}, {name: Git Push, uses: ./.github/actions-hub/actions/git-push},
+    {id: get-pr, name: Find or Create PR, uses: ./.github/actions-hub/actions/follow-merge-find-or-create-pull-request,
+      with: {base_branch_name: '${{ steps.upstream-prs.outputs.base_branch_name }}',
+        branch_name: '${{ steps.get-branch.outputs.branch_name }}', github_token: '${{
+          secrets.GIT_PAT }}', title: '${{ steps.upstream-prs.outputs.title }}', upstream_prs_urls: '${{
+          steps.upstream-prs.outputs.upstream_prs_urls }}'}}, {continue-on-error: true,
+      name: Add PR Assignees, uses: ./.github/actions-hub/actions/github-add-pull-request-assignees,
+      with: {assignees: '${{ steps.upstream-prs.outputs.assignees }},${{ github.event.client_payload.github.actor
+          }}', github_token: '${{ secrets.GIT_PAT }}', pullrequest_number: '${{ steps.get-pr.outputs.number
+          }}'}}, {continue-on-error: true, if: steps.upstream-prs.outputs.status ==
+        'stale', name: Add PR state Labels, uses: ./.github/actions-hub/actions/github-add-pull-request-labels,
+      with: {github_token: '${{ secrets.GIT_PAT }}', labels: FM Stale, pullrequest_number: '${{
+          steps.get-pr.outputs.number }}'}}, {continue-on-error: true, env: {BASE_BRANCH_NAME: 'origin/${{
+          steps.upstream-prs.outputs.base_branch_name }}', BRANCH_NAME: 'origin/${{
+          steps.get-branch.outputs.branch_name }}', GIT_PAT: '${{ secrets.GIT_PAT
+          }}'}, if: steps.upstream-prs.outputs.status == 'stale', name: Merge Stale
+        PR (Dry run), run: ""if git diff --quiet \""${BASE_BRANCH_NAME}..${BRANCH_NAME}\""\
+        ; then\n  echo \""No changes detected.\""\nelse\n  echo \""Changes detected in\
+        \ PR.\""\nfi\n"", shell: bash}, {env: {GIT_PAT: '${{ secrets.GIT_PAT }}'}, id: ready-for-review-pr,
+      if: steps.upstream-prs.outputs.status == 'merged', name: Convert to ready for
+        review, run: ""echo \""$GIT_PAT\"" | gh auth login --with-token\ngh api graphql\
+        \ -F id='${{ steps.get-pr.outputs.node_id }}' -f query='\n  mutation($id:\
+        \ ID!) {\n    markPullRequestReadyForReview(input: { pullRequestId: $id })\
+        \ {\n      pullRequest {\n        id\n      }\n    }\n  }\n'\n"", shell: bash},
+    {continue-on-error: true, env: {GIT_PAT: '${{ secrets.GIT_PAT }}'}, if: steps.upstream-prs.outputs.status
+        == 'merged', name: Enable AutoMerge, run: ""echo \""$GIT_PAT\"" | gh auth login\
+        \ --with-token\ngh api graphql -f pull='${{ steps.get-pr.outputs.node_id }}'\
+        \ -f query='\n  mutation($pull: ID!) {\n    enablePullRequestAutoMerge(input:\
+        \ {pullRequestId: $pull, mergeMethod: SQUASH}) {\n      pullRequest {\n  \
+        \      id\n        number\n      }\n    }\n  }'\n"", shell: bash}, {continue-on-error: true,
+      env: {GIT_PAT: '${{ secrets.GIT_PAT }}'}, if: steps.upstream-prs.outputs.status
+        == 'closed', name: Close PR, run: ""echo \""$GIT_PAT\"" | gh auth login --with-token\n\
+        gh api graphql -f pull='${{ steps.get-pr.outputs.node_id }}' -f query='\n\
+        \  mutation($pull: ID!) {\n    closePullRequest(input: {pullRequestId: $pull\
+        \ }) {\n      pullRequest {\n        id\n        state\n      }\n    }\n \
+        \ }'\n"", shell: bash}, {env: {DOWNSTREAM_PR: '<${{ steps.get-pr.outputs.html_url
+          }}|downstream pr>, ', MENTION: '<@${{ steps.team_details.outputs.slack-user-id
+          }}>', UPSTREAM_PR: '<${{ steps.upstream-prs.outputs.first_upstream_pr_url
+          }}|upstream pr>, ', WORKFLOW: '<https://github.com/${{ github.repository
+          }}/actions/runs/${{ github.run_id }}|workflow>'}, if: failure(), name: Send
+        Slack Notification on failure, uses: slackapi/slack-github-action@v2.1.1,
+      with: {method: chat.postMessage, payload: ""channel: \""${{ env.SLACK_CHANNEL_ID\
+          \ }}\""\ntext: >+\n  :x: Follow Merge downstream workflow has been failed\
+          \ in <https://github.com/${{ github.repository }}|${{ github.repository\
+          \ }}>.\n  [ ${{ steps.upstream-prs.outputs.first_upstream_pr_url && env.UPSTREAM_PR\
+          \ || '' }}${{ steps.get-pr.outputs.html_url && env.DOWNSTREAM_PR || '' }}${{\
+          \ env.WORKFLOW }} ]\n  ${{ steps.team_details.outputs.slack-user-id && env.MENTION\
+          \ || '' }}\n"", token: '${{ secrets.SLACK_LSE_BOT_TOKEN }}'}}, {if: always()
+        && github.event.client_payload.github.payload.comment.id && github.event.client_payload.github.payload.repository.full_name,
+      name: Add reaction to chat ops command comment, uses: peter-evans/create-or-update-comment@v5,
+      with: {comment-id: '${{ github.event.client_payload.github.payload.comment.id
+          }}', reactions: '${{ job.status == ''success'' && ''+1'' || ''-1'' }}',
+        repository: '${{ github.event.client_payload.github.payload.repository.full_name
+          }}', token: '${{ secrets.GIT_PAT }}'}}]}
+",['unknown'],no_ops,HumanSignal__Adala,[build],"Updates dependencies (poetry lock), commits changes, and prepares pull requests for synchronization."
+d894db1c6f11e4bb53376a0f721de8dc3a54a0ca558cb052063bf48a750f0b3a,draft-release,"{name: Draft Release, outputs: {id: '${{ steps.create-draft-release.outputs.id }}',
+    rc-version: '${{ steps.create-draft-release.outputs.rc-version }}'}, permissions: {
+    contents: write}, runs-on: ubuntu-latest, steps: [{env: {DEFAULT_BRANCH: '${{
+          github.event.repository.default_branch }}', RELEASE_BRANCH_PREFIX: '${{
+          env.RELEASE_BRANCH_PREFIX }}', TARGET_COMMITISH: '${{ github.ref_name }}'},
+      id: create-draft-release, name: Create release draft, uses: actions/github-script@v8,
+      with: {script: ""const { repo, owner } = context.repo;\nconst target_commitish\
+          \ = process.env.TARGET_COMMITISH;\nconst default_branch = process.env.DEFAULT_BRANCH;\n\
+          let version = target_commitish.replace(process.env.RELEASE_BRANCH_PREFIX,\
+          \ '')\nconst regexp = '^[v]?([0-9]+)\\.([0-9]+)\\.([0-9]+)(\\.post([0-9]+))?$';\n\
+          \nconst {data: compare} = await github.rest.repos.compareCommits({\n  owner,\n\
+          \  repo,\n  base: default_branch,\n  head: target_commitish,\n});\nconst\
+          \ rc_version = `${version}rc${ compare.ahead_by }`\nconsole.log(`rc-version:\
+          \ ${rc_version}`)\ncore.setOutput(\""rc-version\"", rc_version);\n\nfunction\
+          \ compareVersions(a, b) {\n  if (a[1] === b[1])\n    if (a[2] === b[2])\n\
+          \      if (a[3] === b[3])\n        return (+a[5] || -1) - (+b[5] || -1)\n\
+          \      else\n        return +a[3] - b[3]\n    else\n      return +a[2] -\
+          \ b[2]\n  else\n    return +a[1] - b[1]\n}\n\nconst versionMatch = version.match(regexp)\n\
+          if (!versionMatch) {\n  core.setFailed(`Version \""${version}\"" from branch\
+          \ \""${target_commitish}\"" does not match the regexp ${regexp}`)\n  process.exit()\n\
+          }\n\nconst tags = await github.paginate(\n  github.rest.repos.listTags,\n\
+          \  {\n    owner,\n    repo,\n    per_page: 100\n  },\n  (response) => response.data\n\
+          );\nconsole.log(`Tags:`)\nconsole.log(tags.map(e => e.name))\nconst matchedTags\
+          \ = tags.filter(e => e.name.indexOf(version) !== -1)\nconsole.log(`Tags\
+          \ for ${version}:`)\nconsole.log(matchedTags.map(e => e.name))\nif (matchedTags.length\
+          \ !== 0) {\n    let newHotfixNumber = 0\n    for (let matchedTag of matchedTags)\
+          \ {\n        const matchVersion = matchedTag.name.match('^[v]?([0-9]+)\\\
+          .([0-9]+)\\.([0-9]+)(.post([0-9]+))?$')\n        if (matchVersion && matchVersion[5])\
+          \ {\n            const hotfixNumber = parseInt(matchVersion[5])\n      \
+          \      if (newHotfixNumber <= hotfixNumber) {\n                newHotfixNumber\
+          \ = hotfixNumber + 1\n            }\n        }\n    }\n    version = `${version}.post${newHotfixNumber}`\n\
+          }\nconsole.log(`New version: ${version}`)\n\nconst rawTags = tags.map(e\
+          \ => e.name) \nconst tagsWithNew = [...rawTags, version]\nconst sortedTags\
+          \ = tagsWithNew\n  .filter(e => e.match(regexp))\n  .map((e => e.match(regexp)))\n\
+          \  .sort(compareVersions)\n  .reverse()\n  .map(e => e[0])\nconst previousTag\
+          \ = sortedTags[sortedTags.indexOf(version)+1]\nconsole.log(`Previous version:\
+          \ ${previousTag}`)\n\nconsole.log('Find or Create a Draft release')\nconst\
+          \ releases = await github.paginate(\n  github.rest.repos.listReleases,\n\
+          \  {\n    owner,\n    repo,\n    per_page: 100\n  },\n  (response) => response.data\n\
+          );\nlet release = releases.find(e => target_commitish.endsWith(e.target_commitish)\
+          \ && e.draft)\nif (release) {\n    console.log(`Draft release already exist\
+          \ ${release.html_url}`)\n} else {\n    console.log(`Draft release is not\
+          \ found creating a new one`)                \n    const {data: newDraftRelease}\
+          \ = await github.rest.repos.createRelease({\n        owner,\n        repo,\n\
+          \        draft: true,\n        prerelease: false,\n        name: version,\n\
+          \        tag_name: version,\n        target_commitish: target_commitish,\n\
+          \    });\n    console.log(`Draft release is created ${newDraftRelease.html_url}`)\n\
+          \    release = newDraftRelease;\n    core.setOutput(\""created\"", true);\n\
+          }\n\nconsole.log('Updating release with new release notes')\nconst {data:\
+          \ release_notes} = await github.rest.repos.generateReleaseNotes({\n  owner,\n\
+          \  repo,\n  tag_name: version,\n  previous_tag_name: previousTag,\n  target_commitish:\
+          \ target_commitish,\n});\nconst {data: updated_release} = await github.rest.repos.updateRelease({\n\
+          \  owner,\n  repo,\n  release_id: release.id,\n  draft: true,\n  prerelease:\
+          \ false,\n  name: version,\n  tag_name: version,\n  target_commitish: target_commitish,\n\
+          \  body: release_notes.body\n});\nconsole.log(`Draft release is updated\
+          \ ${updated_release.html_url}`)\n\ncore.setOutput(\""id\"", updated_release.id);\n\
+          core.setOutput(\""tag_name\"", release.tag_name);\n""}}]}
+",['unknown'],deploy_release,HumanSignal__Adala,[deploy_release],Creates and updates GitHub draft releases with version tags and release notes.
+d894db1c6f11e4bb53376a0f721de8dc3a54a0ca558cb052063bf48a750f0b3a,build-pypi,"{name: Build, needs: [draft-release], permissions: {contents: write}, secrets: inherit,
+  uses: ./.github/workflows/build_pypi.yml, with: {ref: '${{ github.ref_name }}',
+    release-id: '${{ needs.draft-release.outputs.id }}', version: '${{ needs.draft-release.outputs.rc-version
+      }}'}}
+",['unknown'],deploy_release,HumanSignal__Adala,[build],Builds PyPI package using reusable workflow with version and release parameters.
+de007375566a5e88fff5cbced8cacaf5143990eefb0750fec05170feddff17c9,draft-new-release,"{name: Cut off release branch, outputs: {next_develop_version: '${{ steps.calculate_branch_name_and_version.outputs.next_develop_version
+      }}', release_branch: '${{ steps.calculate_branch_name_and_version.outputs.release_branch
+      }}', release_version: '${{ steps.calculate_branch_name_and_version.outputs.release_version
+      }}'}, permissions: {contents: write, pull-requests: write}, runs-on: ubuntu-latest,
+  steps: [{uses: hmarr/debug-action@v3.0.0}, {name: Checkout, uses: actions/checkout@v6,
+      with: {fetch-depth: 0, ref: '${{ inputs.ref }}', token: '${{ secrets.GIT_PAT
+          }}'}}, {name: Configure git, run: 'set -xeuo pipefail
+
+        git config --global user.name ''robot-ci-heartex''
+
+        git config --global user.email ''robot-ci-heartex@users.noreply.github.com''
+
+        ', shell: bash}, {id: calculate_branch_name_and_version, name: Calculate branch
+        name and version, run: ""set -xeuo pipefail\n\nregexp='^[v]?([0-9]+)\\.([0-9]+)\\\
+        .([0-9]+)$';\n\nif [[ \""${{ inputs.version }}\"" =~ $regexp ]]; then\n    first=\""\
+        ${BASH_REMATCH[1]}\""\n    second=\""${BASH_REMATCH[2]}\""\n    third=\""${BASH_REMATCH[3]}\""\
+        \nelse\n    echo \""${{ inputs.version }} does not mach the regexp ${regexp}\""\
+        \n    exit 1\nfi\n\nrelease_version=\""${first}.${second}.${third}\""\nrelease_branch=\""\
+        ${{ env.RELEASE_BRANCH_PREFIX }}${first}.${second}.${third}\""\nnext_develop_version=\""\
+        ${first}.${second}.$(($third + 1)).dev\""\n\necho \""release_branch=${release_branch}\""\
+        \ >> $GITHUB_OUTPUT\necho \""release_version=${release_version}\"" >> $GITHUB_OUTPUT\n\
+        echo \""next_develop_version=${next_develop_version}\"" >> $GITHUB_OUTPUT\n"",
+      shell: bash}, {name: Cut release branch, run: 'set -xeuo pipefail
+
+
+        git checkout -b ""${{ steps.calculate_branch_name_and_version.outputs.release_branch
+        }}""
+
+        echo ""commit=$(git rev-parse HEAD)"" >> $GITHUB_OUTPUT
+
+        git push origin HEAD:refs/heads/${{ steps.calculate_branch_name_and_version.outputs.release_branch
+        }}
+
+        ', shell: bash}]}
+",['unknown'],deploy_release,HumanSignal__Adala,[deploy_release],Creates and pushes release branch with version calculations for release management workflow.
+de007375566a5e88fff5cbced8cacaf5143990eefb0750fec05170feddff17c9,set-version-default-branch,"{name: Set version in default branch, needs: [draft-new-release], permissions: {contents: write},
+  secrets: inherit, uses: ./.github/workflows/release-set-version.yml, with: {branch: '${{
+      github.event.repository.default_branch }}', version: '${{ needs.draft-new-release.outputs.next_develop_version
+      }}'}}
+",['unknown'],deploy_release,HumanSignal__Adala,[deploy_release],"Sets version in default branch as part of release workflow, updating repository contents."
+de007375566a5e88fff5cbced8cacaf5143990eefb0750fec05170feddff17c9,set-version-release-branch,"{name: Set version in release branch, needs: [draft-new-release], permissions: {contents: write},
+  secrets: inherit, uses: ./.github/workflows/release-set-version.yml, with: {branch: '${{
+      needs.draft-new-release.outputs.release_branch }}', version: '${{ needs.draft-new-release.outputs.release_version
+      }}'}}
+",['unknown'],deploy_release,HumanSignal__Adala,[deploy_release],Sets version in release branch as part of release workflow preparation.
+e287a335fd35493935f762cc9c098454bb0f501f2c80e9f4f7351f4256a8d941,build,"{if: github.event_name == 'pull_request', name: Build, runs-on: ubuntu-latest, steps: [
+    {uses: actions/checkout@v6}, {name: Install poetry, run: 'pipx install ""poetry==${{
+        env.POETRY_VERSION }}""'}, {id: setup_python, name: Set up Python, uses: actions/setup-python@v6,
+      with: {cache: poetry, python-version: '3.13'}}, {name: Install Python dependencies,
+      run: 'poetry install --sync
+
+        '}, {name: Build MkDocs site, run: 'cd docs/
+
+        poetry run mkdocs build
+
+        '}]}
+",['unknown'],no_ops,HumanSignal__Adala,[build],Installs Poetry dependencies and builds MkDocs documentation site.
+e287a335fd35493935f762cc9c098454bb0f501f2c80e9f4f7351f4256a8d941,upload,"{if: github.event_name == 'push' && github.ref == 'refs/heads/master', name: Upload,
+  permissions: {contents: write}, runs-on: ubuntu-latest, steps: [{uses: actions/checkout@v6},
+    {name: Install poetry, run: 'pipx install ""poetry==${{ env.POETRY_VERSION }}""'},
+    {id: setup_python, name: Set up Python, uses: actions/setup-python@v6, with: {
+        cache: poetry, python-version: '3.13'}}, {name: Install Python dependencies,
+      run: 'poetry install --sync
+
+        '}, {name: Deploy docs, run: 'cd docs/
+
+        poetry run mkdocs gh-deploy --force
+
+        '}]}
+",['unknown'],no_ops,HumanSignal__Adala,[deploy_release],Deploys documentation to GitHub Pages using mkdocs gh-deploy on master branch push.
+f32ad2c0c209c27c37c0a7d0f30b802d909df9eef48cbca4dab45f6932df0e2e,sync,"{if: github.event.client_payload.slash_command.args.unnamed.arg1 == 'sync', name: 'Follow
+    Merge: Sync Upstream PRs', secrets: inherit, uses: ./.github/workflows/follow-merge-upstream-repo-sync-v2.yml,
+  with: {branch_name: '${{ github.event.client_payload.pull_request.head.ref }}'}}
+",['unknown'],no_ops,HumanSignal__Adala,[no_ops],"Conditional workflow trigger for upstream repo sync with no direct build, test, or deployment operations."
+f32ad2c0c209c27c37c0a7d0f30b802d909df9eef48cbca4dab45f6932df0e2e,help,"{if: '${{ github.event.client_payload.slash_command.args.unnamed.arg1 == ''help''
+    || !contains(fromJson(''[""sync""]''), github.event.client_payload.slash_command.args.unnamed.arg1)
+    }}', runs-on: ubuntu-latest, steps: [{name: Update comment, uses: peter-evans/create-or-update-comment@v5,
+      with: {body: '> Command | Description
+
+          > --- | ---
+
+          > /fm sync | Sync upstream prs and merge with pull request base
+
+          ', comment-id: '${{ github.event.client_payload.github.payload.comment.id
+          }}', reactions: hooray, repository: '${{ github.event.client_payload.github.payload.repository.full_name
+          }}', token: '${{ secrets.GIT_PAT }}'}}], timeout-minutes: 1}
+",['unknown'],no_ops,HumanSignal__Adala,[no_ops],Job only updates a GitHub comment with help text; no functional CI/CD operations performed.
+343e513e9e61e75076abc1819db1cd9b55cf372c78fdd9815e66f3ce7684d1ba,main,"{name: sdist + pure wheel, runs-on: ubuntu-latest, steps: [{uses: actions/checkout@v3},
+    {name: Set up latest Python, uses: actions/setup-python@v4, with: {python-version: '*'}},
+    {name: 'Install latest pip, build, twine', run: 'python -m pip install --upgrade
+        --disable-pip-version-check pip
+
+        python -m pip install --upgrade build twine
+
+        '}, {name: Build wheel and source distributions, run: python -m build}, {
+      env: {TWINE_PASSWORD: '${{ secrets.PYPI_TOKEN }}'}, name: Upload to PyPI via
+        Twine, run: twine upload --verbose -u '__token__' dist/*}]}
+",['release'],build|deploy_release,Kav-K__GPTDiscord,[build|deploy_release],Builds Python distributions (sdist + wheel) and uploads to PyPI using Twine.
+648b49a4e7df050a3bb8400f14fdbcca548ccdf4e457d24b909e3cb4655425f3,docker-push-base,"{if: '${{ github.event_name != ''pull_request'' && github.repository == ''Kav-K/GPTDiscord''
+    }}', permissions: {contents: read, id-token: write, packages: write}, runs-on: ubuntu-20.04,
+  steps: [{name: Checkout repository, uses: actions/checkout@v4}, {name: Install cosign,
+      uses: sigstore/cosign-installer@v2, with: {cosign-release: v1.13.1}}, {name: Set
+        up QEMU, uses: docker/setup-qemu-action@v3}, {name: Setup Docker buildx, uses: docker/setup-buildx-action@v3},
+    {name: Login to Docker Hub, uses: docker/login-action@v3, with: {password: '${{
+          secrets.DOCKERHUB_TOKEN }}', username: '${{ secrets.DOCKERHUB_USERNAME }}'}},
+    {name: Login to GitHub Container Registry, uses: docker/login-action@v3, with: {
+        password: '${{ secrets.GITHUB_TOKEN }}', registry: ghcr.io, username: '${{
+          github.actor }}'}}, {id: meta, name: Extract Docker metadata, uses: docker/metadata-action@v5,
+      with: {flavor: 'latest=auto
+
+          suffix=-base,onlatest=true
+
+          ', images: 'kaveenk/gpt3discord
+
+          ghcr.io/${{ github.repository }}
+
+          ', tags: 'type=semver,pattern={{raw}}
+
+          type=ref,event=branch
+
+          '}}, {id: isRelease, name: Check if release, uses: haya14busa/action-cond@v1,
+      with: {cond: '${{ github.event_name == ''release'' }}', if_false: linux/amd64,
+        if_true: 'linux/amd64,linux/arm64'}}, {id: build-and-push-base, name: Build
+        and push base Docker image, uses: docker/build-push-action@v5, with: {cache-from: type=gha,
+        cache-to: 'type=gha,mode=max', context: ., labels: '${{ steps.meta.outputs.labels
+          }}', platforms: '${{ steps.isRelease.outputs.value }}', push: true, tags: '${{
+          steps.meta.outputs.tags }}'}}, {env: {COSIGN_EXPERIMENTAL: 'true'}, name: Sign
+        the published base Docker image, run: 'echo ""${{ steps.meta.outputs.tags }}""
+        | xargs -I {} cosign sign {}@${{ steps.build-and-push-base.outputs.digest
+        }}'}]}
+",['build'],build|deploy_release,Kav-K__GPTDiscord,[deploy_release],Builds and pushes Docker images (push
+648b49a4e7df050a3bb8400f14fdbcca548ccdf4e457d24b909e3cb4655425f3,docker-push-full,"{if: '${{ github.event_name != ''pull_request'' && github.repository == ''Kav-K/GPTDiscord''
+    }}', permissions: {contents: read, id-token: write, packages: write}, runs-on: ubuntu-20.04,
+  steps: [{name: Checkout repository, uses: actions/checkout@v4}, {name: Install cosign,
+      uses: sigstore/cosign-installer@v2, with: {cosign-release: v1.13.1}}, {name: Set
+        up QEMU, uses: docker/setup-qemu-action@v3}, {name: Setup Docker buildx, uses: docker/setup-buildx-action@v3},
+    {name: Login to Docker Hub, uses: docker/login-action@v3, with: {password: '${{
+          secrets.DOCKERHUB_TOKEN }}', username: '${{ secrets.DOCKERHUB_USERNAME }}'}},
+    {name: Login to GitHub Container Registry, uses: docker/login-action@v3, with: {
+        password: '${{ secrets.GITHUB_TOKEN }}', registry: ghcr.io, username: '${{
+          github.actor }}'}}, {id: meta, name: Extract Docker metadata, uses: docker/metadata-action@v5,
+      with: {flavor: 'latest=auto
+
+          suffix=-full,onlatest=true
+
+          ', images: 'kaveenk/gpt3discord
+
+          ghcr.io/${{ github.repository }}
+
+          ', tags: 'type=semver,pattern={{raw}}
+
+          type=ref,event=branch
+
+          '}}, {id: isRelease, name: Check if release, uses: haya14busa/action-cond@v1,
+      with: {cond: '${{ github.event_name == ''release'' }}', if_false: linux/amd64,
+        if_true: 'linux/amd64,linux/arm64'}}, {id: build-and-push-full, name: Build
+        and push full Docker image, uses: docker/build-push-action@v5, with: {build-args: FULL=true,
+        cache-from: type=gha, cache-to: 'type=gha,mode=max', context: ., labels: '${{
+          steps.meta.outputs.labels }}', platforms: '${{ steps.isRelease.outputs.value
+          }}', push: true, tags: '${{ steps.meta.outputs.tags }}'}}, {env: {COSIGN_EXPERIMENTAL: 'true'},
+      name: Sign the published full Docker image, run: 'echo ""${{ steps.meta.outputs.tags
+        }}"" | xargs -I {} cosign sign {}@${{ steps.build-and-push-full.outputs.digest
+        }}'}]}
+",['build'],build|deploy_release,Kav-K__GPTDiscord,[deploy_release],Builds and pushes Docker images (push
+648b49a4e7df050a3bb8400f14fdbcca548ccdf4e457d24b909e3cb4655425f3,docker-pr,"{if: '${{ github.event_name == ''pull_request'' && github.repository == ''Kav-K/GPTDiscord''
+    }}', permissions: {contents: read, id-token: write, packages: write}, runs-on: ubuntu-20.04,
+  steps: [{name: Checkout repository, uses: actions/checkout@v4}, {name: Set up QEMU,
+      uses: docker/setup-qemu-action@v3}, {name: Setup Docker buildx, uses: docker/setup-buildx-action@v3},
+    {id: meta, name: Extract Docker metadata, uses: docker/metadata-action@v5, with: {
+        images: 'kaveenk/gpt3discord
+
+          ghcr.io/${{ github.repository }}
+
+          '}}, {id: build-and-push-base, name: Build and push base Docker image, uses: docker/build-push-action@v5,
+      with: {cache-from: type=gha, cache-to: 'type=gha,mode=max', context: ., labels: '${{
+          steps.meta.outputs.labels }}', platforms: 'linux/amd64,linux/arm64', push: false,
+        tags: '${{ steps.meta.outputs.tags }}'}}, {id: build-and-push-full, name: Build
+        and push full Docker image, uses: docker/build-push-action@v5, with: {build-args: FULL=true,
+        cache-from: type=gha, cache-to: 'type=gha,mode=max', context: ., labels: '${{
+          steps.meta.outputs.labels }}', platforms: 'linux/amd64,linux/arm64', push: false,
+        tags: '${{ steps.meta.outputs.tags }}'}}]}
+",['build'],build,Kav-K__GPTDiscord,[build],Builds Docker images for multiple platforms with caching; push is false so no deployment occurs.
+7fd5e14209ddeb101d56b6b28ef7eef74c51b9a2d2bcf1e20017da1510a28d58,build,"{name: 'Running python ${{ matrix.python-version }} on ${{matrix.os}}', runs-on: '${{
+    matrix.os }}', steps: [{uses: actions/checkout@v3}, {name: 'Set up Python ${{
+        matrix.python-version }}', uses: actions/setup-python@v4, with: {python-version: '${{
+          matrix.python-version }}'}}, {name: Print Python Version, run: python --version
+        --version && which python}, {name: 'Update pip, setuptools + wheels', run: 'python
+        -m pip install --upgrade pip setuptools wheel
+
+        '}, {name: Install deps via requirements + module via pyproject.toml, run: 'python
+        -m pip install -r requirements.txt
+
+        python -m pip install .
+
+        '}], strategy: {matrix: {os: [macOS-latest, ubuntu-latest, windows-latest],
+      python-version: ['3.10', '3.11']}}}
+",['unknown'],build,Kav-K__GPTDiscord,[build],Installs Python dependencies and builds module via pip and pyproject.toml.
