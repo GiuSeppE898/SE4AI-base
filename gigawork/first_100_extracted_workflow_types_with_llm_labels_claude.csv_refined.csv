@@ -1,4 +1,4 @@
-file_hash,job_name,job,SUGGESTED_WORKFLOW_TYPE,workflow_type,repository,LLM_LABEL,LLM_REASON
+file_hash,job_name,job,SUGGESTED_WORKFLOW_TYPE,workflow_type,repository,LLM_LABEL,LLM_REASON,REFINED_LLM_LABEL,REFINEMENT_ITERATIONS,REFINEMENT_HISTORY
 04e8eb65ebb244bfdce18f482301c4a5cc739cdcad2a9ebcc2859c84b1db70e1,test,"{runs-on: ubuntu-latest, steps: [{name: Checkout repository, uses: actions/checkout@v3},
     {name: 'Set up Python ${{ matrix.python-version }}', uses: actions/setup-python@v4,
       with: {cache: pip, python-version: '${{ matrix.python-version == ''3.12'' &&
@@ -10,15 +10,15 @@ file_hash,job_name,job,SUGGESTED_WORKFLOW_TYPE,workflow_type,repository,LLM_LABE
 
         '}, {env: {OPENAI_API_KEY: '${{ secrets.OPENAI_API_KEY }}'}, name: Run tox,
       run: tox}], strategy: {matrix: {python-version: ['3.10', '3.11', '3.12']}}}
-",['unknown'],test,AntonOsika__gpt-engineer,[test],Runs tox test suite across multiple Python versions to verify code functionality.
+",['unknown'],test,AntonOsika__gpt-engineer,[test],Runs tox test suite across multiple Python versions to verify code functionality.,test,1.0,"[('[test]', '[STOP]\n\nThe classification is correct. The job runs tox (a testing framework) across multiple Python versions with test dependencies installed. The primary functional purpose is executing test suites, which clearly falls under the ""test"" category.')]"
 24fbeb2eaafe191cda4d626104815a037e216834f345c0a9302c1d52e1c97f0f,pre-commit,"{permissions: {contents: write}, runs-on: ubuntu-latest, steps: [{uses: actions/checkout@v3},
     {uses: actions/setup-python@v4}, {uses: pre-commit/action@v3.0.0, with: {extra_args: --all-files}}]}
-",['lint'],lint_security,AntonOsika__gpt-engineer,[lint_security],Runs pre-commit hooks for linting and code quality checks across all files.
+",['lint'],lint_security,AntonOsika__gpt-engineer,[lint_security],Runs pre-commit hooks for linting and code quality checks across all files.,lint_security,1.0,"[('[lint_security]', '[STOP]\n\nThe classification is correct. The job uses `pre-commit/action@v3.0.0` with `--all-files`, which is a linting/code quality tool that checks code style, formatting, and security issues. This clearly falls under the `lint_security` category.')]"
 953a30775359908a4e420d0532b35d3c3517736afd745af591a8aa82e695ab36,mark-stale-issues,"{runs-on: ubuntu-latest, steps: [{name: Mark stale issues, uses: actions/stale@v4,
       with: {days-before-stale: 60, stale-issue-message: This issue has been automatically
           marked as stale because it has not had recent activity. It will be closed
           if no further activity occurs.}}]}
-",['unknown'],no_ops,AntonOsika__gpt-engineer,[no_ops],Marks stale issues with automated labels; no functional impact on code or deployment.
+",['unknown'],no_ops,AntonOsika__gpt-engineer,[no_ops],Marks stale issues with automated labels; no functional impact on code or deployment.,no_ops,1.0,"[('[no_ops]', '[STOP]')]"
 b49b58057bd39fccb7df78f7213d805bd534811a812b78b659219256fd74f513,build,"{runs-on: ubuntu-latest, steps: [{uses: actions/checkout@v3}, {uses: actions/setup-python@v4,
       with: {python-version: '${{ matrix.python-version }}'}}, {name: Install Poetry,
       run: 'curl -sSL https://install.python-poetry.org | python3 -
@@ -31,12 +31,12 @@ b49b58057bd39fccb7df78f7213d805bd534811a812b78b659219256fd74f513,build,"{runs-on
           '}}, {name: Install dependencies, run: poetry install}, {name: Build package,
       run: poetry build --format sdist}, {uses: actions/upload-artifact@v3, with: {
         name: package, path: dist/}}], strategy: {matrix: {python-version: ['3.10']}}}
-",['build'],build,AntonOsika__gpt-engineer,[build],Installs Poetry dependencies and builds Python package distribution artifact (sdist).
+",['build'],build,AntonOsika__gpt-engineer,[build],Installs Poetry dependencies and builds Python package distribution artifact (sdist).,build,1.0,"[('[build]', '[STOP]\n\nThe classification is correct. The job performs:\n1. Installing Poetry (dependency manager)\n2. Installing dependencies via `poetry install`\n3. Building the package with `poetry build --format sdist`\n4. Uploading the built artifact\n\nThese are all core build activities (compiling/packaging code and updating dependencies), which clearly fall under the ""build"" category.')]"
 b49b58057bd39fccb7df78f7213d805bd534811a812b78b659219256fd74f513,publish,"{environment: {name: pypi, url: 'https://pypi.org/p/gpt-engineer'}, needs: build,
   permissions: {id-token: write}, runs-on: ubuntu-latest, steps: [{uses: actions/download-artifact@v3,
       with: {name: package, path: dist/}}, {name: Publish packages to PyPI, uses: pypa/gh-action-pypi-publish@release/v1,
       with: {password: '${{ secrets.PYPI_API_TOKEN }}'}}]}
-",['build'],deploy_release,AntonOsika__gpt-engineer,[deploy_release],Downloads built package artifact and publishes to PyPI repository using authentication token.
+",['build'],deploy_release,AntonOsika__gpt-engineer,[deploy_release],Downloads built package artifact and publishes to PyPI repository using authentication token.,deploy_release,1.0,"[('[deploy_release]', '[STOP]')]"
 08902e730b8199fba694284d8392daac0b2310ad020dfd06fa37065e666b4ce1,clippy-test,"{runs-on: ubuntu-latest, steps: [{name: Checkout code, uses: actions/checkout@v4,
       with: {lfs: true, token: '${{ secrets.GITHUB_TOKEN }}'}}, {name: Install Rust
         stable, uses: dtolnay/rust-toolchain@stable, with: {components: 'rustfmt,
@@ -50,17 +50,17 @@ b49b58057bd39fccb7df78f7213d805bd534811a812b78b659219256fd74f513,publish,"{envir
           runner.os }}-cargo-'}}, {name: Rustfmt, run: cargo --locked fmt -p bloop
         -- --check}, {name: Clippy, run: cargo --locked clippy -p bloop}, {name: Tests,
       run: cargo --locked test -p bloop --release}]}
-",['unknown'],lint_security|test,BloopAI__bloop,[build|lint_security|test],"Installs dependencies and sets up Rust toolchain (build), runs rustfmt and clippy linting (lint_security), executes test suite (test)."
+",['unknown'],lint_security|test,BloopAI__bloop,[build|lint_security|test],"Installs dependencies and sets up Rust toolchain (build), runs rustfmt and clippy linting (lint_security), executes test suite (test).",build|lint_security|test,1.0,"[('[build|lint_security|test]', '[STOP]')]"
 37b6bb9c0904d4a136da75fce3f6d7481158fd88e6403ab2dcd5b7f995a0a173,test,"{runs-on: ubuntu-latest, steps: [{run: 'echo ""No checks required"" '}]}
-",['lint'],no_ops,BloopAI__bloop,[no_ops],Job only echoes a message with no functional impact or operations performed.
+",['lint'],no_ops,BloopAI__bloop,[no_ops],Job only echoes a message with no functional impact or operations performed.,no_ops,1.0,"[('[no_ops]', '[STOP]')]"
 37b6bb9c0904d4a136da75fce3f6d7481158fd88e6403ab2dcd5b7f995a0a173,fmt-clippy-build,"{runs-on: ubuntu-latest, steps: [{run: 'echo ""No checks required"" '}]}
-",['lint'],no_ops,BloopAI__bloop,[no_ops],Job only echoes a message with no functional impact or operations performed.
+",['lint'],no_ops,BloopAI__bloop,[no_ops],Job only echoes a message with no functional impact or operations performed.,no_ops,1.0,"[('[no_ops]', '[STOP]')]"
 37b6bb9c0904d4a136da75fce3f6d7481158fd88e6403ab2dcd5b7f995a0a173,build-client,"{runs-on: ubuntu-latest, steps: [{name: Checkout, uses: actions/checkout@v4, with: {
         fetch-depth: 0}}, {name: Use Node.js, uses: actions/setup-node@v3, with: {
         cache: npm, node-version: 16}}, {name: Install dependencies, run: npm ci},
     {name: Run lint, run: npm run lint}, {name: Run type-check, run: npm run client-type-check},
     {name: Run tests, run: npm --prefix client run test}]}
-",['lint'],lint_security|test,BloopAI__bloop,[lint_security|test],"Runs linting and type-checking (lint_security), executes test suite (test)."
+",['lint'],lint_security|test,BloopAI__bloop,[lint_security|test],"Runs linting and type-checking (lint_security), executes test suite (test).",lint_security|test,1.0,"[('[lint_security|test]', 'ISSUE: The classification includes `lint_security` but the job does not perform security scanning, vulnerability checks, or policy enforcement—only code linting and type checking.\n\nSUGGESTION: The correct classification should be `[lint_security|test]` is partially correct, but should be refined to `[lint_security|test]` where `lint_security` applies only to the linting step (npm run lint), and `test` applies to both type-checking (npm run client-type-check) and test execution (npm --prefix client run test). However, if strict categorization is required, `lint_security` is acceptable since linting is included, but note that ""security"" aspect is not present—only ""lint"" is. The classification is marginally acceptable as-is since linting is a component of lint_security, but ideally should be labeled `[lint|test]` if a pure ""lint"" category existed.\n\nActually, reconsidering: the classification `[lint_security|test]` is **acceptable** because linting is a recognized component of the `lint_security` category per the rules, even without explicit security scanning.\n\n[STOP]')]"
 5147a4948766bb4b952be4dd6b74f2a4acba2daa054479d6ee09dc002c0c5952,build-and-sign-tauri,"{env: {ORT_LIB_LOCATION: '${{ github.workspace }}/lib/${{ matrix.target }}/onnxruntime'},
   runs-on: '${{ matrix.name }}', steps: [{if: matrix.name == 'ubuntu-20.04', uses: pierotofy/set-swap-space@v1.0,
       with: {swap-size-gb: 10}}, {name: Checkout code, uses: actions/checkout@v4,
@@ -166,7 +166,7 @@ b49b58057bd39fccb7df78f7213d805bd534811a812b78b659219256fd74f513,publish,"{envir
           target: x86_64-unknown-linux-gnu}, {name: macos-11, target: x86_64-apple-darwin},
         {name: macos-11, target: aarch64-apple-darwin}], target: [x86_64-unknown-linux-gnu,
         x86_64-apple-darwin, aarch64-apple-darwin]}}}
-","['build', 'release']",build|deploy_release,BloopAI__bloop,[build|deploy_release],"Compiles Rust/Node.js application with Tauri, uploads artifacts, creates Sentry release, and publishes GitHub release assets on tags."
+","['build', 'release']",build|deploy_release,BloopAI__bloop,[build|deploy_release],"Compiles Rust/Node.js application with Tauri, uploads artifacts, creates Sentry release, and publishes GitHub release assets on tags.",build | deploy_release,2.0,"[('[build|deploy_release]', 'ISSUE: The classification is incomplete and misses a critical category.\n\nSUGGESTION: The classification should be [build|deploy_release|lint_security].\n\nREASONING:\n1. **build** is correct: The job compiles code, installs dependencies (npm ci, Rust toolchain), and builds artifacts using tauri-action.\n2. **deploy_release** is correct: The job uploads release assets to GitHub Releases via softprops/action-gh-release (conditional on tag refs).\n3. **lint_security is missing**: The job explicitly checks for required secrets/keys with `exit 1` if they\'re missing (the ""Check if keys exist"" step). This is a security/policy validation step that should be classified as lint_security, as it verifies configuration requirements before proceeding.'), ('[build | deploy_release | lint_security]\nReason: Compiles code, builds artifacts via tauri-action, uploads to GitHub Releases, and validates required secrets/keys before proceeding.', 'ISSUE: The classification includes `lint_security` but the job contains no linting, vulnerability scanning, dependency upgrades, or security policy checks. The secret validation step (""Check if keys exist"") is a prerequisite check, not a security audit.\n\nSUGGESTION: The correct classification should be `[build | deploy_release]`. The job compiles code (Rust/Node.js via tauri-action), builds artifacts (bundles for Linux/macOS), and deploys to GitHub Releases (softprops/action-gh-release with conditional tag-based upload). The secret validation is part of the build setup, not a distinct security operation.')]"
 6623e1e8223cc9cfc8aae480bf07788b1f5a0d763d9b847b0dc2be2471c8f1f6,build_and_push,"{secrets: {awsAccountID: '${{ secrets.AWS_ACCOUNT_ID }}', awsRegion: '${{ secrets.AWS_REGION
       }}', build-args: 'SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
 
@@ -174,16 +174,16 @@ b49b58057bd39fccb7df78f7213d805bd534811a812b78b659219256fd74f513,publish,"{envir
 
       ', slackBuildWebhook: '${{ secrets.SLACK_BUILD_WEBHOOK }}'}, uses: BloopAI/workflows/.github/workflows/build-container.yml@main,
   with: {repository: bloop, runner: ubuntu-latest, tag: 'build-${{ github.sha }}'}}
-",['deploy'],build,BloopAI__bloop,[build],"Builds Docker container image with specified tag and build arguments (Sentry token, release version)."
+",['deploy'],build,BloopAI__bloop,[build],"Builds Docker container image with specified tag and build arguments (Sentry token, release version).",build,1.0,"[('[build]', '[STOP]\n\nThe classification is correct. This is a reusable workflow call that builds a Docker container image (indicated by `build-container.yml`), which falls squarely under the **build** category. The presence of build arguments (SENTRY_AUTH_TOKEN, SENTRY_RELEASE_VERSION), Docker image tagging, and the explicit workflow name all confirm this is a build operation.')]"
 6623e1e8223cc9cfc8aae480bf07788b1f5a0d763d9b847b0dc2be2471c8f1f6,validate_helm,"{secrets: {slackBuildWebhook: '${{ secrets.SLACK_BUILD_WEBHOOK }}'}, uses: BloopAI/reusable-workflows/.github/workflows/validate-helm-chart.yml@main,
   with: {path: helm/bloop}}
-",['deploy'],lint_security,BloopAI__bloop,[lint_security],Validates Helm chart configuration for policy/syntax compliance.
+",['deploy'],lint_security,BloopAI__bloop,[lint_security],Validates Helm chart configuration for policy/syntax compliance.,lint_security,1.0,"[('[lint_security]', 'ISSUE: The classification is incomplete. This job calls a reusable workflow for Helm chart validation, which typically involves both linting (lint_security) and structural/syntax verification (build).\n\nSUGGESTION: The classification should be [lint_security, build]. Helm chart validation encompasses:\n- Linting checks (lint_security) - style, best practices\n- Chart syntax/structure validation (build) - ensuring the chart is well-formed and can be built/packaged\n\nHowever, if the reusable workflow performs only linting without any build/package operations, [lint_security] alone would be correct. Without visibility into the reusable workflow definition, [lint_security] is a reasonable conservative classification, but [lint_security, build] is more likely accurate for typical Helm validation workflows.\n\nIf you can confirm the reusable workflow only performs linting: [STOP]')]"
 7399a7d3650ef583781223255f318b66a1be874937cef52a2f247aa3e7daef2e,test,"{runs-on: ubuntu-latest, steps: [{run: 'echo ""No checks required"" '}]}
-",['unknown'],no_ops,BloopAI__bloop,[no_ops],Job only echoes a message with no functional impact or operations performed.
+",['unknown'],no_ops,BloopAI__bloop,[no_ops],Job only echoes a message with no functional impact or operations performed.,no_ops,1.0,"[('[no_ops]', '[STOP]')]"
 7399a7d3650ef583781223255f318b66a1be874937cef52a2f247aa3e7daef2e,fmt-clippy-build,"{runs-on: ubuntu-latest, steps: [{run: 'echo ""No checks required"" '}]}
-",['unknown'],no_ops,BloopAI__bloop,[no_ops],Job only echoes a message with no functional impact or operations performed.
+",['unknown'],no_ops,BloopAI__bloop,[no_ops],Job only echoes a message with no functional impact or operations performed.,no_ops,1.0,"[('[no_ops]', '[STOP]')]"
 7399a7d3650ef583781223255f318b66a1be874937cef52a2f247aa3e7daef2e,build-client,"{runs-on: ubuntu-latest, steps: [{run: 'echo ""No checks required"" '}]}
-",['unknown'],no_ops,BloopAI__bloop,[no_ops],Job only echoes a message with no functional impact or operations performed.
+",['unknown'],no_ops,BloopAI__bloop,[no_ops],Job only echoes a message with no functional impact or operations performed.,no_ops,1.0,"[('[no_ops]', '[STOP]')]"
 91131528408fc1aa2a66d45eb02526d1889f678ce863d5589b42e1181f5fb8b4,build_and_push,"{secrets: {awsAccountID: '${{ secrets.AWS_ACCOUNT_ID }}', awsRegion: '${{ secrets.AWS_REGION
       }}', build-args: 'SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
 
@@ -192,10 +192,10 @@ b49b58057bd39fccb7df78f7213d805bd534811a812b78b659219256fd74f513,publish,"{envir
       ', slackBuildWebhook: '${{ secrets.SLACK_BUILD_WEBHOOK }}'}, uses: BloopAI/workflows/.github/workflows/build-container.yml@main,
   with: {repository: bloop, runner: ubuntu-latest, tag: '${{ github.event.release.tag_name
       }}'}}
-",['unknown'],build|deploy_release,BloopAI__bloop,[build|deploy_release],Builds Docker container with Sentry release metadata and pushes to registry on release tag.
+",['unknown'],build|deploy_release,BloopAI__bloop,[build|deploy_release],Builds Docker container with Sentry release metadata and pushes to registry on release tag.,build | deploy_release,2.0,"[('[build|deploy_release]', ""ISSUE: The classification includes `deploy_release` but the YAML shows no evidence of image pushing, signing, or GitHub Release operations. The job only builds a container image (via `build-container.yml` workflow) with a release tag.\n\nSUGGESTION: Classification should be `[build]` only. The presence of a release tag in the `tag` parameter does not constitute deployment—it's merely using the release version as a build identifier. Actual deployment would require explicit `push: true`, registry push commands, or cosign signing operations, which are absent here.""), ('[build]\nReason: Container image build only; no push, signing, or release operations present.', ""ISSUE: The classification misses a critical operation. The job is triggered on a release event (`github.event.release.tag_name`) and uses a reusable workflow from BloopAI/workflows that is specifically named `build-container.yml`. While the YAML snippet shown doesn't explicitly contain `push: true` or `cosign` commands, the context strongly suggests this is part of a release pipeline where the built container is intended to be pushed and released.\n\nSUGGESTION: The classification should be [build, deploy_release]. The presence of `github.event.release.tag_name` as the tag parameter indicates this job is tied to a GitHub Release event, which typically involves pushing the built image to a registry as part of the release process. Even though the push operation may be abstracted into the reusable workflow, the functional intent is both building and releasing the container image."")]"
 cf4ca34801c11d7cecfbe94fcde8774de1f6e533575cfcfe9daa467c4277b694,debug,"{runs-on: ubuntu-latest, steps: [{env: {GITHUB_CONTEXT: '${{ toJson(github) }}'},
       name: $github, run: echo ""$GITHUB_CONTEXT""}]}
-",['unknown'],no_ops,BloopAI__bloop,[no_ops],"Echoes GitHub context to logs with no functional impact on build, test, or deployment."
+",['unknown'],no_ops,BloopAI__bloop,[no_ops],"Echoes GitHub context to logs with no functional impact on build, test, or deployment.",no_ops,1.0,"[('[no_ops]', '[STOP]')]"
 cf4ca34801c11d7cecfbe94fcde8774de1f6e533575cfcfe9daa467c4277b694,permissions,"{if: 'github.event.issue.pull_request && contains(github.event.comment.body, ''/build'')',
   name: Validate user is the member of BloopAI organization, outputs: {is-member: '${{
       steps.membership.outputs.is-member }}'}, runs-on: ubuntu-latest, steps: [{env: {
@@ -206,7 +206,7 @@ cf4ca34801c11d7cecfbe94fcde8774de1f6e533575cfcfe9daa467c4277b694,permissions,"{i
         \ | jq -r \"".[] .login\"")\nfor member in $(echo ${members}); do \n  if [[\
         \ $member = $ACTOR ]]; then \n    echo \""is-member=true\"" >> $GITHUB_OUTPUT\n\
         \  fi\ndone\n""}]}
-",['unknown'],lint_security,BloopAI__bloop,[no_ops],"Job only validates organization membership; performs no build, test, deploy, or security operations."
+",['unknown'],lint_security,BloopAI__bloop,[no_ops],"Job only validates organization membership; performs no build, test, deploy, or security operations.",lint_security,2.0,"[('[no_ops]', 'ISSUE: The classification as `no_ops` is incorrect. This job performs a functional operation that has downstream impact: it validates organization membership and produces an output (`is-member`) that is explicitly designed to be consumed by other jobs in the workflow.\n\nSUGGESTION: The correct classification should be `lint_security`. This job performs a policy/access control check by verifying that the user triggering the `/build` comment is a member of the BloopAI organization. This is a security validation step that gates subsequent operations, which aligns with the `lint_security` category\'s inclusion of ""path/policy checks.""'), ('[lint_security]\nReason: Validates organization membership as a policy/access control check gating downstream operations.', ""[STOP]\n\nThe classification is correct. This job performs an organization membership validation check using GitHub's API, which is a policy/access control verification. This fits the `lint_security` category as it enforces access control policies before allowing operations (gated by the `/build` comment trigger). The job does not build, test, deploy, or evaluate—it purely validates permissions."")]"
 cf4ca34801c11d7cecfbe94fcde8774de1f6e533575cfcfe9daa467c4277b694,build_tag,"{if: 'github.event.issue.pull_request && contains(github.event.comment.body, ''/build'')
     && needs.permissions.outputs.is-member == ''true''', name: Run container build
     on comment, needs: [permissions], outputs: {ref: '${{ steps.comment-branch.outputs.head_ref
@@ -214,7 +214,7 @@ cf4ca34801c11d7cecfbe94fcde8774de1f6e533575cfcfe9daa467c4277b694,build_tag,"{if:
   steps: [{id: comment-branch, name: Get PR branch, uses: xt0rted/pull-request-comment-branch@v1},
     {name: Checkout PR branch, uses: actions/checkout@v4, with: {ref: '${{ steps.comment-branch.outputs.head_ref
           }}'}}]}
-",['unknown'],build,BloopAI__bloop,[build],Builds container image on PR comment trigger; outputs ref and tag for downstream build processes.
+",['unknown'],build,BloopAI__bloop,[build],Builds container image on PR comment trigger; outputs ref and tag for downstream build processes.,build,2.0,"[('[build]', 'ISSUE: The classification is a FALSE POSITIVE. This job does not perform any build operations. It only checks out code in response to a comment trigger (`/build` command). There is no compilation, dependency updates, Docker image building, or any functional build work.\n\nSUGGESTION: The correct classification should be [no_ops]. This job has no functional impact—it merely prepares the workspace by checking out a PR branch based on a comment. The actual build work would occur in a downstream job (not shown here).'), ('[no_ops]\nReason: Job only checks out code in response to comment trigger; performs no compilation, dependency updates, or Docker image building.', 'ISSUE: The classification misses the functional purpose of this job. While it\'s true that this specific job only performs checkout operations, it\'s explicitly designed as a trigger/orchestration step for a container build workflow (as evidenced by the job name ""Run container build on comment"" and the output tag ""build-${{ steps.comment-branch.outputs.head_sha }}""). The job outputs are consumed by downstream jobs that will perform the actual build.\n\nSUGGESTION: The classification should be [build] or include build in the categories. The job is part of a build pipeline triggered by PR comments with ""/build"" command. Although this particular job doesn\'t compile code itself, it\'s a prerequisite step that enables container building in downstream jobs. Alternatively, if strictly evaluating only this isolated job\'s operations, [no_ops] could be defensible, but the context suggests it\'s a build orchestration step rather than a no-op job.')]"
 cf4ca34801c11d7cecfbe94fcde8774de1f6e533575cfcfe9daa467c4277b694,build_and_push,"{if: needs.permissions.outputs.is-member == 'true', needs: [permissions, build_tag],
   secrets: {awsAccountID: '${{ secrets.AWS_ACCOUNT_ID }}', awsRegion: '${{ secrets.AWS_REGION
       }}', build-args: 'SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
@@ -224,7 +224,7 @@ cf4ca34801c11d7cecfbe94fcde8774de1f6e533575cfcfe9daa467c4277b694,build_and_push,
       ', slackBuildWebhook: '${{ secrets.SLACK_BUILD_WEBHOOK }}'}, uses: BloopAI/workflows/.github/workflows/build-container.yml@main,
   with: {repository: bloop, runner: ubuntu-latest, tag: '${{ needs.build_tag.outputs.tag
       }}'}}
-",['unknown'],build,BloopAI__bloop,[build],"Builds Docker container image with specified tag and build arguments (Sentry token, release version)."
+",['unknown'],build,BloopAI__bloop,[build],"Builds Docker container image with specified tag and build arguments (Sentry token, release version).",build,1.0,"[('[build]', '[STOP]')]"
 cf4ca34801c11d7cecfbe94fcde8774de1f6e533575cfcfe9daa467c4277b694,report_status,"{if: always() && needs.permissions.outputs.is-member == 'true', name: Report status
     of the build, needs: [permissions, build_tag, build_and_push], runs-on: ubuntu-latest,
   steps: [{id: pr, name: pr, run: 'PR_NUMBER=$(echo $GITHUB_REF | awk ''BEGIN { FS
@@ -248,7 +248,7 @@ cf4ca34801c11d7cecfbe94fcde8774de1f6e533575cfcfe9daa467c4277b694,report_status,"
           github.run_id }}
 
           ', pr_number: '${{ steps.pr.outputs.number }}'}}]}
-",['unknown'],no_ops,BloopAI__bloop,[no_ops],"Job only reports build status via PR comments; no functional deployment, testing, or build operations."
+",['unknown'],no_ops,BloopAI__bloop,[no_ops],"Job only reports build status via PR comments; no functional deployment, testing, or build operations.",no_ops,1.0,"[('[no_ops]', '[STOP]')]"
 e3663d18d528eba177f40a7d1ca8fff42987865a548155777b22726adeabc17a,clippy-test,"{runs-on: ubuntu-latest, steps: [{name: Checkout code, uses: actions/checkout@v4,
       with: {lfs: true, token: '${{ secrets.GITHUB_TOKEN }}'}}, {name: Install Rust
         stable, uses: dtolnay/rust-toolchain@stable, with: {components: 'rustfmt,
@@ -259,12 +259,12 @@ e3663d18d528eba177f40a7d1ca8fff42987865a548155777b22726adeabc17a,clippy-test,"{r
     {name: Rustfmt, run: cargo --locked fmt -p bleep -- --check}, {name: Clippy, run: cargo
         --locked clippy -p bleep}, {name: Tests, run: cargo --locked test -p bleep
         --release}]}
-",['unknown'],lint_security|test,BloopAI__bloop,[lint_security|test],"Runs rustfmt (linting), clippy (security/linting), and cargo test suite (testing)."
+",['unknown'],lint_security|test,BloopAI__bloop,[lint_security|test],"Runs rustfmt (linting), clippy (security/linting), and cargo test suite (testing).",lint_security|test,1.0,"[('[lint_security|test]', '[STOP]')]"
 05d673f3f0818989c8f8e33d4736d3e4193080f6aeef873baaa8503026c34229,golangci,"{name: lint, runs-on: ubuntu-latest, steps: [{uses: actions/checkout@v4}, {uses: actions/setup-go@v5,
       with: {cache-dependency-path: wren-launcher/go.sum, go-version: '1.24'}}, {
       name: golangci-lint, uses: golangci/golangci-lint-action@v8, with: {version: v2.3.1,
         working-directory: wren-launcher}}]}
-","['lint', 'test']",lint_security,Canner__WrenAI,[lint_security],Runs golangci-lint for Go code linting and static analysis.
+","['lint', 'test']",lint_security,Canner__WrenAI,[lint_security],Runs golangci-lint for Go code linting and static analysis.,lint_security,1.0,"[('[lint_security]', '[STOP]')]"
 05d673f3f0818989c8f8e33d4736d3e4193080f6aeef873baaa8503026c34229,fmt-and-test,"{runs-on: ubuntu-latest, steps: [{name: Checkout repository, uses: actions/checkout@v4},
     {name: Setup Go, uses: actions/setup-go@v5, with: {cache-dependency-path: wren-launcher/go.sum,
         go-version: '1.24'}}, {name: Install goimports, run: go install golang.org/x/tools/cmd/goimports@latest},
@@ -273,7 +273,7 @@ e3663d18d528eba177f40a7d1ca8fff42987865a548155777b22726adeabc17a,clippy-test,"{r
         \ diff --name-only)\"" ]; then\n  echo \""Code is not formatted properly. Please\
         \ run 'make fmt' and commit the changes.\""\n  git diff\n  exit 1\nfi\n""},
     {name: Run go vet, run: make vet}, {name: Run tests, run: go test ./commands/dbt}]}
-","['lint', 'test']",test,Canner__WrenAI,[lint_security|test],"Runs code formatting checks (goimports, fmt), linting (go vet), and executes test suite (go test)."
+","['lint', 'test']",test,Canner__WrenAI,[lint_security|test],"Runs code formatting checks (goimports, fmt), linting (go vet), and executes test suite (go test).",lint_security | test,2.0,"[('[lint_security|test]', 'ISSUE: The classification includes `test` but the job\'s primary purpose is linting/formatting verification, not testing. The ""Run tests"" step is minimal (single package test) and appears secondary to the formatting and vet checks.\n\nSUGGESTION: The classification should be `[lint_security]` only. The job performs:\n1. Format checking with goimports (lint)\n2. Code formatting verification via git diff (lint)\n3. `go vet` static analysis (security/lint)\n4. A single test command that is incidental to the linting workflow\n\nWhile technically a test runs, the job\'s primary design is enforcing code quality standards (formatting, linting), not comprehensive testing. The test step is a minor component of a lint-focused job.'), ('[lint_security]\nReason: Job primarily enforces code formatting and static analysis (goimports, go vet). Single test step is incidental to linting workflow.', 'ISSUE: FALSE NEGATIVE - The classification misses the `test` category which clearly applies.\n\nSUGGESTION: The correct classification should be `[lint_security, test]`. \n\nThe job includes:\n1. **lint_security**: `goimports` (formatting), `go fmt` (format check), `go vet` (static analysis)\n2. **test**: `go test ./commands/dbt` (running test suite)\n\nThe reasoning incorrectly dismisses the test step as ""incidental,"" but running a test suite is a core functional operation that matches the `test` category definition. Both categories apply here.')]"
 05d673f3f0818989c8f8e33d4736d3e4193080f6aeef873baaa8503026c34229,security-scan,"{needs: fmt-and-test, runs-on: ubuntu-latest, steps: [{name: Checkout repository,
       uses: actions/checkout@v4}, {name: Setup Go, uses: actions/setup-go@v5, with: {
         cache-dependency-path: wren-launcher/go.sum, go-version: '1.24'}}, {name: Run
@@ -287,7 +287,7 @@ e3663d18d528eba177f40a7d1ca8fff42987865a548155777b22726adeabc17a,clippy-test,"{r
         \(.Version)""'' | sort -u
 
         '}]}
-","['lint', 'test']",lint_security,Canner__WrenAI,[lint_security],Runs Gosec security scanner and Go module audit for vulnerability detection.
+","['lint', 'test']",lint_security,Canner__WrenAI,[lint_security],Runs Gosec security scanner and Go module audit for vulnerability detection.,lint_security,1.0,"[('[lint_security]', '[STOP]\n\nThe classification is correct. The job performs security scanning (gosec) and dependency verification (go mod audit), both of which are security-focused linting activities that fall squarely under the `lint_security` category.')]"
 2102adf6be5466373c55a5fd94fa677424cdf2b209900c038d776266a15749a3,build-image,"{outputs: {tag_name: '${{ steps.tag-preparation.outputs.TAG_NAME }}'}, runs-on: '${{
     matrix.arch.runner }}', steps: [{uses: actions/checkout@v4}, {name: Login to GitHub
         Container Registry, uses: docker/login-action@v3, with: {password: '${{ secrets.GITHUB_TOKEN
@@ -316,7 +316,7 @@ e3663d18d528eba177f40a7d1ca8fff42987865a548155777b22726adeabc17a,clippy-test,"{r
         name: 'digests-${{ env.PLATFORM_PAIR }}', path: /tmp/digests/*, retention-days: 1}}],
   strategy: {fail-fast: false, matrix: {arch: [{platform: linux/amd64, runner: ubuntu-latest},
         {platform: linux/arm64, runner: linux_arm64_runner}]}}}
-",['build'],build,Canner__WrenAI,[build|deploy_release],Builds Docker images with docker/build-push-action (build) and pushes to registry with push=true (deploy_release).
+",['build'],build,Canner__WrenAI,[build|deploy_release],Builds Docker images with docker/build-push-action (build) and pushes to registry with push=true (deploy_release).,build | deploy_release,2.0,"[('[build|deploy_release]', ""ISSUE: The classification includes `deploy_release` but the YAML does not contain the key indicators of a release deployment job.\n\nREASONING: While the job does push Docker images (`push=true` in the build-push-action), this is a multi-architecture build job that:\n1. Uses a dynamic tag based on git commit hash (`main-$(git log -1 --pretty=%h)`)\n2. Exports digests for later assembly (typical of multi-arch workflows)\n3. Uploads artifacts for downstream consumption\n4. Does NOT create GitHub Releases, sign artifacts with cosign, or perform any release-specific operations\n\nThe `push=true` alone does not constitute a `deploy_release` job—it's part of the build process. This appears to be a build job that happens to push intermediate artifacts, not a release deployment.\n\nSUGGESTION: Classification should be `[build]` only. The job compiles/builds Docker images and pushes them by digest as part of a multi-architecture build pipeline, which is core build functionality, not release deployment.""), ('[build]\nReason: Builds Docker images with dynamic tags and pushes by digest for multi-arch pipeline; no release/signing operations.', 'ISSUE: The classification is incomplete. The YAML contains `push=true` in the docker/build-push-action outputs, which is a deploy_release operation, not just a build operation.\n\nSUGGESTION: The correct classification should be [build, deploy_release]. While the job does build Docker images (build category), it explicitly pushes them to the registry with `push=true`, which constitutes a release/deployment action. The presence of registry login and push operations indicates this is both a build AND a deployment step.')]"
 2102adf6be5466373c55a5fd94fa677424cdf2b209900c038d776266a15749a3,merge,"{needs: [build-image], runs-on: ubuntu-latest, steps: [{name: Download digests, uses: actions/download-artifact@v4,
       with: {merge-multiple: true, path: /tmp/digests, pattern: digests-*}}, {name: Set
         up Docker Buildx, uses: docker/setup-buildx-action@v3}, {id: meta, name: Docker
@@ -332,7 +332,7 @@ e3663d18d528eba177f40a7d1ca8fff42987865a548155777b22726adeabc17a,clippy-test,"{r
         docker buildx imagetools create $(jq -cr '.tags | map(\""-t \"" + .) | join(\""\
         \ \"")' <<< \""$DOCKER_METADATA_OUTPUT_JSON\"") \\\n  $(printf '${{ env.WREN_AI_SERVICE_IMAGE\
         \ }}@sha256:%s ' *) \\\n  $TAGS\n"", working-directory: /tmp/digests}]}
-",['build'],deploy_release,Canner__WrenAI,[deploy_release],Logs into container registry and pushes Docker image manifest with tags to GHCR.
+",['build'],deploy_release,Canner__WrenAI,[deploy_release],Logs into container registry and pushes Docker image manifest with tags to GHCR.,deploy_release,1.0,"[('[deploy_release]', ""ISSUE: The classification is incomplete. The job performs a manifest list creation and push operation, which is clearly a `deploy_release` action (pushing images to a registry). However, the job also depends on `build-image` and downloads digests from build artifacts, which suggests it's part of a multi-stage release pipeline. The classification correctly identifies `deploy_release`, but misses that this is specifically about **pushing/publishing container images to a registry** (the core deploy_release indicator).\n\nSUGGESTION: The classification `[deploy_release]` is actually correct. The job:\n1. Downloads pre-built image digests (artifacts from build-image job)\n2. Logs into GitHub Container Registry (ghcr.io)\n3. Creates a manifest list and **pushes** it to the registry with tags (nightly, specific tag_name)\n\nThis is definitively a `deploy_release` operation. No changes needed.\n\n[STOP]"")]"
 298d23e5ab0b5f3233a409b0e72e2316ca7396b9c86581802391dd66dc5448ee,pytest,"{if: '${{ contains(github.event.pull_request.labels.*.name, ''ci/ai-service'') ||
     github.event_name == ''push'' }}', runs-on: ubuntu-22.04, steps: [{uses: actions/checkout@v4},
     {name: Install Poetry, uses: abatilo/actions-poetry@v3, with: {poetry-version: 1.8.3}},
@@ -345,7 +345,7 @@ e3663d18d528eba177f40a7d1ca8fff42987865a548155777b22726adeabc17a,clippy-test,"{r
         testing environment and Run tests, run: 'just test
 
         '}], timeout-minutes: 10}
-",['test'],test,Canner__WrenAI,[build|test],Installs Poetry dependencies (build) and runs test suite via just command (test).
+",['test'],test,Canner__WrenAI,[build|test],Installs Poetry dependencies (build) and runs test suite via just command (test).,build|test,1.0,"[('[build|test]', '[STOP]\n\nThe classification is correct. The job performs:\n1. **build** activities: installing Poetry, setting up Python, installing project dependencies\n2. **test** activities: running tests via `just test`\n\nBoth categories appropriately apply to this job.')]"
 42a57e0e9d8a4b7ad9d26f8574ebf619c43e3e3869c9244cbd69d9688e34adfd,upgrade-ai-service-version,"{runs-on: ubuntu-latest, steps: [{id: generate-token, name: Generate a token, uses: actions/create-github-app-token@v1,
       with: {app-id: '${{ vars.CI_APP_ID }}', private-key: '${{ secrets.CI_APP_PRIVATE_KEY
           }}'}}, {uses: actions/checkout@v4, with: {fetch-depth: 0, token: '${{ steps.generate-token.outputs.token
@@ -384,7 +384,7 @@ e3663d18d528eba177f40a7d1ca8fff42987865a548155777b22726adeabc17a,clippy-test,"{r
         git push origin ""release/ai-service/$version""
 
         '}]}
-",['build'],deploy_release,Canner__WrenAI,[deploy_release],"Creates GitHub App token, generates changelog, upgrades version, commits, and pushes git tags for release."
+",['build'],deploy_release,Canner__WrenAI,[deploy_release],"Creates GitHub App token, generates changelog, upgrades version, commits, and pushes git tags for release.",build | deploy_release,2.0,"[('[deploy_release]', 'ISSUE: The classification is incomplete. The job performs multiple distinct CI/CD operations beyond just deploy_release.\n\nSUGGESTION: The correct classification should be [build, deploy_release]. \n\nReasoning:\n- **build**: The job runs `poetry version` to update the version in `pyproject.toml`, commits, and pushes changes. This is a build/dependency management operation.\n- **deploy_release**: The job creates and pushes a Git tag (`git tag -a ""release/ai-service/$version""` and `git push origin`), which is a release deployment operation.\n\nThe current classification only captures the deploy_release aspect but misses the build component of updating and committing version information.'), ('[build | deploy_release]\nReason: Updates version in pyproject.toml (build), creates and pushes release tag (deploy_release).', '[STOP]\n\nThe classification is correct. The job performs:\n1. **build**: Updates `pyproject.toml` with version bump via `poetry version`\n2. **deploy_release**: Creates and pushes a release tag (`git tag` + `git push origin`)\n\nBoth categories accurately apply to this workflow.')]"
 42a57e0e9d8a4b7ad9d26f8574ebf619c43e3e3869c9244cbd69d9688e34adfd,build-image,"{needs: upgrade-ai-service-version, runs-on: '${{ matrix.arch.runner }}', steps: [
     {uses: actions/checkout@v4, with: {ref: '${{ github.ref }}'}}, {name: Login to
         GitHub Container Registry, uses: docker/login-action@v3, with: {password: '${{
@@ -409,7 +409,7 @@ e3663d18d528eba177f40a7d1ca8fff42987865a548155777b22726adeabc17a,clippy-test,"{r
         name: 'digests-${{ env.PLATFORM_PAIR }}', path: /tmp/digests/*, retention-days: 1}}],
   strategy: {fail-fast: false, matrix: {arch: [{platform: linux/amd64, runner: ubuntu-latest},
         {platform: linux/arm64, runner: linux_arm64_runner}]}}}
-",['build'],build|deploy_release,Canner__WrenAI,[deploy_release],Builds Docker images and pushes to registry (push=true) for multiple architectures.
+",['build'],build|deploy_release,Canner__WrenAI,[deploy_release],Builds Docker images and pushes to registry (push=true) for multiple architectures.,build | deploy_release,2.0,"[('[deploy_release]', 'ISSUE: The classification is incomplete. The job performs both build and deploy_release operations, but only deploy_release is listed.\n\nREASONING: The YAML contains:\n1. **build** operations: `docker/build-push-action@v6` compiles a Docker image from a Dockerfile\n2. **deploy_release** operations: `push=true` in the build-push-action outputs pushes the image to ghcr.io (GitHub Container Registry)\n\nThe job is a multi-architecture build that constructs and immediately pushes Docker images, which spans both categories.\n\nSUGGESTION: The classification should be `[build, deploy_release]` because the job both compiles Docker images AND pushes them to a registry with `push=true`.'), ('[build | deploy_release]\nReason: Builds Docker images via docker/build-push-action and pushes to registry with push=true.', '[STOP]\n\nThe classification is correct. The job builds Docker images (`docker/build-push-action@v6`) and pushes them to the GitHub Container Registry (`push=true` in outputs), which clearly falls under both **build** (compiling/building Docker images) and **deploy_release** (pushing images). The reasoning accurately reflects the YAML content.')]"
 42a57e0e9d8a4b7ad9d26f8574ebf619c43e3e3869c9244cbd69d9688e34adfd,merge,"{needs: [build-image], runs-on: ubuntu-latest, steps: [{name: Download digests, uses: actions/download-artifact@v4,
       with: {merge-multiple: true, path: /tmp/digests, pattern: digests-*}}, {name: Set
         up Docker Buildx, uses: docker/setup-buildx-action@v3}, {id: meta, name: Docker
@@ -425,7 +425,7 @@ e3663d18d528eba177f40a7d1ca8fff42987865a548155777b22726adeabc17a,clippy-test,"{r
         docker buildx imagetools create $(jq -cr '.tags | map(\""-t \"" + .) | join(\""\
         \ \"")' <<< \""$DOCKER_METADATA_OUTPUT_JSON\"") \\\n  $(printf '${{ env.WREN_AI_SERVICE_IMAGE\
         \ }}@sha256:%s ' *) \\\n  $TAGS\n"", working-directory: /tmp/digests}]}
-",['build'],deploy_release,Canner__WrenAI,[deploy_release],Creates and pushes Docker manifest list to container registry with version tags.
+",['build'],deploy_release,Canner__WrenAI,[deploy_release],Creates and pushes Docker manifest list to container registry with version tags.,deploy_release,1.0,"[('[deploy_release]', '[STOP]')]"
 7a97eb0db5a8d2791b2b3d360a7c268ef6be23cd59da55a7d6b0964a6635de80,unit-test,"{if: '${{ github.event.label.name == ''ci/ui''}}', runs-on: ubuntu-latest, steps: [
     {uses: actions/checkout@v4}, {name: Set up Node.js, uses: actions/setup-node@v2,
       with: {node-version: '18'}}, {id: yarn-cache-dir-path, name: Get yarn cache
@@ -439,7 +439,7 @@ e3663d18d528eba177f40a7d1ca8fff42987865a548155777b22726adeabc17a,clippy-test,"{r
           '}}, {continue-on-error: true, if: '${{ steps.yarn-cache.cache-hit != ''true''
         }}', name: List the state of node modules, run: yarn list}, {name: Install
         dependencies, run: yarn}, {name: Run tests, run: yarn test}]}
-",['test'],test,Canner__WrenAI,[build|test],Installs Node.js dependencies via yarn (build) and executes test suite (test).
+",['test'],test,Canner__WrenAI,[build|test],Installs Node.js dependencies via yarn (build) and executes test suite (test).,build|test,1.0,"[('[build|test]', '[STOP]\n\nThe classification is correct. The job performs:\n1. **build**: Sets up Node.js, installs dependencies via `yarn`\n2. **test**: Runs `yarn test`\n\nBoth categories appropriately apply to this CI/CD job.')]"
 88cdf6b00d86ed806397597c975fa46f1e4172aa518de22c5548a194abab2768,eslint,"{if: '${{ github.event.label.name == ''ci/ui'' }}', runs-on: ubuntu-latest, steps: [
     {uses: actions/checkout@v3}, {name: Set up Node.js, uses: actions/setup-node@v2,
       with: {node-version: '18'}}, {id: yarn-cache-dir-path, name: Get yarn cache
@@ -454,7 +454,7 @@ e3663d18d528eba177f40a7d1ca8fff42987865a548155777b22726adeabc17a,clippy-test,"{r
         != ''true'' }}', name: List the state of node modules, run: yarn list}, {
       name: Install Node.js dependencies, run: yarn install}, {name: Run lint, run: yarn
         lint}]}
-",['lint'],lint_security,Canner__WrenAI,[lint_security],"Sets up Node.js environment, installs dependencies, and runs linting checks on codebase."
+",['lint'],lint_security,Canner__WrenAI,[lint_security],"Sets up Node.js environment, installs dependencies, and runs linting checks on codebase.",lint_security,1.0,"[('[lint_security]', '[STOP]')]"
 8a97da004dfb4e76e9156cc2fdcffeede96a1f98c14d798669c0115efc6c68eb,build-image,"{outputs: {tag_name: '${{ steps.tag-preparation.outputs.TAG_NAME }}'}, runs-on: '${{
     matrix.arch.runner }}', steps: [{uses: actions/checkout@v4}, {name: Login to GitHub
         Container Registry, uses: docker/login-action@v3, with: {password: '${{ secrets.GITHUB_TOKEN
@@ -482,7 +482,7 @@ e3663d18d528eba177f40a7d1ca8fff42987865a548155777b22726adeabc17a,clippy-test,"{r
         name: 'digests-${{ env.PLATFORM_PAIR }}', path: /tmp/digests/*, retention-days: 1}}],
   strategy: {fail-fast: false, matrix: {arch: [{platform: linux/amd64, runner: ubuntu-latest},
         {platform: linux/arm64, runner: linux_arm64_runner}]}}}
-",['build'],deploy_release,Canner__WrenAI,[build|deploy_release],Builds Docker images with push=true and logs into container registry for deployment.
+",['build'],deploy_release,Canner__WrenAI,[build|deploy_release],Builds Docker images with push=true and logs into container registry for deployment.,build | deploy_release,2.0,"[('[build|deploy_release]', 'ISSUE: The classification includes `deploy_release` but this is incorrect. The job uses `push=true` in the Docker build step, which pushes images to a registry. However, this is a **multi-platform build job that pushes intermediate digests**, not a release deployment. The actual release consolidation (manifest creation and final push) would occur in a separate job.\n\nSUGGESTION: The classification should be `[build]` only. This job compiles/builds Docker images and pushes them by digest to the registry as part of a multi-platform build pipeline, which is a build operation. `deploy_release` should be reserved for jobs that create GitHub Releases, sign artifacts with cosign, or perform final release-level deployments—not intermediate build artifact pushes.'), ('[build]\nReason: Multi-platform Docker image build with intermediate digest push, not final release deployment.', 'ISSUE: The classification is incomplete. The YAML contains `push=true` in the build-push-action, which indicates images are being pushed to the registry (ghcr.io). This is a characteristic of deploy_release operations, not just build.\n\nSUGGESTION: The classification should be `[build, deploy_release]`. While this is an intermediate multi-platform build step, the explicit `push=true` parameter means images are actively being deployed/pushed to the container registry. This satisfies the deploy_release criterion of ""Pushing images (push: true)"". The job performs both compilation/building (build) and pushing to registry (deploy_release).')]"
 8a97da004dfb4e76e9156cc2fdcffeede96a1f98c14d798669c0115efc6c68eb,merge,"{needs: [build-image], runs-on: ubuntu-latest, steps: [{name: Download digests, uses: actions/download-artifact@v4,
       with: {merge-multiple: true, path: /tmp/digests, pattern: digests-*}}, {name: Set
         up Docker Buildx, uses: docker/setup-buildx-action@v3}, {id: meta, name: Docker
@@ -496,7 +496,7 @@ e3663d18d528eba177f40a7d1ca8fff42987865a548155777b22726adeabc17a,clippy-test,"{r
         docker buildx imagetools create $(jq -cr '.tags | map(\""-t \"" + .) | join(\""\
         \ \"")' <<< \""$DOCKER_METADATA_OUTPUT_JSON\"") \\\n  $(printf '${{ env.WREN_UI_IMAGE\
         \ }}@sha256:%s ' *) \\\n  $TAGS\n"", working-directory: /tmp/digests}]}
-",['build'],deploy_release,Canner__WrenAI,[deploy_release],Authenticates to container registry and pushes Docker image manifest with tags.
+",['build'],deploy_release,Canner__WrenAI,[deploy_release],Authenticates to container registry and pushes Docker image manifest with tags.,deploy_release,1.0,"[('[deploy_release]', '[STOP]')]"
 8c7e8343ecea27938dc3807b9c716145342866bb64da75783a24764c786fdff1,tag-pr,"{permissions: {pull-requests: write}, runs-on: ubuntu-latest, steps: [{name: Checkout
         code, uses: actions/checkout@v3, with: {fetch-depth: 0}}, {id: changed-files,
       name: Get changed files, uses: tj-actions/changed-files@v46}, {name: Tag PR
@@ -547,7 +547,7 @@ e3663d18d528eba177f40a7d1ca8fff42987865a548155777b22726adeabc17a,clippy-test,"{r
           \ context.issue.number,\n    labels: Array.from(labels)\n  });\n  \n  console.log(`Added\
           \ labels: ${Array.from(labels).join(', ')}`);\n} else {\n  console.log('No\
           \ matching directories or milestone found');\n}\n""}}]}
-",['unknown'],lint_security,Canner__WrenAI,[no_ops],Automatically tags PRs based on changed files and title; no functional impact on code or deployment.
+",['unknown'],lint_security,Canner__WrenAI,[no_ops],Automatically tags PRs based on changed files and title; no functional impact on code or deployment.,no_ops,2.0,"[('[no_ops]', 'ISSUE: The classification as [no_ops] is incorrect. This job performs functional operations that impact the PR workflow.\n\nSUGGESTION: The correct classification should be [lint_security] or a combination including policy checks. \n\nREASONING: The job:\n1. Analyzes changed files to determine relevant labels\n2. Extracts milestones from PR titles\n3. Updates PR titles when environment changes are detected\n4. Creates/updates/applies labels to PRs with specific colors\n\nThese are policy/metadata enforcement operations that affect PR organization and visibility. While not traditional linting or security scanning, this job enforces labeling policies and PR metadata standards, which aligns with the ""path/policy checks"" aspect of the lint_security category. The job has clear functional impact on PR management workflows, making [no_ops] a false negative.'), ('[lint_security]\nReason: Enforces PR labeling policies and metadata standards based on changed files and title patterns.', ""ISSUE: The classification as [lint_security] is incorrect. This job performs no linting, security scanning, vulnerability checks, or policy enforcement in the traditional sense.\n\nSUGGESTION: This should be classified as [no_ops]. The job only applies labels to PRs based on changed files and title patterns—it's a metadata/organizational task with no functional impact on code quality, security, or deployment. It doesn't compile, test, deploy, or scan anything; it merely tags PRs for organizational purposes."")]"
 9b490f066d0a3f6573e57afc8f07985e4ee725e77fd24872ce7651fd8f025a5b,build-image,"{runs-on: '${{ matrix.arch.runner }}', steps: [{uses: actions/checkout@v4}, {name: Login
         to GitHub Container Registry, uses: docker/login-action@v3, with: {password: '${{
           secrets.GITHUB_TOKEN }}', registry: ghcr.io, username: '${{ github.actor
@@ -570,7 +570,7 @@ e3663d18d528eba177f40a7d1ca8fff42987865a548155777b22726adeabc17a,clippy-test,"{r
         name: 'digests-${{ env.PLATFORM_PAIR }}', path: /tmp/digests/*, retention-days: 1}}],
   strategy: {fail-fast: false, matrix: {arch: [{platform: linux/amd64, runner: ubuntu-latest},
         {platform: linux/arm64, runner: linux_arm64_runner}]}}}
-",['build'],build|deploy_release,Canner__WrenAI,[build|deploy_release],Builds Docker images with multi-platform support and pushes to registry (push=true).
+",['build'],build|deploy_release,Canner__WrenAI,[build|deploy_release],Builds Docker images with multi-platform support and pushes to registry (push=true).,build | deploy_release,2.0,"[('[build|deploy_release]', 'ISSUE: The classification includes `deploy_release` but this is incorrect. The job builds and pushes Docker images (`push=true`), but does NOT perform release operations. There is no signing (cosign), no GitHub Release creation, and no release artifact management. The push is part of the build process for multi-platform images, not a release deployment.\n\nSUGGESTION: The classification should be `[build]` only. This job compiles/builds Docker images and pushes them to a registry as part of the build pipeline, which is the core definition of the build category. The push is a build artifact distribution mechanism, not a release operation.'), ('[build]\nReason: Builds and pushes Docker images to registry; no signing, GitHub Release, or release artifact management.', 'ISSUE: The classification is incomplete. The YAML contains `push=true` in the docker/build-push-action outputs, which indicates images are being pushed to a registry (ghcr.io). This is a characteristic of the `deploy_release` category.\n\nSUGGESTION: The correct classification should be `[build, deploy_release]`. While the job does compile/build Docker images (build), it also actively pushes them to a registry with `push=true`, which falls under deployment activities. The reasoning provided only acknowledges the build aspect and explicitly excludes deploy_release based on the absence of signing and GitHub Releases, but pushing images to a registry is itself a deploy_release activity regardless of whether signing or GitHub Releases are present.')]"
 9b490f066d0a3f6573e57afc8f07985e4ee725e77fd24872ce7651fd8f025a5b,merge,"{needs: [build-image], runs-on: ubuntu-latest, steps: [{name: Download digests, uses: actions/download-artifact@v4,
       with: {merge-multiple: true, path: /tmp/digests, pattern: digests-*}}, {name: Set
         up Docker Buildx, uses: docker/setup-buildx-action@v3}, {id: meta, name: Docker
@@ -584,7 +584,7 @@ e3663d18d528eba177f40a7d1ca8fff42987865a548155777b22726adeabc17a,clippy-test,"{r
         docker buildx imagetools create $(jq -cr '.tags | map(\""-t \"" + .) | join(\""\
         \ \"")' <<< \""$DOCKER_METADATA_OUTPUT_JSON\"") \\\n  $(printf '${{ env.WREN_UI_IMAGE\
         \ }}@sha256:%s ' *) \\\n  $TAGS\n"", working-directory: /tmp/digests}]}
-",['build'],deploy_release,Canner__WrenAI,[deploy_release],Logs into container registry and pushes Docker image manifest with version tags.
+",['build'],deploy_release,Canner__WrenAI,[deploy_release],Logs into container registry and pushes Docker image manifest with version tags.,deploy_release,1.0,"[('[deploy_release]', '[STOP]')]"
 9b490f066d0a3f6573e57afc8f07985e4ee725e77fd24872ce7651fd8f025a5b,tag-ui-version,"{needs: [merge], runs-on: ubuntu-latest, steps: [{id: generate-token, name: Generate
         a token, uses: actions/create-github-app-token@v1, with: {app-id: '${{ vars.CI_APP_ID
           }}', private-key: '${{ secrets.CI_APP_PRIVATE_KEY }}'}}, {uses: actions/checkout@v4,
@@ -621,7 +621,7 @@ e3663d18d528eba177f40a7d1ca8fff42987865a548155777b22726adeabc17a,clippy-test,"{r
         git push origin ""release/ui/$version""
 
         '}]}
-",['build'],deploy_release,Canner__WrenAI,[deploy_release],"Generates changelog, updates version, commits changes, and creates/pushes git tags for release."
+",['build'],deploy_release,Canner__WrenAI,[deploy_release],"Generates changelog, updates version, commits changes, and creates/pushes git tags for release.",deploy_release,2.0,"[('[deploy_release]', 'ISSUE: The classification is incomplete. The job performs multiple distinct operations that span multiple categories.\n\nSUGGESTION: The correct classification should be [deploy_release, build]. \n\nReasoning:\n- **deploy_release**: The job creates and pushes a Git tag (`git tag -a ""release/ui/$version""` and `git push origin ""release/ui/$version""`), which is a release artifact creation activity.\n- **build**: The job updates the version in `package.json` and commits this change (`git add package.json`, `git commit`), which constitutes updating dependencies/metadata and preparing a release build.\n\nThe current classification only captures the release aspect but misses the build/version update component that precedes it.'), ('[build | deploy_release]\nReason: Updates package.json version, commits changes, creates and pushes Git release tag.', 'ISSUE: The classification includes ""build"" but the job performs no compilation, dependency updates, or Docker image building. The job is purely about version management and release tagging.\n\nSUGGESTION: The classification should be [deploy_release] only. The job updates version metadata, creates a Git tag, and pushes it to the repository—all characteristic of release operations. There is no build activity present.')]"
 ce81b64e75daba7a9484115cf577e1f7da476b139db85413894ca926bd413e48,create-release-pr,"{runs-on: ubuntu-latest, steps: [{name: Checkout repository, uses: actions/checkout@v3},
     {name: Setup Git Identity, run: 'git config --global user.name ""wren-ai[bot]""
 
@@ -675,7 +675,7 @@ ce81b64e75daba7a9484115cf577e1f7da476b139db85413894ca926bd413e48,create-release-
           github.event.inputs.release_version }}', commit-message: 'release ${{ github.event.inputs.release_version
           }}', draft: false, title: 'Release ${{ github.event.inputs.release_version
           }}'}}]}
-",['unknown'],deploy_release,Canner__WrenAI,[deploy_release],Updates version files and creates release PR for new product version deployment.
+",['unknown'],deploy_release,Canner__WrenAI,[deploy_release],Updates version files and creates release PR for new product version deployment.,deploy_release,2.0,"[('[deploy_release]', 'ISSUE: The classification assigns `deploy_release` but this job does not push images, sign artifacts, or create GitHub Releases. It only modifies source files and opens a pull request.\n\nSUGGESTION: The correct classification should be `build`. This job updates version strings in configuration files (docker.go, .env.example) and creates a PR—activities that prepare code for release but do not constitute actual deployment. The `deploy_release` category requires concrete deployment actions like image pushes or release publishing, which are absent here.'), ('[build]\nReason: Updates version strings in source files and creates PR; no image push, signing, or release publishing.', 'ISSUE: The classification is incomplete. The job performs version updates and creates a pull request, but this is fundamentally a release preparation workflow, not a build operation.\n\nSUGGESTION: The correct classification should be [deploy_release]. While the job doesn\'t push images or sign artifacts, it explicitly creates a GitHub pull request for a release (evidenced by branch naming `release/${{ github.event.inputs.release_version }}`, commit message ""release"", and PR title ""Release ${{ github.event.inputs.release_version }}""). This is a release workflow step. The [build] category is for compiling code and building artifacts, which this job does not do—it only modifies version configuration files and initiates the release process via PR creation.')]"
 d511b214da69f08fe7b2f8e43ffe8ced525d8e28abef8ab7236b35ae8f65e33c,release,"{if: '${{ github.event_name == ''issue_comment'' && contains(github.event.comment.body,
     ''/release-rc'') && startsWith(github.event.issue.title, ''Release'') }}', runs-on: macos-latest,
   steps: [{name: Checkout repository, uses: actions/checkout@v4, with: {ref: main}},
@@ -754,11 +754,11 @@ d511b214da69f08fe7b2f8e43ffe8ced525d8e28abef8ab7236b35ae8f65e33c,release,"{if: '
         \ \\\n-d \""{\\\""body\\\"": \\\""\U0001F680 A new release has been created! [View\
         \ Release](${release_url})\\\""}\"" \\\n\""https://api.github.com/repos/${{ github.repository\
         \ }}/issues/${{ github.event.issue.number }}/comments\""\n""}]}
-","['build', 'release']",build|deploy_release,Canner__WrenAI,[build|deploy_release],Compiles Go binaries for multiple platforms (build) and creates GitHub Release with artifacts (deploy_release).
+","['build', 'release']",build|deploy_release,Canner__WrenAI,[build|deploy_release],Compiles Go binaries for multiple platforms (build) and creates GitHub Release with artifacts (deploy_release).,build|deploy_release,1.0,"[('[build|deploy_release]', '[STOP]')]"
 dbfd68b7e980319a779e2e22dac325a31802afbe2cff161fbea9f3e3b85cab0d,validator,"{name: validate-pull-request-title, runs-on: ubuntu-latest, steps: [{name: validate
         pull request title, uses: kontrolplane/pull-request-title-validator@v1.3.1,
       with: {scopes: wren-ai-service, types: 'fix,feat,chore'}}]}
-",['unknown'],lint_security,Canner__WrenAI,[lint_security],Validates pull request title format against defined conventions and scopes.
+",['unknown'],lint_security,Canner__WrenAI,[lint_security],Validates pull request title format against defined conventions and scopes.,no_ops,2.0,"[('[lint_security]', ""ISSUE: The classification assigns `lint_security` but this job performs neither linting nor security checks. It validates pull request title format against conventional commit conventions.\n\nSUGGESTION: The correct classification should be `no_ops`. This job has no functional impact on the codebase—it only validates metadata (PR title format) and does not compile, test, deploy, or scan for vulnerabilities. It's a policy/format check with no operational consequence.""), ('[no_ops]\nReason: Validates PR title format only; no functional impact on codebase, compilation, testing, or deployment.', '[STOP]\n\nThe classification is correct. This job only validates pull request title formatting against conventional commit standards (checking scopes and types). It has no functional impact on the codebase, does not compile, test, deploy, or scan for security issues. It is purely a policy/format check with no operational consequence.')]"
 eccf8d6a0fc725f9c722d3a826d53ff64caccd41def09c05ca69314cb9021385,build-image,"{outputs: {tag_name: '${{ steps.tag-preparation.outputs.TAG_NAME }}'}, runs-on: '${{
     matrix.arch.runner }}', steps: [{uses: actions/checkout@v4}, {name: Login to GitHub
         Container Registry, uses: docker/login-action@v3, with: {password: '${{ secrets.GITHUB_TOKEN
@@ -786,7 +786,7 @@ eccf8d6a0fc725f9c722d3a826d53ff64caccd41def09c05ca69314cb9021385,build-image,"{o
         name: 'digests-${{ env.PLATFORM_PAIR }}', path: /tmp/digests/*, retention-days: 1}}],
   strategy: {fail-fast: false, matrix: {arch: [{platform: linux/amd64, runner: ubuntu-latest},
         {platform: linux/arm64, runner: linux_arm64_runner}]}}}
-",['build'],build|deploy_release,Canner__WrenAI,[build|deploy_release],Builds Docker images for multiple platforms (docker/build-push-action) and pushes to registry (push=true).
+",['build'],build|deploy_release,Canner__WrenAI,[build|deploy_release],Builds Docker images for multiple platforms (docker/build-push-action) and pushes to registry (push=true).,build,2.0,"[('[build|deploy_release]', 'ISSUE: The classification includes `deploy_release` but the YAML does not perform any release operations.\n\nREASONING: The job builds Docker images with `docker/build-push-action@v6` and pushes them (`push=true`), but this is a multi-platform build step that uploads digests as artifacts for later consolidation. There is no:\n- GitHub Release creation\n- Image signing (cosign)\n- Final manifest push or release tagging\n\nThe `push=true` here is for intermediate digest storage in a multi-arch workflow, not a release deployment. The actual release would occur in a separate job that consumes these digests.\n\nSUGGESTION: Classification should be `[build]` only. This job compiles/builds Docker images and stores artifacts, which is the definition of the build category. The deploy_release category should only apply to jobs that actually create releases or push final production artifacts.'), ('[build]\nReason: Builds Docker images and uploads digests as artifacts for multi-platform workflow; no release creation or signing.', '[STOP]\n\nThe classification is correct. The job builds Docker images (`docker/build-push-action@v6` with `push=true`), uploads build artifacts (digests), and is part of a multi-platform build workflow. It does not create releases, sign artifacts, or perform other deploy_release operations. The `build` category is the appropriate single classification.')]"
 eccf8d6a0fc725f9c722d3a826d53ff64caccd41def09c05ca69314cb9021385,merge,"{needs: [build-image], runs-on: ubuntu-latest, steps: [{name: Download digests, uses: actions/download-artifact@v4,
       with: {merge-multiple: true, path: /tmp/digests, pattern: digests-*}}, {name: Set
         up Docker Buildx, uses: docker/setup-buildx-action@v3}, {id: meta, name: Docker
@@ -800,7 +800,7 @@ eccf8d6a0fc725f9c722d3a826d53ff64caccd41def09c05ca69314cb9021385,merge,"{needs: 
         docker buildx imagetools create $(jq -cr '.tags | map(\""-t \"" + .) | join(\""\
         \ \"")' <<< \""$DOCKER_METADATA_OUTPUT_JSON\"") \\\n  $(printf '${{ env.WREN_AI_SERVICE_IMAGE\
         \ }}@sha256:%s ' *) \\\n  $TAGS\n"", working-directory: /tmp/digests}]}
-",['build'],deploy_release,Canner__WrenAI,[deploy_release],Logs into container registry and pushes Docker manifest list with tags to GHCR.
+",['build'],deploy_release,Canner__WrenAI,[deploy_release],Logs into container registry and pushes Docker manifest list with tags to GHCR.,deploy_release,1.0,"[('[deploy_release]', '[STOP]')]"
 108516fa7d85b7008e3d66560dde46c9f5d9e3c00ca28e708c4592a1b37a877f,windows-test,"{runs-on: windows-latest, steps: [{uses: actions/checkout@v4}, {name: 'Set up Python
         ${{ matrix.python-version }}', uses: actions/setup-python@v4, with: {python-version: '${{
           matrix.python-version }}'}}, {name: Install dependencies, run: 'pip install
@@ -816,7 +816,7 @@ eccf8d6a0fc725f9c722d3a826d53ff64caccd41def09c05ca69314cb9021385,merge,"{needs: 
         '}, {name: Release Test, run: 'pytest -v -n auto tests
 
         '}], strategy: {matrix: {python-version: ['3.8', '3.9', '3.10', '3.11']}}}
-",['test'],test,Farama-Foundation__chatarena,[build|test],"Installs dependencies and builds source distribution (build), then runs pytest test suite (test)."
+",['test'],test,Farama-Foundation__chatarena,[build|test],"Installs dependencies and builds source distribution (build), then runs pytest test suite (test).",build|test,1.0,"[('[build|test]', ""[STOP]\n\nThe classification is correct. The job performs:\n1. **build**: Installing dependencies (`pip install -e '.[all]'`), building source distribution (`python -m build --sdist`), and installing the built artifact.\n2. **test**: Running pytest test suite (`pytest -v -n auto tests`).\n\nBoth categories appropriately apply to this job's functionality."")]"
 5835203288489b86a55fe0d1a7e477d9685949694d22e25b3284982d0fa069e1,environment-test-openai,"{runs-on: ubuntu-latest, steps: [{uses: actions/checkout@v4}, {name: 'Set up Python
         ${{ matrix.python-version }}', uses: actions/setup-python@v4, with: {python-version: '${{
           matrix.python-version }}'}}, {name: Install dependencies, run: 'pip install
@@ -833,12 +833,12 @@ eccf8d6a0fc725f9c722d3a826d53ff64caccd41def09c05ca69314cb9021385,merge,"{needs: 
         pytest -v -n auto tests/unit/test_umshini_environments.py
 
         '}], strategy: {matrix: {python-version: ['3.11']}}}
-",['test'],test,Farama-Foundation__chatarena,[build|test],Installs dependencies with pip (build) and runs pytest test suites (test).
+",['test'],test,Farama-Foundation__chatarena,[build|test],Installs dependencies with pip (build) and runs pytest test suites (test).,build|test,1.0,"[('[build|test]', ""[STOP]\n\nThe classification is correct. The job performs:\n1. **build**: `pip install -e '.[all]'` installs dependencies\n2. **test**: Two `pytest` invocations run test suites\n\nBoth categories appropriately apply."")]"
 ac63f8d85e9147345d07c01cfadd97d2e697ede97c50c1b370d02a3949228ef1,pre-commit,"{runs-on: ubuntu-latest, steps: [{uses: actions/checkout@v4}, {uses: actions/setup-python@v4,
       with: {python-version: '3.11'}}, {run: pip install pre-commit}, {run: 'pip install
         -e ''.[all]'''}, {run: pre-commit --version}, {run: pre-commit install}, {
       run: pre-commit run --all-files}]}
-",['lint'],lint_security,Farama-Foundation__chatarena,[lint_security],Installs and runs pre-commit hooks for linting and code quality checks across all files.
+",['lint'],lint_security,Farama-Foundation__chatarena,[lint_security],Installs and runs pre-commit hooks for linting and code quality checks across all files.,lint_security,1.0,"[('[lint_security]', '[STOP]\n\nThe classification is correct. The job installs pre-commit and runs `pre-commit run --all-files`, which is a linting/code quality check tool. This clearly falls under the lint_security category.')]"
 bd04506a2c7bf0f318a0da23613f99ccbb9c1d3aeb933ea91f4eb78436b8788c,macos-test,"{runs-on: macos-11, steps: [{uses: actions/checkout@v4}, {name: 'Set up Python ${{
         matrix.python-version }}', uses: actions/setup-python@v4, with: {python-version: '${{
           matrix.python-version }}'}}, {name: Install dependencies, run: 'pip install
@@ -854,7 +854,7 @@ bd04506a2c7bf0f318a0da23613f99ccbb9c1d3aeb933ea91f4eb78436b8788c,macos-test,"{ru
         '}, {name: Release Test, run: 'pytest -v -n auto tests/
 
         '}], strategy: {matrix: {python-version: ['3.8', '3.9', '3.10', '3.11']}}}
-",['test'],test,Farama-Foundation__chatarena,[build|test],"Installs dependencies and builds source distribution (build), then runs pytest test suite (test)."
+",['test'],test,Farama-Foundation__chatarena,[build|test],"Installs dependencies and builds source distribution (build), then runs pytest test suite (test).",build|test,1.0,"[('[build|test]', ""[STOP]\n\nThe classification is correct. The job contains:\n1. **build** activities: `pip install -e '.[all]'`, `python -m build --sdist`, and `pip install dist/*.tar.gz` (dependency updates and building source distribution)\n2. **test** activities: `pytest -v -n auto tests/` (running test suite)\n\nBoth categories clearly apply."")]"
 ca3af7cec96c1e560a1a3b20559b24689f9ca914ee2bb74372619b2eafaf138e,environment-test-azure-openai,"{env: {AZURE_DEPLOYMENT: gpt-4, AZURE_OPENAI_ENDPOINT: '${{ secrets.AZURE_OPENAI_ENDPOINT
       }}', OPENAI_API_KEY: '${{ secrets.AZURE_OPENAI_API_KEY }}', OPENAI_API_TYPE: azure,
     OPENAI_API_VERSION: 2023-05-15}, runs-on: ubuntu-latest, steps: [{uses: actions/checkout@v4},
@@ -868,7 +868,7 @@ ca3af7cec96c1e560a1a3b20559b24689f9ca914ee2bb74372619b2eafaf138e,environment-tes
         pytest -v -n auto tests/unit/test_umshini_environments.py
 
         '}], strategy: {matrix: {python-version: ['3.11']}}}
-",['test'],test,Farama-Foundation__chatarena,[test],Installs dependencies and runs pytest unit tests for Umshini environments.
+",['test'],test,Farama-Foundation__chatarena,[test],Installs dependencies and runs pytest unit tests for Umshini environments.,test,1.0,"[('[test]', '[STOP]')]"
 d73017db77118d1eb8abafad71390e51ac44ae2fe4c965f9cf6fea0cd12beb0e,build-wheels,"{permissions: {contents: read}, runs-on: '${{ matrix.os }}', steps: [{uses: actions/checkout@v4},
     {name: Set up Python, uses: actions/setup-python@v4, with: {python-version: 3.x}},
     {name: Install dependencies, run: python -m pip install --upgrade setuptools wheel},
@@ -877,12 +877,12 @@ d73017db77118d1eb8abafad71390e51ac44ae2fe4c965f9cf6fea0cd12beb0e,build-wheels,"{
       include: [{os: ubuntu-latest, platform: manylinux_x86_64, python: 38}, {os: ubuntu-latest,
           platform: manylinux_x86_64, python: 39}, {os: ubuntu-latest, platform: manylinux_x86_64,
           python: 310}, {os: ubuntu-latest, platform: manylinux_x86_64, python: 311}]}}}
-",['build'],build,Farama-Foundation__chatarena,[build],"Installs dependencies, builds Python wheels and source distributions, stores artifacts."
+",['build'],build,Farama-Foundation__chatarena,[build],"Installs dependencies, builds Python wheels and source distributions, stores artifacts.",build,1.0,"[('[build]', '[STOP]')]"
 d73017db77118d1eb8abafad71390e51ac44ae2fe4c965f9cf6fea0cd12beb0e,publish,"{if: github.event_name == 'release' && github.event.action == 'published', needs: [
     build-wheels], runs-on: ubuntu-latest, steps: [{name: Download dists, uses: actions/download-artifact@v3,
       with: {name: artifact, path: dist}}, {name: Publish, uses: pypa/gh-action-pypi-publish@release/v1,
       with: {password: '${{ secrets.PYPI_API_TOKEN }}'}}]}
-",['build'],deploy_release,Farama-Foundation__chatarena,[deploy_release],Downloads build artifacts and publishes Python package to PyPI using API token.
+",['build'],deploy_release,Farama-Foundation__chatarena,[deploy_release],Downloads build artifacts and publishes Python package to PyPI using API token.,deploy_release,1.0,"[('[deploy_release]', '[STOP]')]"
 ef764dc4085a0f4608726da323ecb7d4ca2e9c450ab7e2f7d6be9fa9bbf0234d,linux-test,"{runs-on: ubuntu-latest, steps: [{uses: actions/checkout@v4}, {name: 'Set up Python
         ${{ matrix.python-version }}', uses: actions/setup-python@v4, with: {python-version: '${{
           matrix.python-version }}'}}, {name: Install dependencies, run: 'sudo apt-get
@@ -901,7 +901,7 @@ ef764dc4085a0f4608726da323ecb7d4ca2e9c450ab7e2f7d6be9fa9bbf0234d,linux-test,"{ru
         -v -n auto tests/
 
         '}], strategy: {matrix: {python-version: ['3.8', '3.9', '3.10', '3.11']}}}
-",['test'],test,Farama-Foundation__chatarena,[build|test],"Installs dependencies and builds source distribution (build), runs pytest test suite (test)."
+",['test'],test,Farama-Foundation__chatarena,[build|test],"Installs dependencies and builds source distribution (build), runs pytest test suite (test).",build|test,1.0,"[('[build|test]', ""[STOP]\n\nThe classification is correct. The job performs both build and test operations:\n- **build**: Installing dependencies (`pip install -e '.[all]'`), building source distribution (`python -m build --sdist`), and installing the built artifact (`pip install dist/*.tar.gz`)\n- **test**: Running pytest test suite (`pytest -v -n auto tests/`)\n\nBoth categories clearly apply."")]"
 10e75b79bd87ec915486dca1641919a1189df1844c7d882f1e1038859d8ebe67,check-proprietary-paths,"{if: github.repository == 'FlowiseAI/Flowise', name: Check for Proprietary Paths,
   runs-on: ubuntu-latest, steps: [{name: Checkout repository, uses: actions/checkout@v6,
       with: {fetch-depth: 0}}, {id: check-paths, name: Check for proprietary paths,
@@ -940,7 +940,7 @@ ef764dc4085a0f4608726da323ecb7d4ca2e9c450ab7e2f7d6be9fa9bbf0234d,linux-test,"{ru
         exit 1
 
         '}]}
-",['unknown'],lint_security,FlowiseAI__Flowise,[lint_security],"Checks for proprietary path violations in code changes, enforcing policy compliance."
+",['unknown'],lint_security,FlowiseAI__Flowise,[lint_security],"Checks for proprietary path violations in code changes, enforcing policy compliance.",lint_security,1.0,"[('[lint_security]', '[STOP]\n\nThe classification is correct. This job performs a **path/policy check** by scanning changed files for violations against proprietary path restrictions (blocking `extensions/` and non-OSS `apps/` directories). This is a security/policy enforcement mechanism, which falls squarely under the `lint_security` category as defined (""path/policy checks"").')]"
 7adecc865f7499325d783300d4a1b67f241a1839963db2980b69e56c800c9c7c,dry-run,"{outputs: {version: '${{ steps.resolve-version.outputs.version }}'}, permissions: {
     contents: read}, runs-on: ubuntu-latest, steps: [{uses: actions/checkout@v6},
     {uses: pnpm/action-setup@v4, with: {version: 10.26.0}}, {uses: actions/setup-node@v6,
@@ -970,7 +970,7 @@ ef764dc4085a0f4608726da323ecb7d4ca2e9c450ab7e2f7d6be9fa9bbf0234d,linux-test,"{ru
         --dry-run}, {env: {NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}'}, name: Dry
         run publish, run: 'pnpm --filter @flowiseai/agentflow publish --no-git-checks
         --dry-run --tag ${{ inputs.tag }}'}]}
-",['unknown'],deploy_release,FlowiseAI__Flowise,[build],"Installs dependencies, validates and sets package version, performs dry-run publish to npm."
+",['unknown'],deploy_release,FlowiseAI__Flowise,[build],"Installs dependencies, validates and sets package version, performs dry-run publish to npm.",build,1.0,"[('[build]', '[STOP]\n\nThe classification is correct. This job performs dependency installation (`pnpm install`), version management/bumping, and a dry-run publish to npm. These are all build-related activities (preparing and packaging code for release). While there is a `--dry-run` publish step, it does not actually push to npm (no `push: true` equivalent), so `deploy_release` does not apply. The job is purely preparatory/build work.')]"
 7adecc865f7499325d783300d4a1b67f241a1839963db2980b69e56c800c9c7c,publish,"{environment: npm-publish, needs: dry-run, permissions: {contents: write, pull-requests: write},
   runs-on: ubuntu-latest, steps: [{uses: actions/checkout@v6}, {uses: pnpm/action-setup@v4,
       with: {version: 10.26.0}}, {uses: actions/setup-node@v6, with: {node-version: 18.15.0,
@@ -998,7 +998,7 @@ ef764dc4085a0f4608726da323ecb7d4ca2e9c450ab7e2f7d6be9fa9bbf0234d,linux-test,"{ru
         \ to ${VERSION}\"" \\\n  --body \""Automated version bump after publishing \\\
         `@flowiseai/agentflow@${VERSION}\\` to npm with tag \\`${{ inputs.tag }}\\\
         `.\"" \\\n  --base main \\\n  --head \""$BRANCH\""\n""}]}
-",['unknown'],deploy_release,FlowiseAI__Flowise,[deploy_release],Publishes npm package to registry and creates version bump PR with GitHub token.
+",['unknown'],deploy_release,FlowiseAI__Flowise,[deploy_release],Publishes npm package to registry and creates version bump PR with GitHub token.,deploy_release,1.0,"[('[deploy_release]', '[STOP]')]"
 8ca87f61ded0df671a2d315911846602d29a7d1767deb562bf064c57fc453c81,docker,"{environment: '${{ github.event.inputs.environment }}', runs-on: ubuntu-latest, steps: [
     {id: defaults, name: Set default values, run: 'echo ""node_version=${{ github.event.inputs.node_version
         || ''20'' }}"" >> $GITHUB_OUTPUT
@@ -1022,7 +1022,7 @@ ef764dc4085a0f4608726da323ecb7d4ca2e9c450ab7e2f7d6be9fa9bbf0234d,linux-test,"{ru
           ', context: ., file: Dockerfile, platforms: 'linux/amd64,linux/arm64', push: true,
         tags: ""${{ format('{0}.dkr.ecr.{1}.amazonaws.com/flowise:{2}', \n    secrets.AWS_ACCOUNT_ID,\
           \ \n    secrets.AWS_REGION, \n    steps.defaults.outputs.tag_version) }}\n""}}]}
-","['build', 'deploy']",deploy_release,FlowiseAI__Flowise,[build|deploy_release],Builds Docker image with multi-platform support and pushes to ECR registry (push
+","['build', 'deploy']",deploy_release,FlowiseAI__Flowise,[build|deploy_release],Builds Docker image with multi-platform support and pushes to ECR registry (push,build | deploy_release,2.0,"[('[build|deploy_release]', ""ISSUE: The classification includes `deploy_release` but the reasoning or context suggests this may be overstated. While `push: true` is present in the Docker build step, there is no evidence of GitHub Releases creation, artifact signing (cosign), or formal release publishing—only ECR image pushing.\n\nSUGGESTION: The classification should be `[build]` alone. The job performs Docker image building and pushing to ECR, which is a build artifact distribution step, not a formal release deployment. `deploy_release` typically implies GitHub Releases, signing, or explicit release versioning workflows. If ECR pushes are considered deployment in your organization's taxonomy, then `[build|deploy_release]` could be acceptable, but clarify whether ECR pushes alone warrant `deploy_release` classification.""), ('[build]\nReason: Docker image building and ECR pushing. No GitHub Releases, signing, or formal release publishing.', 'ISSUE: The classification is incomplete. The job includes `push: true` in the docker/build-push-action step, which means images are being pushed to a registry (Amazon ECR).\n\nSUGGESTION: The classification should be [build, deploy_release]. While the primary activity is building a Docker image, the explicit `push: true` parameter combined with ECR login and tag versioning indicates this job also performs deployment/release operations. According to the categories, ""deploy_release"" includes ""Pushing images (push: true)"". This job clearly does both.')]"
 96dbe0c38daa76a21e6390de30fa0a53d47799b7f16cee52766481c3abd8bc34,docker,"{runs-on: ubuntu-latest, steps: [{id: defaults, name: Set default values, run: 'echo
         ""node_version=${{ github.event.inputs.node_version || ''20'' }}"" >> $GITHUB_OUTPUT
 
@@ -1048,10 +1048,10 @@ ef764dc4085a0f4608726da323ecb7d4ca2e9c450ab7e2f7d6be9fa9bbf0234d,linux-test,"{ru
           }}
 
           '}}]}
-",['build'],deploy_release,FlowiseAI__Flowise,[build|deploy_release],Builds Docker images for multiple platforms and pushes to Docker Hub registry (push
+",['build'],deploy_release,FlowiseAI__Flowise,[build|deploy_release],Builds Docker images for multiple platforms and pushes to Docker Hub registry (push,build | deploy_release,2.0,"[('[build|deploy_release]', ""ISSUE: The classification includes `build` but this is incorrect. The job does not compile code or update dependencies—it only builds and pushes pre-built Docker images to a registry.\n\nSUGGESTION: The classification should be `[deploy_release]` only. The job's primary function is pushing Docker images (`push: true`) to Docker Hub, which is a release/deployment action. Building Docker images from existing Dockerfiles is part of the deployment pipeline, not a build step in the CI/CD sense (which refers to compiling source code or dependency management).""), ('[deploy_release]\nReason: Job builds and pushes Docker images to registry with push: true, which is a deployment action, not source code compilation.', 'ISSUE: FALSE NEGATIVE - Missing ""build"" category.\n\nThe classification only assigns ""deploy_release"" but misses that this job performs both build AND deploy operations. The job explicitly:\n1. Sets up Docker Buildx (build infrastructure)\n2. Builds Docker images (two separate builds with `docker/build-push-action`)\n3. Pushes images to registry (`push: true`)\n\nThe ""build"" category applies to ""building Docker images"" regardless of whether they\'re subsequently pushed. The job is not purely a deployment/release job—it includes the build step as a core function.\n\nSUGGESTION: Classify as [build, deploy_release]. The job both builds Docker images AND pushes them to a registry, satisfying criteria for both categories.')]"
 f22ee4829b3ed911dd3d8a9b5e811ce9b5339bdb8d8a93640cb73d74e94495a8,build,"{env: {PUPPETEER_SKIP_DOWNLOAD: true}, runs-on: ubuntu-latest, steps: [{uses: actions/checkout@v6},
     {run: docker build --no-cache -t flowise .}]}
-",['build'],build,FlowiseAI__Flowise,[build],Builds Docker image from Dockerfile without caching.
+",['build'],build,FlowiseAI__Flowise,[build],Builds Docker image from Dockerfile without caching.,build,1.0,"[('[build]', '[STOP]\n\nThe classification is correct. The job runs `docker build` which is explicitly listed as a build category activity (""building Docker images""). The checkout step is preparatory. No false positives or negatives are present.')]"
 f82159009ea8e8991eabd0d2291687617da54856af43d81f6947ad6b912cbb4e,build,"{env: {PUPPETEER_SKIP_DOWNLOAD: true}, runs-on: '${{ matrix.platform }}', steps: [
     {uses: actions/checkout@v6}, {uses: pnpm/action-setup@v4, with: {version: 10.26.0}},
     {name: 'Use Node.js ${{ matrix.node-version }}', uses: actions/setup-node@v6,
@@ -1064,7 +1064,7 @@ f82159009ea8e8991eabd0d2291687617da54856af43d81f6947ad6b912cbb4e,build,"{env: {P
       with: {browser: chrome, install: false, start: pnpm start, wait-on: 'http://localhost:3000',
         wait-on-timeout: 120, working-directory: packages/server}}], strategy: {matrix: {
       node-version: [18.15.0], platform: [ubuntu-latest]}}}
-","['lint', 'test', 'build']",build|test|lint_security,FlowiseAI__Flowise,[build|test|lint_security],"Installs dependencies (build), runs linting (lint_security), builds project (build), executes test coverage and Cypress tests (test)."
+","['lint', 'test', 'build']",build|test|lint_security,FlowiseAI__Flowise,[build|test|lint_security],"Installs dependencies (build), runs linting (lint_security), builds project (build), executes test coverage and Cypress tests (test).",build|test|lint_security,1.0,"[('[build|test|lint_security]', '[STOP]')]"
 02b57a0bfd1f02f3d1d04e399696e5cffdf8711ed525d0f92c8632cff14c7704,gitleaks,"{name: Gitleaks, runs-on: ubuntu-latest, steps: [{uses: hmarr/debug-action@v3.0.0},
     {name: install, run: ""set -euo pipefail\narch=\""$(uname)_$(uname -m)\""\nplatform=$(echo\
         \ $arch | tr '[:upper:]' '[:lower:]' )\necho \""PLATFORM=$platform\"" >> $GITHUB_ENV\n\
@@ -1087,13 +1087,13 @@ f82159009ea8e8991eabd0d2291687617da54856af43d81f6947ad6b912cbb4e,build,"{env: {P
         \ \\\n  --log-level=debug \\\n  --log-opts='${{ inputs.base_sha }}..${{ inputs.head_sha\
         \ }}'\n""}, {if: failure(), name: Upload test results, uses: actions/upload-artifact@v7,
       with: {name: GitLeaks results, path: results.sarif}}]}
-","['build', 'security', 'eval']",lint_security,HumanSignal__Adala,[lint_security],Runs Gitleaks to detect secrets and vulnerabilities in repository code.
+","['build', 'security', 'eval']",lint_security,HumanSignal__Adala,[lint_security],Runs Gitleaks to detect secrets and vulnerabilities in repository code.,lint_security,1.0,"[('[lint_security]', '[STOP]\n\nThe classification is correct. This job runs Gitleaks, which is a secrets detection tool that scans for credential leaks in code. This is a vulnerability/security scan, which falls squarely under the `lint_security` category. The job downloads the tool, runs a security scan (`gitleaks detect`), and uploads SARIF results for vulnerability reporting.')]"
 0b50e22d810c17bf92adf4d09d5f1484ca80064c3b693cfd7d9bb1cd9f5b2184,run_black,"{name: Code formatting, runs-on: ubuntu-latest, steps: [{uses: actions/checkout@v6},
     {name: Install poetry, run: 'pipx install ""poetry==${{ env.POETRY_VERSION }}""'},
     {id: setup_python, name: Set up Python, uses: actions/setup-python@v6, with: {
         cache: poetry, python-version: '3.13'}}, {name: Install Python dependencies,
       run: poetry install}, {name: Run black, run: poetry run black --check .}]}
-","['lint', 'test']",lint_security,HumanSignal__Adala,[lint_security],Runs black code formatter check to enforce code style standards.
+","['lint', 'test']",lint_security,HumanSignal__Adala,[lint_security],Runs black code formatter check to enforce code style standards.,lint_security,1.0,"[('[lint_security]', '[STOP]')]"
 0b50e22d810c17bf92adf4d09d5f1484ca80064c3b693cfd7d9bb1cd9f5b2184,run_pytest,"{defaults: {run: {shell: bash}}, name: 'pytest ${{ matrix.os }} | ${{ matrix.python-version
     }}', runs-on: '${{ matrix.os }}', steps: [{uses: actions/checkout@v6}, {name: Install
         poetry, run: 'pipx install ""poetry==${{ env.POETRY_VERSION }}""'}, {id: setup_python,
@@ -1114,7 +1114,7 @@ f82159009ea8e8991eabd0d2291687617da54856af43d81f6947ad6b912cbb4e,build,"{env: {P
         files: tests/coverage.xml, token: '${{ secrets.CODECOV_TOKEN }}'}}], strategy: {
     fail-fast: false, matrix: {os: [ubuntu-latest, windows-latest], python-version: [
         '3.13']}}}
-","['lint', 'test']",test,HumanSignal__Adala,[test],Runs pytest test suite with coverage reporting and uploads results to Codecov.
+","['lint', 'test']",test,HumanSignal__Adala,[test],Runs pytest test suite with coverage reporting and uploads results to Codecov.,test,1.0,"[('[test]', '[STOP]\n\nThe classification is correct. This job is clearly a test job that:\n1. Sets up Python and installs dependencies via poetry\n2. Runs pytest with coverage reporting\n3. Uploads coverage results to Codecov\n\nAll steps are focused on testing functionality, with no build artifacts, deployments, linting, or security scanning involved.')]"
 0b50e22d810c17bf92adf4d09d5f1484ca80064c3b693cfd7d9bb1cd9f5b2184,dependabot-auto-merge,"{if: 'always() &&
 
     needs.run_pytest.result == ''success'' &&
@@ -1130,7 +1130,7 @@ f82159009ea8e8991eabd0d2291687617da54856af43d81f6947ad6b912cbb4e,build,"{env: {P
   steps: [{env: {GITHUB_TOKEN: '${{ secrets.GIT_PAT }}', PR_URL: '${{ github.event.pull_request.html_url
           }}'}, name: Enable auto-merge for Dependabot PRs, run: 'gh pr merge --admin
         --squash ""${PR_URL}""'}]}
-","['lint', 'test']",lint_security,HumanSignal__Adala,[no_ops],Automatically merges dependabot PRs without functional code changes or deployments.
+","['lint', 'test']",lint_security,HumanSignal__Adala,[no_ops],Automatically merges dependabot PRs without functional code changes or deployments.,no_ops,1.0,"[('[no_ops]', '[STOP]')]"
 35d4c30cb5189e2f93dd2b5661e07a84cb7a6f3c0160518a58cf4abc951f020e,delete-cache,"{runs-on: ubuntu-latest, steps: [{env: {GH_TOKEN: '${{ secrets.GITHUB_TOKEN }}'},
       name: Delete all caches, run: ""while true; do\n  CACHE_IDS=$(gh cache list --repo\
         \ \""${{ github.repository }}\"" --limit 100 --json id --jq '.[].id' | tr '\\\
@@ -1141,7 +1141,7 @@ f82159009ea8e8991eabd0d2291687617da54856af43d81f6947ad6b912cbb4e,build,"{env: {P
         \ cache list --repo \""${{ github.repository }}\"" --limit 1 --json id | jq\
         \ length)\nif [ \""$REMAINING_CACHES\"" -ne 0 ]; then\n  echo \""Warning: $REMAINING_CACHES\
         \ caches remain\""\nfi""}], timeout-minutes: 10}
-",['unknown'],lint_security,HumanSignal__Adala,[no_ops],"Deletes GitHub Actions caches with no functional impact on build, test, or deployment processes."
+",['unknown'],lint_security,HumanSignal__Adala,[no_ops],"Deletes GitHub Actions caches with no functional impact on build, test, or deployment processes.",no_ops,1.0,"[('[no_ops]', ""[STOP]\n\nThe classification is correct. This job deletes GitHub Actions caches and verifies the deletion—operations with no functional impact on the actual build, test, or deployment pipeline. It's purely maintenance/cleanup work."")]"
 4cb1eced2064c47ef84a9b4a785c00d26bc730cc49345659a7fd54c1b731fe5a,slashCommandDispatch,"{if: 'startsWith(github.event.comment.body, ''/'')', runs-on: ubuntu-latest, steps: [
     {uses: hmarr/debug-action@v3.0.0}, {name: React to comment, uses: peter-evans/create-or-update-comment@v5,
       with: {comment-id: '${{ github.event.comment.id }}', reactions: eyes, token: '${{
@@ -1167,7 +1167,7 @@ f82159009ea8e8991eabd0d2291687617da54856af43d81f6947ad6b912cbb4e,build,"{env: {P
 
           ', comment-id: '${{ github.event.comment.id }}', reactions: confused, token: '${{
           secrets.GIT_PAT }}'}}], timeout-minutes: 1}
-",['unknown'],no_ops,HumanSignal__Adala,[no_ops],"Processes slash commands in comments; no build, test, deploy, or security operations performed."
+",['unknown'],no_ops,HumanSignal__Adala,[no_ops],"Processes slash commands in comments; no build, test, deploy, or security operations performed.",no_ops,1.0,"[('[no_ops]', '[STOP]')]"
 59a3885897181e0e847474c600d3599460d7ad5c540d337fcfd1eb9513bfbe51,version,"{name: Poetry Lock Change Size, runs-on: ubuntu-latest, steps: [{uses: hmarr/debug-action@v3.0.0},
     {env: {BASE_REF: '${{ github.event.merge_group.base_sha || github.event.pull_request.base.sha
           || github.event.before }}', HEAD_REF: '${{ github.event.merge_group.head_sha
@@ -1184,7 +1184,7 @@ f82159009ea8e8991eabd0d2291687617da54856af43d81f6947ad6b912cbb4e,build,"{env: {P
           \    if (poetry_lock.changes > 50) {\n      core.setFailed(`${poetry_lock.filename}\
           \ has too many changes: ${poetry_lock.changes}`);\n    }\n    core.endGroup();\n\
           \  }\n}\n""}}]}
-",['unknown'],lint_security,HumanSignal__Adala,[lint_security],Validates poetry.lock file changes to enforce dependency management policies and prevent excessive modifications.
+",['unknown'],lint_security,HumanSignal__Adala,[lint_security],Validates poetry.lock file changes to enforce dependency management policies and prevent excessive modifications.,lint_security,1.0,"[('[lint_security]', 'ISSUE: The classification as `lint_security` is incorrect. This job performs a policy check on dependency lock file changes, which is a validation/gating mechanism rather than a security or linting operation.\n\nSUGGESTION: The correct classification should be `lint_security` is acceptable only if interpreted broadly as ""policy checks,"" but more precisely this is a **path/policy check** that validates `poetry.lock` change size. However, since the job doesn\'t perform linting, vulnerability scanning, or security analysis—it only validates that lock file changes don\'t exceed a threshold—it could also be argued as `no_ops` if the check is purely informational. Given the categories provided, `lint_security` is the closest fit if ""policy checks"" are included in that category, making the classification marginally acceptable. If stricter interpretation is required, this should be its own category or `no_ops` since it has no functional impact on the build/test/deploy pipeline.\n\nActually, re-reading the categories: ""path/policy checks"" are explicitly listed under `lint_security`. The job validates policy (lock file change size limits). The classification is **correct**.\n\n[STOP]')]"
 5a26e53b0531df74988c58b897440d0355d8ec13c9f3d17e3c8def93e448d971,details,"{name: Details, outputs: {membership: '${{ steps.membership.outputs.membership }}'},
   runs-on: ubuntu-latest, steps: [{env: {ACTOR: '${{ github.actor }}'}, id: membership,
       name: Check user's membership, uses: actions/github-script@v8, with: {github-token: '${{
@@ -1193,15 +1193,15 @@ f82159009ea8e8991eabd0d2291687617da54856af43d81f6947ad6b912cbb4e,build,"{env: {P
           \ owner,\n  username: actor,\n})\n  .then(response => core.setOutput(\""\
           membership\"", true))\n  .catch(reason => core.setOutput(\""membership\"",\
           \ false));\n""}}]}
-",['security'],no_ops,HumanSignal__Adala,[no_ops],"Checks user membership status without performing build, test, deploy, or security operations."
+",['security'],no_ops,HumanSignal__Adala,[no_ops],"Checks user membership status without performing build, test, deploy, or security operations.",no_ops,1.0,"[('[no_ops]', '[STOP]')]"
 5a26e53b0531df74988c58b897440d0355d8ec13c9f3d17e3c8def93e448d971,gitleaks,"{if: github.event_name == 'pull_request', name: Linter, uses: ./.github/workflows/gitleaks.yml,
   with: {base_sha: '${{ github.event.pull_request.base.sha || github.event.before
       }}', head_sha: '${{ github.sha }}'}}
-",['security'],lint_security,HumanSignal__Adala,[lint_security],Runs gitleaks to scan for secrets and security vulnerabilities in pull requests.
+",['security'],lint_security,HumanSignal__Adala,[lint_security],Runs gitleaks to scan for secrets and security vulnerabilities in pull requests.,lint_security,1.0,"[('[lint_security]', '[STOP]\n\nThe classification is correct. This job calls the gitleaks workflow, which is a secret scanning tool used for detecting credentials and sensitive information in code. This clearly falls under the `lint_security` category as it performs security scanning.')]"
 5a26e53b0531df74988c58b897440d0355d8ec13c9f3d17e3c8def93e448d971,build,"{name: Build, permissions: {checks: write, contents: read}, secrets: inherit, uses: ./.github/workflows/docker-build.yml,
   with: {branch_name: '${{ github.event.pull_request.head.ref || github.ref_name }}',
     sha: '${{ github.event.pull_request.head.sha || github.event.after }}'}}
-",['security'],build,HumanSignal__Adala,[build],Calls reusable workflow for Docker image building with branch and commit SHA parameters.
+",['security'],build,HumanSignal__Adala,[build],Calls reusable workflow for Docker image building with branch and commit SHA parameters.,build,1.0,"[('[build]', '[STOP]\n\nThe classification is correct. This is a reusable workflow call that invokes `docker-build.yml`, which based on the name and context is responsible for building Docker images. The `build` category explicitly includes ""building Docker images,"" and the parameters passed (branch_name, sha) are typical for a build workflow. No deploy, test, lint, or other operations are evident in this job definition.')]"
 611b8da82774685f4d625fd6842ec59bc28a3f35dbfeff4db8d27b11484709c8,ReleaseNotification,"{name: PyPI, runs-on: ubuntu-latest, steps: [{uses: hmarr/debug-action@v3.0.0}, {
       name: Checkout, uses: actions/checkout@v6, with: {ref: '${{ inputs.ref }}'}},
     {env: {PROVIDED_VERSION: '${{ inputs.version }}'}, name: Manage version, run: 'set
@@ -1232,15 +1232,15 @@ f82159009ea8e8991eabd0d2291687617da54856af43d81f6947ad6b912cbb4e,build,"{env: {P
           \      data: await fs.readFileSync(`./dist/${file}`)\n   });\n}\n""}}, {
       if: always(), name: Upload to artifact, uses: actions/upload-artifact@v7, with: {
         name: Dist, path: dist/}}]}
-",['build'],deploy_release,HumanSignal__Adala,[build|deploy_release],Builds Python package with poetry (build) and publishes to PyPI/attaches to GitHub Release (deploy_release).
+",['build'],deploy_release,HumanSignal__Adala,[build|deploy_release],Builds Python package with poetry (build) and publishes to PyPI/attaches to GitHub Release (deploy_release).,build|deploy_release,1.0,"[('[build|deploy_release]', 'ISSUE: The classification is incomplete. The job includes a step that performs vulnerability/dependency management (""Manage version"") but this aspect is not captured. More critically, the ""Upload to PYPI"" step conditionally pushes artifacts to PyPI, which is a release deployment action, but the classification misses the conditional nature and doesn\'t clearly distinguish when this is actually a deploy_release operation.\n\nSUGGESTION: The classification should be [build|deploy_release] is acceptable as-is. The job:\n1. **build**: Installs dependencies (poetry install), packages code (poetry build)\n2. **deploy_release**: Conditionally uploads to PyPI (poetry publish) and attaches artifacts to GitHub Release\n\nHowever, note that deploy_release only applies when `inputs.upload_to_pypi` or `inputs.release-id` are true. If the classification is meant to represent all possible execution paths, [build|deploy_release] is correct. If it should only reflect guaranteed operations, it should be [build].\n\nGiven the presence of conditional deploy steps, [build|deploy_release] is the most accurate classification.\n\n[STOP]')]"
 6a7cf053cc2cf3a27577b06c72606e5513bc6a2c3e34b9c5cd5a5146bb583568,cancel,"{runs-on: ubuntu-latest, steps: [{uses: hmarr/debug-action@v3.0.0}, {run: 'echo CI/CD
         Pipeline-${{ github.event.pull_request.number || github.event.pull_request.head.ref
         || github.ref_name }}'}]}
-",['unknown'],no_ops,HumanSignal__Adala,[no_ops],"Debug action and echo statement with no functional impact on build, test, or deployment."
+",['unknown'],no_ops,HumanSignal__Adala,[no_ops],"Debug action and echo statement with no functional impact on build, test, or deployment.",no_ops,1.0,"[('[no_ops]', '[STOP]')]"
 70758d51fce149de43bdf6ddf78c7159008afcb5eb77b3135526ef581924eb7b,build-pypi,"{name: Build, permissions: {contents: write}, secrets: inherit, uses: ./.github/workflows/build_pypi.yml,
   with: {ref: '${{ github.ref_name }}', release-id: '${{ github.event.release.id }}',
     upload_to_pypi: true, version: '${{ github.ref_name }}'}}
-",['unknown'],build|deploy_release,HumanSignal__Adala,[build|deploy_release],Builds PyPI package and uploads to PyPI (upload_to_pypi
+",['unknown'],build|deploy_release,HumanSignal__Adala,[build|deploy_release],Builds PyPI package and uploads to PyPI (upload_to_pypi,build | deploy_release,2.0,"[('[build|deploy_release]', ""ISSUE: The classification includes `build` but the YAML shows this is a workflow call (uses: ./.github/workflows/build_pypi.yml) with `upload_to_pypi: true`, which indicates the primary purpose is uploading to PyPI, not compiling/building code in this job itself.\n\nSUGGESTION: The classification should be `[deploy_release]` only. The job is a release deployment step that uploads a Python package to PyPI. While the called workflow may contain build steps, this job's functional role is deployment. The `upload_to_pypi: true` parameter and `release-id` context confirm this is part of a release workflow, not a build job.""), ('[deploy_release]\nReason: Workflow call with `upload_to_pypi: true` and `release-id` indicates PyPI package deployment, not local compilation.', 'ISSUE: The classification is incomplete. The `upload_to_pypi: true` parameter indicates a deploy_release action, but this is a reusable workflow call that likely performs multiple stages.\n\nSUGGESTION: The classification should be `[build, deploy_release]`. The workflow is named ""Build"" and calls `build_pypi.yml`, which typically involves both compiling/packaging code (build) and uploading to PyPI (deploy_release). The presence of `upload_to_pypi: true` confirms the deploy aspect, but the build step is implicit in the workflow name and PyPI packaging process.')]"
 87a6f34104e1b3a90675c7bfe289836f7497296afc833db31ca75fa9a476db45,sync,"{if: 'startsWith(github.head_ref, ''fb-'') || startsWith(github.head_ref, ''revert-'')
     || startsWith(github.head_ref, ''cursor'')', name: Sync, runs-on: ubuntu-latest,
   steps: [{uses: hmarr/debug-action@v3.0.0}, {id: check-membership, name: Check user's
@@ -1261,7 +1261,7 @@ f82159009ea8e8991eabd0d2291687617da54856af43d81f6947ad6b912cbb4e,build,"{env: {P
           secrets.GIT_PAT }}'}}, {name: Dispatch label-studio-enterprise Follow Merge,
       uses: ./.github/actions-hub/actions/follow-merge-dispatch, with: {downstream_repository: label-studio-enterprise,
         github_token: '${{ secrets.GIT_PAT }}'}}]}
-",['unknown'],no_ops,HumanSignal__Adala,[no_ops],"Checks user membership and dispatches follow-merge event; no functional code changes, builds, tests, or deployments."
+",['unknown'],no_ops,HumanSignal__Adala,[no_ops],"Checks user membership and dispatches follow-merge event; no functional code changes, builds, tests, or deployments.",no_ops,1.0,"[('[no_ops]', '[STOP]')]"
 8d3282eaf953206fb4221316b02334fea722235b84ec38d6af6a4ebe725e34ca,calculate_version,"{name: Calculate version, outputs: {build_version: '${{ steps.version.outputs.build_version
       }}', image_version: '${{ steps.version.outputs.image_version }}', pretty_branch_name: '${{
       steps.version.outputs.pretty_branch_name }}', sha: '${{ steps.version.outputs.sha
@@ -1282,7 +1282,7 @@ f82159009ea8e8991eabd0d2291687617da54856af43d81f6947ad6b912cbb4e,build,"{env: {P
         \ | awk '{print length}')\""\nversion=\""${current_time}$(echo $branch | cut\
         \ -c1-$((50 - short_sha_length - current_time_length)))-${short_sha}\""\necho\
         \ \""build_version=$version\"" >> $GITHUB_OUTPUT\n""}]}
-",['build'],deploy_release,HumanSignal__Adala,[no_ops],"Calculates and outputs version strings; no functional build, test, or deployment impact."
+",['build'],deploy_release,HumanSignal__Adala,[no_ops],"Calculates and outputs version strings; no functional build, test, or deployment impact.",build,2.0,"[('[no_ops]', 'ISSUE: The classification as [no_ops] is incorrect. This job performs functional operations that have downstream impact.\n\nSUGGESTION: This job should be classified as [build]. The job calculates and outputs version information (build_version, image_version, sha, pretty_branch_name) that are explicitly exported via `$GITHUB_OUTPUT` and consumed by other jobs in the workflow. Version calculation is a build-time operation that directly supports subsequent build and deployment steps. Jobs that compute artifacts or metadata used by dependent jobs are not ""no_ops"" — they have functional impact on the CI/CD pipeline.'), ('[build]\nReason: Calculates and exports version metadata (build_version, image_version, sha) used by downstream jobs in CI/CD pipeline.', '[STOP]')]"
 8d3282eaf953206fb4221316b02334fea722235b84ec38d6af6a4ebe725e34ca,docker_build,"{name: 'Docker image (${{ matrix.platform }})', needs: calculate_version, runs-on: '${{
     matrix.runner }}', steps: [{uses: hmarr/debug-action@v3.0.0}, {name: Prepare,
       run: 'platform=${{ matrix.platform }}
@@ -1313,7 +1313,7 @@ f82159009ea8e8991eabd0d2291687617da54856af43d81f6947ad6b912cbb4e,build,"{env: {P
         retention-days: 1}}], strategy: {fail-fast: false, matrix: {include: [{platform: linux/amd64,
           runner: ubuntu-latest}, {platform: linux/arm64, runner: ubuntu-24.04-arm}]}},
   timeout-minutes: 15}
-",['build'],build|deploy_release,HumanSignal__Adala,[build|deploy_release],Builds Docker images with multi-platform support and pushes to registry (push=true).
+",['build'],build|deploy_release,HumanSignal__Adala,[build|deploy_release],Builds Docker images with multi-platform support and pushes to registry (push=true).,deploy_release,2.0,"[('[build|deploy_release]', 'ISSUE: The classification includes `build` but this is incorrect. The job does not compile code or update dependencies—it only builds and pushes a pre-existing Dockerfile.\n\nISSUE: The `deploy_release` category is assigned, but the job does not perform release operations (GitHub Releases, signing with cosign, or version tagging). It pushes Docker images to a registry, which is a deployment action, but `deploy_release` specifically requires ""Pushing images (push: true), signing (cosign), GitHub Releases""—this job only does the push without signing or release management.\n\nSUGGESTION: The correct classification should be `[deploy_release]` alone. The job\'s primary function is pushing Docker images (`push=true` in the build-push-action), which falls under the deploy_release category as defined. Remove `build` since no compilation or dependency updates occur.'), ('[deploy_release]\nReason: Job pushes Docker images with push=true to registry. No code compilation, dependency updates, or release management (signing/GitHub Releases) occur.', '[STOP]\n\nThe classification is correct. The job builds and pushes Docker images (`push=true` in the build-push-action), which is the defining characteristic of the `deploy_release` category. The reason accurately notes that while this is image pushing (deploy_release), there is no signing, GitHub Releases, or other release management activities. The job is properly classified as `deploy_release` only.')]"
 8d3282eaf953206fb4221316b02334fea722235b84ec38d6af6a4ebe725e34ca,merge_docker_manifest,"{needs: [docker_build, calculate_version], runs-on: ubuntu-latest, steps: [{name: Download
         digests, uses: actions/download-artifact@v8, with: {merge-multiple: true,
         path: '${{ runner.temp }}/digests', pattern: digests-*}}, {name: Login to
@@ -1332,7 +1332,7 @@ f82159009ea8e8991eabd0d2291687617da54856af43d81f6947ad6b912cbb4e,build,"{env: {P
         inspect ${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.version }}
 
         '}]}
-",['build'],deploy_release,HumanSignal__Adala,[deploy_release],Creates Docker manifest list and pushes multi-platform images to registry with versioned tags.
+",['build'],deploy_release,HumanSignal__Adala,[deploy_release],Creates Docker manifest list and pushes multi-platform images to registry with versioned tags.,deploy_release,1.0,"[('[deploy_release]', 'ISSUE: The classification is incomplete. The job performs manifest creation and pushing to Docker Hub, which clearly falls under `deploy_release`, but it also depends on `docker_build` and uses `calculate_version` outputs, indicating this is part of a multi-job deployment pipeline. However, the primary issue is that the job **pushes Docker images** (via `docker buildx imagetools create` with manifest list operations), which is a core `deploy_release` activity.\n\nThe classification `[deploy_release]` is technically correct for the primary function, but the reasoning should explicitly note the image push operation as the justification.\n\n[STOP]')]"
 8d3282eaf953206fb4221316b02334fea722235b84ec38d6af6a4ebe725e34ca,create_check,"{if: success(), name: Create Docker image tag Check, needs: [calculate_version, docker_build,
     merge_docker_manifest], runs-on: ubuntu-latest, steps: [{name: Create Docker image
         tag Check, uses: actions/github-script@v8, with: {script: ""const { repo, owner\
@@ -1346,7 +1346,7 @@ f82159009ea8e8991eabd0d2291687617da54856af43d81f6947ad6b912cbb4e,build,"{env: {P
           \ }}',\n    summary: JSON.stringify(details)\n  }\n});\nawait github.rest.checks.update({\n\
           \  owner,\n  repo,\n  check_run_id: check.id,\n  status: 'completed',\n\
           \  conclusion: 'success'\n});\n""}}]}
-",['build'],deploy_release,HumanSignal__Adala,[no_ops],Creates a GitHub check run with build metadata; no functional impact on deployment or testing.
+",['build'],deploy_release,HumanSignal__Adala,[no_ops],Creates a GitHub check run with build metadata; no functional impact on deployment or testing.,no_ops,1.0,"[('[no_ops]', ""[STOP]\n\nThe classification is correct. This job creates and updates a GitHub check run with build metadata (branch, version, SHA) but performs no functional operations—it doesn't build, test, deploy, or scan anything. It's purely informational/reporting, which fits the `no_ops` category."")]"
 8f0ac75d1d3caf2cc02c11eef2bc6b6db3cad6e0c18a9e0febe638e8cee4f90a,convert_stale_prs,"{runs-on: ubuntu-latest, steps: [{uses: hmarr/debug-action@v3.0.0}, {id: get_timestamp,
       name: Get timestamp, run: 'echo ""ts=$(date -d ''10 hours ago'' +""%Y-%m-%dT%H:%M:%S"")""
         >> $GITHUB_OUTPUT', shell: bash}, {env: {GITHUB_TOKEN: '${{ secrets.GIT_PAT
@@ -1372,7 +1372,7 @@ f82159009ea8e8991eabd0d2291687617da54856af43d81f6947ad6b912cbb4e,build,"{env: {P
         steps.mutation_step.outputs.exec == ''true'' }}', name: Post to a Slack channel,
       uses: slackapi/slack-github-action@v2.1, with: {channel-id: C02LMULF4NA, payload: '{
           ""type"": ""mrkdwn"", ""text"": ""${{ env.SLACK_MESSAGE }}"" }'}}], timeout-minutes: 2}
-",['unknown'],no_ops,HumanSignal__Adala,[no_ops],Automated maintenance task that converts stale PRs to draft status and posts notifications with no functional code impact.
+",['unknown'],no_ops,HumanSignal__Adala,[no_ops],Automated maintenance task that converts stale PRs to draft status and posts notifications with no functional code impact.,no_ops,2.0,"[('[no_ops]', ""ISSUE: The classification as [no_ops] is incorrect. This job performs functional operations that modify repository state.\n\nREASONING ERROR: The job executes a GraphQL mutation (`convertPullRequestToDraft`) that converts open pull requests to draft status. This is a state-changing operation on the repository, not a no-op. Additionally, it queries for stale PRs and posts notifications to Slack, which are observable side effects.\n\nSUGGESTION: The correct classification should be [lint_security] or a custom category for maintenance/automation tasks. This job performs automated repository maintenance (converting stale PRs to draft status), which is a policy enforcement action similar to automated cleanup operations. If forced to choose from the given categories, [lint_security] is most appropriate as it involves policy checks (identifying stale PRs) and enforcement, though this is admittedly not a perfect fit. Alternatively, if the system allows, this could be classified as a repository maintenance/automation job that doesn't fit cleanly into the provided categories.""), ('[lint_security]\nReason: Enforces repository policy by identifying and converting stale PRs to draft status; policy-driven automation.', ""ISSUE: The classification as `lint_security` is incorrect. This job does not perform linting, vulnerability scanning, path/policy checks, or dependency upgrades—the defining characteristics of `lint_security`.\n\nSUGGESTION: This job should be classified as `no_ops`. It performs repository maintenance (converting stale PRs to draft status) and sends notifications, but has no functional impact on code compilation, testing, deployment, or security scanning. It's a housekeeping automation task that modifies PR metadata without affecting the actual codebase or CI/CD pipeline outputs."")]"
 92e7af04fdd41e4a35d3aca1b272e246586d65609a5208f2ca47de4905ef6962,merge,"{if: '${{ github.event.client_payload.slash_command.args.unnamed.arg1 == ''merge''
     }}', runs-on: ubuntu-latest, steps: [{uses: hmarr/debug-action@v3.0.0}, {name: Add
         Workflow link to command comment, uses: peter-evans/create-or-update-comment@v5,
@@ -1400,7 +1400,7 @@ f82159009ea8e8991eabd0d2291687617da54856af43d81f6947ad6b912cbb4e,build,"{env: {P
           }}', reactions: '${{ steps.merge.outputs.reaction || ''-1'' }}', repository: '${{
           github.event.client_payload.github.payload.repository.full_name }}', token: '${{
           secrets.GIT_PAT }}'}}], timeout-minutes: 10}
-",['unknown'],lint_security,HumanSignal__Adala,[no_ops],"Job performs git merge and comment updates with no build, test, deploy, or security impact."
+",['unknown'],lint_security,HumanSignal__Adala,[no_ops],"Job performs git merge and comment updates with no build, test, deploy, or security impact.",no_ops,2.0,"[('[no_ops]', 'ISSUE: The classification as [no_ops] is incorrect. This job performs functional operations that have direct impact on the repository state.\n\nSUGGESTION: The correct classification should be [build] or a combination including repository modification operations. \n\nReasoning: The job executes git merge and git push operations (steps: ""Git Merge"" and ""Git Push""), which modify the repository\'s commit history and branch state. These are not no-ops—they have persistent effects on the codebase. While this job doesn\'t compile code or run tests, it performs dependency file management (pyproject.toml, poetry.lock) during the merge, which aligns with ""updating dependencies"" under the build category. Alternatively, if no build category fits, this could be classified as a deployment-adjacent operation, but it is definitively not a no-ops job.'), ('[build]\nReason: Git merge and push operations modify repository state; dependency file management (pyproject.toml, poetry.lock) aligns with updating dependencies.', 'ISSUE: The classification conflates repository state management with dependency updates. The job performs git merge and push operations on dependency files, but does NOT execute any build, compilation, or dependency installation steps (no pip/poetry install commands).\n\nSUGGESTION: The correct classification should be [no_ops]. This job is a workflow automation utility that merges branches and pushes changes via GitHub comments. While it touches dependency files (pyproject.toml, poetry.lock), it only performs git operations without actually building, compiling, or updating dependencies. The ""build"" category requires functional compilation/dependency management work, not just file manipulation.')]"
 92e7af04fdd41e4a35d3aca1b272e246586d65609a5208f2ca47de4905ef6962,help,"{if: '${{ github.event.client_payload.slash_command.args.unnamed.arg1 == ''help''
     || !contains(fromJson(''[""merge""]''), github.event.client_payload.slash_command.args.unnamed.arg1)
     }}', runs-on: ubuntu-latest, steps: [{name: Update comment, uses: peter-evans/create-or-update-comment@v5,
@@ -1413,7 +1413,7 @@ f82159009ea8e8991eabd0d2291687617da54856af43d81f6947ad6b912cbb4e,build,"{env: {P
           ', comment-id: '${{ github.event.client_payload.github.payload.comment.id
           }}', reactions: hooray, repository: '${{ github.event.client_payload.github.payload.repository.full_name
           }}', token: '${{ secrets.GIT_PAT }}'}}], timeout-minutes: 1}
-",['unknown'],no_ops,HumanSignal__Adala,[no_ops],Updates a GitHub comment with help text; no functional impact on code or deployment.
+",['unknown'],no_ops,HumanSignal__Adala,[no_ops],Updates a GitHub comment with help text; no functional impact on code or deployment.,no_ops,1.0,"[('[no_ops]', '[STOP]')]"
 ae0b5018edd71818d4700763a13bdb1b0ffba52ab20e766570f86665fd9b0cc2,create,"{if: '${{ github.event.client_payload.slash_command.args.unnamed.arg1 == ''create''
     }}', runs-on: ubuntu-latest, steps: [{uses: hmarr/debug-action@v3.0.0}, {name: Add
         Workflow link to command comment, uses: peter-evans/create-or-update-comment@v5,
@@ -1455,7 +1455,7 @@ ae0b5018edd71818d4700763a13bdb1b0ffba52ab20e766570f86665fd9b0cc2,create,"{if: '$
           ', comment-id: '${{ github.event.client_payload.github.payload.comment.id
           }}', reactions: '-1', repository: '${{ github.event.client_payload.github.payload.repository.full_name
           }}', token: '${{ secrets.GIT_PAT }}'}}], timeout-minutes: 3}
-",['unknown'],no_ops,HumanSignal__Adala,[no_ops],"Job creates Jira issues from GitHub comments with no deployment, testing, or build impact."
+",['unknown'],no_ops,HumanSignal__Adala,[no_ops],"Job creates Jira issues from GitHub comments with no deployment, testing, or build impact.",no_ops,2.0,"[('[no_ops]', ""ISSUE: The classification as [no_ops] is incorrect. This job has clear functional impact: it creates Jira issues based on GitHub slash commands, checks user membership, and updates GitHub comments with results.\n\nSUGGESTION: The correct classification should be [lint_security] or a combination including it. The job performs:\n1. **lint_security**: User membership verification (policy/access check)\n2. **no_ops** does not apply because the job executes meaningful operations (Jira issue creation, comment updates) that affect external systems and have functional consequences.\n\nThe job should minimally include [lint_security] for the membership check step, and arguably includes operational workflow automation that doesn't fit cleanly into the provided categories, but definitely is not [no_ops].""), ('[lint_security]\nReason: User membership verification (policy/access check) is the primary functional gate before Jira operations execute.', ""ISSUE: The classification is incomplete and misses the primary functional purpose of this job.\n\nSUGGESTION: The correct classification should be [no_ops]. While the job does include a membership check (lint_security-adjacent), the actual primary operations are:\n1. Creating a Jira issue via a custom action\n2. Updating GitHub comments with workflow links and results\n\nThese are administrative/workflow orchestration tasks triggered by a slash command that have no impact on the codebase, artifacts, or deployments. The membership check is a gating mechanism, not the primary function. The job is essentially a command handler that creates external tickets and updates comments—neither of which fits build, test, deploy_release, eval, or lint_security categories. It's operational overhead without functional CI/CD impact."")]"
 ae0b5018edd71818d4700763a13bdb1b0ffba52ab20e766570f86665fd9b0cc2,help,"{if: 'github.event.client_payload.slash_command.args.unnamed.arg1 == ''help'' || !contains(fromJson(''[""create""]''),
     github.event.client_payload.slash_command.args.unnamed.arg1)', runs-on: ubuntu-latest,
   steps: [{name: Update comment, uses: peter-evans/create-or-update-comment@v5, with: {
@@ -1469,7 +1469,7 @@ ae0b5018edd71818d4700763a13bdb1b0ffba52ab20e766570f86665fd9b0cc2,help,"{if: 'git
           ', comment-id: '${{ github.event.client_payload.github.payload.comment.id
           }}', reaction-type: hooray, repository: '${{ github.event.client_payload.github.payload.repository.full_name
           }}', token: '${{ secrets.GIT_PAT }}'}}], timeout-minutes: 1}
-",['unknown'],no_ops,HumanSignal__Adala,[no_ops],Updates GitHub comment with help text; no functional impact on code or deployment.
+",['unknown'],no_ops,HumanSignal__Adala,[no_ops],Updates GitHub comment with help text; no functional impact on code or deployment.,no_ops,1.0,"[('[no_ops]', '[STOP]')]"
 b945549e43caf2dcf145030c2ac6eeb17fb725148f92a64978c8c44aac814e51,help,"{runs-on: ubuntu-latest, steps: [{if: '${{ github.event.client_payload.slash_command.args.all
         == '''' }}', name: Update comment if empty, uses: peter-evans/create-or-update-comment@v5,
       with: {body: '> Command | Description
@@ -1485,7 +1485,7 @@ b945549e43caf2dcf145030c2ac6eeb17fb725148f92a64978c8c44aac814e51,help,"{runs-on:
           ', comment-id: '${{ github.event.client_payload.github.payload.comment.id
           }}', reaction-type: hooray, repository: '${{ github.event.client_payload.github.payload.repository.full_name
           }}', token: '${{ secrets.GIT_PAT }}'}}], timeout-minutes: 1}
-",['unknown'],no_ops,HumanSignal__Adala,[no_ops],"Updates GitHub comment with help text; no functional impact on build, test, or deployment."
+",['unknown'],no_ops,HumanSignal__Adala,[no_ops],"Updates GitHub comment with help text; no functional impact on build, test, or deployment.",no_ops,1.0,"[('[no_ops]', '[STOP]')]"
 c0254fd064608476f33118f95b730ea1dd49b29ce99ed30deb09756bce256c52,commit-version,"{permissions: {contents: write}, runs-on: ubuntu-latest, steps: [{uses: hmarr/debug-action@v3.0.0},
     {name: Checkout, uses: actions/checkout@v6, with: {fetch-depth: 1, ref: '${{ inputs.branch
           }}', token: '${{ secrets.GIT_PAT }}'}}, {env: {ACTOR_USERNAME: '${{ github.event.sender.login
@@ -1525,14 +1525,14 @@ c0254fd064608476f33118f95b730ea1dd49b29ce99ed30deb09756bce256c52,commit-version,
         echo ""commit=$(git rev-parse HEAD)"" >> $GITHUB_OUTPUT
 
         git push origin HEAD:refs/heads/${{ inputs.branch }}'}]}
-",['unknown'],deploy_release,HumanSignal__Adala,[no_ops],"Job validates input, configures git, and commits version changes with no functional deployment or testing impact."
+",['unknown'],deploy_release,HumanSignal__Adala,[no_ops],"Job validates input, configures git, and commits version changes with no functional deployment or testing impact.",deploy_release,2.0,"[('[no_ops]', 'ISSUE: The classification as [no_ops] is incorrect. This job performs functional CI/CD operations that have real impact.\n\nSUGGESTION: The correct classification should include **build** and **deploy_release**. \n\nReasoning:\n1. The job validates user input (version format validation) - a build-related check\n2. It modifies the version file and commits the change to git\n3. It pushes the commit to a branch (`git push origin HEAD:refs/heads/${{ inputs.branch }}`)\n4. It has `permissions: {contents: write}`, indicating it modifies repository content\n5. The job is clearly part of a release workflow (version bumping, commit, push)\n\nThis is a release preparation job with functional impact on the repository state, not a no-ops job.'), ('[build | deploy_release]\nReason: Validates version format, modifies version file, commits, and pushes to branch with write permissions.', 'ISSUE: The classification includes `build` which is incorrect. The job performs no compilation, dependency updates, or Docker image building.\n\nSUGGESTION: The classification should be `deploy_release` only. The job validates version input, updates a version file, commits the change, and pushes to a branch—all characteristic of release preparation/versioning workflows. The `build` category does not apply here.')]"
 c0d3e2ca8889520924d0c4e64c871dcaa4012ba258d39bf0481595079e698221,analyze,"{name: Analyze, permissions: {actions: read, contents: read, security-events: write},
   runs-on: ubuntu-latest, steps: [{name: Checkout repository, uses: actions/checkout@v6},
     {name: Initialize CodeQL, uses: github/codeql-action/init@v4, with: {languages: '${{
           matrix.language }}'}}, {name: Perform CodeQL Analysis, uses: github/codeql-action/analyze@v4,
       with: {category: '/language:${{matrix.language}}'}}], strategy: {fail-fast: false,
     matrix: {language: [python]}}, timeout-minutes: 45}
-",['security'],lint_security,HumanSignal__Adala,[lint_security],CodeQL static analysis performs vulnerability scanning and security code analysis.
+",['security'],lint_security,HumanSignal__Adala,[lint_security],CodeQL static analysis performs vulnerability scanning and security code analysis.,lint_security,1.0,"[('[lint_security]', '[STOP]')]"
 c7e56b861f3c6667dca0bd9c61da9dcb02209c24cd046c0a3938049b8f01634c,sync,"{name: Sync PR, outputs: {label-studio-sdk: '${{ fromJSON(steps.upstream-prs.outputs.shas).label-studio-sdk
       }}'}, runs-on: ubuntu-latest, steps: [{uses: hmarr/debug-action@v3.0.0}, {if: github.event.client_payload.github.payload.comment.id
         && github.event.client_payload.github.payload.repository.full_name, name: Add
@@ -1626,7 +1626,7 @@ c7e56b861f3c6667dca0bd9c61da9dcb02209c24cd046c0a3938049b8f01634c,sync,"{name: Sy
           }}', reactions: '${{ job.status == ''success'' && ''+1'' || ''-1'' }}',
         repository: '${{ github.event.client_payload.github.payload.repository.full_name
           }}', token: '${{ secrets.GIT_PAT }}'}}]}
-",['unknown'],no_ops,HumanSignal__Adala,[build],"Updates dependencies (poetry lock), commits changes, and prepares pull requests for synchronization."
+",['unknown'],no_ops,HumanSignal__Adala,[build],"Updates dependencies (poetry lock), commits changes, and prepares pull requests for synchronization.",no_ops,2.0,"[('[build]', 'ISSUE: The classification is incomplete and misses critical categories.\n\nSUGGESTION: The correct classification should be [build, deploy_release] because:\n\n1. **build** is correct: The job runs `poetry add` and `poetry lock` to update dependencies (lines with ""Commit submodule"" step).\n\n2. **deploy_release** should be included: The job performs git commits, pushes changes (`git-push` action), creates/manages pull requests (`follow-merge-find-or-create-pull-request`), and enables auto-merge on PRs. These are release/deployment orchestration activities that go beyond simple dependency updates.\n\n3. The job also has operational/notification steps (Slack notifications, PR state management) but these are secondary to the primary build and release functions.\n\nThe classification [build] alone is too narrow and misses the significant PR creation and merge automation that constitutes release management.'), ('[build | deploy_release]\nReason: Updates dependencies via poetry, creates/manages PRs, pushes commits, enables auto-merge for release orchestration.', 'ISSUE: The classification includes `build` but this job performs no compilation, artifact building, or Docker image creation. The poetry operations are dependency synchronization for upstream PRs, not dependency updates for a build process.\n\nISSUE: The classification includes `deploy_release` but this job does not push images, sign artifacts with cosign, or create GitHub Releases. PR management and auto-merge are orchestration activities, not release deployment.\n\nSUGGESTION: The correct classification should be `no_ops`. This is a follow-merge synchronization workflow that manages PR lifecycle (create, label, auto-merge, close) based on upstream PR status. While it commits and pushes changes, these are intermediate synchronization steps with no functional impact on actual builds, tests, or releases. The job is purely orchestration/automation of dependency tracking across repositories.')]"
 d894db1c6f11e4bb53376a0f721de8dc3a54a0ca558cb052063bf48a750f0b3a,draft-release,"{name: Draft Release, outputs: {id: '${{ steps.create-draft-release.outputs.id }}',
     rc-version: '${{ steps.create-draft-release.outputs.rc-version }}'}, permissions: {
     contents: write}, runs-on: ubuntu-latest, steps: [{env: {DEFAULT_BRANCH: '${{
@@ -1684,12 +1684,12 @@ d894db1c6f11e4bb53376a0f721de8dc3a54a0ca558cb052063bf48a750f0b3a,draft-release,"
           \  body: release_notes.body\n});\nconsole.log(`Draft release is updated\
           \ ${updated_release.html_url}`)\n\ncore.setOutput(\""id\"", updated_release.id);\n\
           core.setOutput(\""tag_name\"", release.tag_name);\n""}}]}
-",['unknown'],deploy_release,HumanSignal__Adala,[deploy_release],Creates and updates GitHub draft releases with version tags and release notes.
+",['unknown'],deploy_release,HumanSignal__Adala,[deploy_release],Creates and updates GitHub draft releases with version tags and release notes.,deploy_release,1.0,"[('[deploy_release]', 'ISSUE: The classification is incomplete. While the job does create/update a GitHub Release (which falls under deploy_release), it also performs significant version calculation and validation logic that should be classified as part of the release preparation process.\n\nHowever, more critically, the job creates a DRAFT release, not a published release. Draft releases are not deployed to end users and represent work-in-progress release preparation, not actual deployment.\n\nSUGGESTION: The classification should be [deploy_release] but with the caveat that this is a draft release creation step (release preparation), not a final deployment. If strict categorization is required, this could alternatively be considered part of a release workflow that precedes actual deployment. The current classification is acceptable if draft release creation is considered part of the deploy_release pipeline, but it\'s worth noting this is not a ""push"" or final release action.\n\n[STOP]')]"
 d894db1c6f11e4bb53376a0f721de8dc3a54a0ca558cb052063bf48a750f0b3a,build-pypi,"{name: Build, needs: [draft-release], permissions: {contents: write}, secrets: inherit,
   uses: ./.github/workflows/build_pypi.yml, with: {ref: '${{ github.ref_name }}',
     release-id: '${{ needs.draft-release.outputs.id }}', version: '${{ needs.draft-release.outputs.rc-version
       }}'}}
-",['unknown'],deploy_release,HumanSignal__Adala,[build],Builds PyPI package using reusable workflow with version and release parameters.
+",['unknown'],deploy_release,HumanSignal__Adala,[build],Builds PyPI package using reusable workflow with version and release parameters.,build,1.0,"[('[build]', '[STOP]')]"
 de007375566a5e88fff5cbced8cacaf5143990eefb0750fec05170feddff17c9,draft-new-release,"{name: Cut off release branch, outputs: {next_develop_version: '${{ steps.calculate_branch_name_and_version.outputs.next_develop_version
       }}', release_branch: '${{ steps.calculate_branch_name_and_version.outputs.release_branch
       }}', release_version: '${{ steps.calculate_branch_name_and_version.outputs.release_version
@@ -1724,17 +1724,17 @@ de007375566a5e88fff5cbced8cacaf5143990eefb0750fec05170feddff17c9,draft-new-relea
         }}
 
         ', shell: bash}]}
-",['unknown'],deploy_release,HumanSignal__Adala,[deploy_release],Creates and pushes release branch with version calculations for release management workflow.
+",['unknown'],deploy_release,HumanSignal__Adala,[deploy_release],Creates and pushes release branch with version calculations for release management workflow.,no_ops,2.0,"[('[deploy_release]', 'ISSUE: The classification assigns `deploy_release` but the job performs no release deployment activities.\n\nREASONING ERROR: The job only creates and pushes a release branch (`git checkout -b` and `git push`). It does not push Docker images, sign artifacts with cosign, create GitHub Releases, or perform any actual deployment. The `deploy_release` category explicitly requires ""Pushing images (push: true), signing (cosign), GitHub Releases"" — none of which occur here.\n\nSUGGESTION: This job should be classified as `build` (or potentially `no_ops` if branch creation is considered non-functional). The job calculates version numbers and creates a release branch for future use, which is preparatory work, not a release deployment. If it must be classified, `build` is more appropriate as it\'s part of the release preparation pipeline, though the job itself has minimal functional impact beyond git operations.'), ('[build]\nReason: Calculates version numbers and creates release branch; no image push, signing, or GitHub Release creation.', 'ISSUE: The classification is incomplete. This job performs version calculation and branch management operations that are preparatory steps for release workflows, but the reasoning misses a key aspect of what this job actually does.\n\nSUGGESTION: The classification should be [no_ops] or potentially include context that this is a preparatory/setup job. The job:\n1. Calculates version numbers (outputs only, no compilation/building)\n2. Creates and pushes a release branch to git\n\nThis is neither ""build"" (no compilation, dependency updates, or Docker image creation) nor does it fit the other categories. It\'s a git workflow orchestration step that prepares for downstream release processes. The ""build"" classification is a false positive—version calculation and branch creation are not build activities.')]"
 de007375566a5e88fff5cbced8cacaf5143990eefb0750fec05170feddff17c9,set-version-default-branch,"{name: Set version in default branch, needs: [draft-new-release], permissions: {contents: write},
   secrets: inherit, uses: ./.github/workflows/release-set-version.yml, with: {branch: '${{
       github.event.repository.default_branch }}', version: '${{ needs.draft-new-release.outputs.next_develop_version
       }}'}}
-",['unknown'],deploy_release,HumanSignal__Adala,[deploy_release],"Sets version in default branch as part of release workflow, updating repository contents."
+",['unknown'],deploy_release,HumanSignal__Adala,[deploy_release],"Sets version in default branch as part of release workflow, updating repository contents.",deploy_release,2.0,"[('[deploy_release]', 'ISSUE: The classification assigns `deploy_release` but this job only sets a version in the default branch—it does not push images, sign artifacts, or create GitHub Releases.\n\nSUGGESTION: The correct classification should be `build`. This job updates version information (likely in configuration files or version files) in the repository, which is a build-phase activity that prepares code for subsequent release steps. It is not itself a deployment or release action.'), ('[build]\nReason: Updates version information in repository files during build preparation phase, not a deployment or release action.', 'ISSUE: The classification mischaracterizes the job\'s purpose. This is a reusable workflow call that sets version information in the default branch, which is a release preparation step, not a build step.\n\nSUGGESTION: The correct classification should be [deploy_release]. The job updates version information in the repository (via `contents: write` permission) as part of a release workflow chain (triggered after `draft-new-release`). Version bumping in the default branch is a release management activity, not compilation or dependency updates (which define ""build"").')]"
 de007375566a5e88fff5cbced8cacaf5143990eefb0750fec05170feddff17c9,set-version-release-branch,"{name: Set version in release branch, needs: [draft-new-release], permissions: {contents: write},
   secrets: inherit, uses: ./.github/workflows/release-set-version.yml, with: {branch: '${{
       needs.draft-new-release.outputs.release_branch }}', version: '${{ needs.draft-new-release.outputs.release_version
       }}'}}
-",['unknown'],deploy_release,HumanSignal__Adala,[deploy_release],Sets version in release branch as part of release workflow preparation.
+",['unknown'],deploy_release,HumanSignal__Adala,[deploy_release],Sets version in release branch as part of release workflow preparation.,deploy_release,2.0,"[('[deploy_release]', 'ISSUE: The classification assigns `deploy_release` but this job only sets a version in a release branch—it does not push images, sign artifacts, or create GitHub Releases.\n\nSUGGESTION: The correct classification should be `build`. This job modifies version information in a release branch, which is a preparatory build/configuration step, not an actual deployment or release action. It uses a reusable workflow to update version metadata, which aligns with build-phase activities.'), ('[build]\nReason: Sets version metadata in release branch; preparatory configuration step, not image push/signing/release creation.', ""ISSUE: The classification misses a critical category. This job is explicitly part of a release workflow (it depends on `draft-new-release` and sets version in a release branch), which is a core characteristic of `deploy_release` operations.\n\nSUGGESTION: The correct classification should be `[deploy_release]`. While the job itself doesn't push images or sign artifacts, it is a preparatory step within the release pipeline that modifies the release branch with version metadata—this is part of the release deployment process, not a build step. The `deploy_release` category includes release-related operations beyond just image pushes/signing."")]"
 e287a335fd35493935f762cc9c098454bb0f501f2c80e9f4f7351f4256a8d941,build,"{if: github.event_name == 'pull_request', name: Build, runs-on: ubuntu-latest, steps: [
     {uses: actions/checkout@v6}, {name: Install poetry, run: 'pipx install ""poetry==${{
         env.POETRY_VERSION }}""'}, {id: setup_python, name: Set up Python, uses: actions/setup-python@v6,
@@ -1746,7 +1746,7 @@ e287a335fd35493935f762cc9c098454bb0f501f2c80e9f4f7351f4256a8d941,build,"{if: git
         poetry run mkdocs build
 
         '}]}
-",['unknown'],no_ops,HumanSignal__Adala,[build],Installs Poetry dependencies and builds MkDocs documentation site.
+",['unknown'],no_ops,HumanSignal__Adala,[build],Installs Poetry dependencies and builds MkDocs documentation site.,build,1.0,"[('[build]', '[STOP]')]"
 e287a335fd35493935f762cc9c098454bb0f501f2c80e9f4f7351f4256a8d941,upload,"{if: github.event_name == 'push' && github.ref == 'refs/heads/master', name: Upload,
   permissions: {contents: write}, runs-on: ubuntu-latest, steps: [{uses: actions/checkout@v6},
     {name: Install poetry, run: 'pipx install ""poetry==${{ env.POETRY_VERSION }}""'},
@@ -1759,11 +1759,11 @@ e287a335fd35493935f762cc9c098454bb0f501f2c80e9f4f7351f4256a8d941,upload,"{if: gi
         poetry run mkdocs gh-deploy --force
 
         '}]}
-",['unknown'],no_ops,HumanSignal__Adala,[deploy_release],Deploys documentation to GitHub Pages using mkdocs gh-deploy on master branch push.
+",['unknown'],no_ops,HumanSignal__Adala,[deploy_release],Deploys documentation to GitHub Pages using mkdocs gh-deploy on master branch push.,build | deploy_release,2.0,"[('[deploy_release]', 'ISSUE: The classification as [deploy_release] is incorrect. The job performs documentation deployment (mkdocs gh-deploy), not a release operation. The deploy_release category is specifically for pushing images, signing artifacts, or creating GitHub Releases—none of which occur here.\n\nSUGGESTION: The correct classification should be [build] or a combination including [build]. The job installs dependencies (poetry, Python packages) and builds/deploys documentation. If documentation deployment must be captured separately, it could be considered a specialized deployment, but it does not fit the deploy_release definition which focuses on artifact/image/release operations.'), ('[build]\nReason: Installs dependencies (poetry, Python packages) and builds/deploys documentation via mkdocs, not image/release operations.', 'ISSUE: The classification misses a critical category. While the job does install dependencies (build aspect), the primary action is deploying documentation to GitHub Pages via `mkdocs gh-deploy --force`, which is a deployment operation.\n\nSUGGESTION: The classification should be [build, deploy_release]. The job performs both dependency installation (build) and documentation deployment (deploy_release), as it pushes built artifacts (docs) to a remote location (GitHub Pages) with `--force` flag, which is characteristic of release/deployment operations.')]"
 f32ad2c0c209c27c37c0a7d0f30b802d909df9eef48cbca4dab45f6932df0e2e,sync,"{if: github.event.client_payload.slash_command.args.unnamed.arg1 == 'sync', name: 'Follow
     Merge: Sync Upstream PRs', secrets: inherit, uses: ./.github/workflows/follow-merge-upstream-repo-sync-v2.yml,
   with: {branch_name: '${{ github.event.client_payload.pull_request.head.ref }}'}}
-",['unknown'],no_ops,HumanSignal__Adala,[no_ops],"Conditional workflow trigger for upstream repo sync with no direct build, test, or deployment operations."
+",['unknown'],no_ops,HumanSignal__Adala,[no_ops],"Conditional workflow trigger for upstream repo sync with no direct build, test, or deployment operations.",no_ops,1.0,"[('[no_ops]', '[STOP]')]"
 f32ad2c0c209c27c37c0a7d0f30b802d909df9eef48cbca4dab45f6932df0e2e,help,"{if: '${{ github.event.client_payload.slash_command.args.unnamed.arg1 == ''help''
     || !contains(fromJson(''[""sync""]''), github.event.client_payload.slash_command.args.unnamed.arg1)
     }}', runs-on: ubuntu-latest, steps: [{name: Update comment, uses: peter-evans/create-or-update-comment@v5,
@@ -1776,7 +1776,7 @@ f32ad2c0c209c27c37c0a7d0f30b802d909df9eef48cbca4dab45f6932df0e2e,help,"{if: '${{
           ', comment-id: '${{ github.event.client_payload.github.payload.comment.id
           }}', reactions: hooray, repository: '${{ github.event.client_payload.github.payload.repository.full_name
           }}', token: '${{ secrets.GIT_PAT }}'}}], timeout-minutes: 1}
-",['unknown'],no_ops,HumanSignal__Adala,[no_ops],Job only updates a GitHub comment with help text; no functional CI/CD operations performed.
+",['unknown'],no_ops,HumanSignal__Adala,[no_ops],Job only updates a GitHub comment with help text; no functional CI/CD operations performed.,no_ops,1.0,"[('[no_ops]', '[STOP]')]"
 343e513e9e61e75076abc1819db1cd9b55cf372c78fdd9815e66f3ce7684d1ba,main,"{name: sdist + pure wheel, runs-on: ubuntu-latest, steps: [{uses: actions/checkout@v3},
     {name: Set up latest Python, uses: actions/setup-python@v4, with: {python-version: '*'}},
     {name: 'Install latest pip, build, twine', run: 'python -m pip install --upgrade
@@ -1787,7 +1787,7 @@ f32ad2c0c209c27c37c0a7d0f30b802d909df9eef48cbca4dab45f6932df0e2e,help,"{if: '${{
         '}, {name: Build wheel and source distributions, run: python -m build}, {
       env: {TWINE_PASSWORD: '${{ secrets.PYPI_TOKEN }}'}, name: Upload to PyPI via
         Twine, run: twine upload --verbose -u '__token__' dist/*}]}
-",['release'],build|deploy_release,Kav-K__GPTDiscord,[build|deploy_release],Builds Python distributions (sdist + wheel) and uploads to PyPI using Twine.
+",['release'],build|deploy_release,Kav-K__GPTDiscord,[build|deploy_release],Builds Python distributions (sdist + wheel) and uploads to PyPI using Twine.,build|deploy_release,1.0,"[('[build|deploy_release]', ""[STOP]\n\nThe classification is correct. The job performs:\n1. **build**: `python -m build` compiles source distributions and wheels\n2. **deploy_release**: `twine upload` pushes artifacts to PyPI using credentials\n\nBoth categories accurately apply to this job's functionality."")]"
 648b49a4e7df050a3bb8400f14fdbcca548ccdf4e457d24b909e3cb4655425f3,docker-push-base,"{if: '${{ github.event_name != ''pull_request'' && github.repository == ''Kav-K/GPTDiscord''
     }}', permissions: {contents: read, id-token: write, packages: write}, runs-on: ubuntu-20.04,
   steps: [{name: Checkout repository, uses: actions/checkout@v4}, {name: Install cosign,
@@ -1820,7 +1820,7 @@ f32ad2c0c209c27c37c0a7d0f30b802d909df9eef48cbca4dab45f6932df0e2e,help,"{if: '${{
         the published base Docker image, run: 'echo ""${{ steps.meta.outputs.tags }}""
         | xargs -I {} cosign sign {}@${{ steps.build-and-push-base.outputs.digest
         }}'}]}
-",['build'],build|deploy_release,Kav-K__GPTDiscord,[deploy_release],Builds and pushes Docker images (push
+",['build'],build|deploy_release,Kav-K__GPTDiscord,[deploy_release],Builds and pushes Docker images (push,build | deploy_release,2.0,"[('[deploy_release]', ""ISSUE: The classification is incomplete. The job performs multiple distinct CI/CD operations beyond just deployment/release.\n\nSUGGESTION: The correct classification should be [build, deploy_release]. \n\nReasoning:\n- **build**: The job explicitly builds a Docker image using `docker/build-push-action@v5` with caching and multi-platform support (linux/amd64, linux/arm64).\n- **deploy_release**: The job pushes the built image (`push: true`) to Docker Hub and GitHub Container Registry, and signs the image with cosign, which are release/deployment operations.\n\nThe current classification only captures the deployment aspect but misses the build operation that is a core part of this job's functionality.""), ('[build | deploy_release]\nReason: Job builds Docker image with multi-platform support and pushes to registries with cosign signing.', '[STOP]\n\nThe classification is correct. The job performs both:\n1. **build**: Docker image compilation with multi-platform support (QEMU, buildx)\n2. **deploy_release**: Image push (`push: true`) to Docker Hub and GHCR, plus cosign signing\n\nBoth categories accurately apply to this workflow.')]"
 648b49a4e7df050a3bb8400f14fdbcca548ccdf4e457d24b909e3cb4655425f3,docker-push-full,"{if: '${{ github.event_name != ''pull_request'' && github.repository == ''Kav-K/GPTDiscord''
     }}', permissions: {contents: read, id-token: write, packages: write}, runs-on: ubuntu-20.04,
   steps: [{name: Checkout repository, uses: actions/checkout@v4}, {name: Install cosign,
@@ -1853,7 +1853,7 @@ f32ad2c0c209c27c37c0a7d0f30b802d909df9eef48cbca4dab45f6932df0e2e,help,"{if: '${{
       name: Sign the published full Docker image, run: 'echo ""${{ steps.meta.outputs.tags
         }}"" | xargs -I {} cosign sign {}@${{ steps.build-and-push-full.outputs.digest
         }}'}]}
-",['build'],build|deploy_release,Kav-K__GPTDiscord,[deploy_release],Builds and pushes Docker images (push
+",['build'],build|deploy_release,Kav-K__GPTDiscord,[deploy_release],Builds and pushes Docker images (push,deploy_release,1.0,"[('[deploy_release]', '[STOP]')]"
 648b49a4e7df050a3bb8400f14fdbcca548ccdf4e457d24b909e3cb4655425f3,docker-pr,"{if: '${{ github.event_name == ''pull_request'' && github.repository == ''Kav-K/GPTDiscord''
     }}', permissions: {contents: read, id-token: write, packages: write}, runs-on: ubuntu-20.04,
   steps: [{name: Checkout repository, uses: actions/checkout@v4}, {name: Set up QEMU,
@@ -1871,7 +1871,7 @@ f32ad2c0c209c27c37c0a7d0f30b802d909df9eef48cbca4dab45f6932df0e2e,help,"{if: '${{
         cache-from: type=gha, cache-to: 'type=gha,mode=max', context: ., labels: '${{
           steps.meta.outputs.labels }}', platforms: 'linux/amd64,linux/arm64', push: false,
         tags: '${{ steps.meta.outputs.tags }}'}}]}
-",['build'],build,Kav-K__GPTDiscord,[build],Builds Docker images for multiple platforms with caching; push is false so no deployment occurs.
+",['build'],build,Kav-K__GPTDiscord,[build],Builds Docker images for multiple platforms with caching; push is false so no deployment occurs.,build,1.0,"[('[build]', '[STOP]')]"
 7fd5e14209ddeb101d56b6b28ef7eef74c51b9a2d2bcf1e20017da1510a28d58,build,"{name: 'Running python ${{ matrix.python-version }} on ${{matrix.os}}', runs-on: '${{
     matrix.os }}', steps: [{uses: actions/checkout@v3}, {name: 'Set up Python ${{
         matrix.python-version }}', uses: actions/setup-python@v4, with: {python-version: '${{
@@ -1886,4 +1886,4 @@ f32ad2c0c209c27c37c0a7d0f30b802d909df9eef48cbca4dab45f6932df0e2e,help,"{if: '${{
 
         '}], strategy: {matrix: {os: [macOS-latest, ubuntu-latest, windows-latest],
       python-version: ['3.10', '3.11']}}}
-",['unknown'],build,Kav-K__GPTDiscord,[build],Installs Python dependencies and builds module via pip and pyproject.toml.
+",['unknown'],build,Kav-K__GPTDiscord,[build],Installs Python dependencies and builds module via pip and pyproject.toml.,build,1.0,"[('[build]', '[STOP]\n\nThe classification is correct. The job performs build activities: setting up Python, upgrading pip/setuptools/wheel, and installing dependencies via requirements.txt and the module via pyproject.toml. These are standard dependency management and build preparation steps.')]"

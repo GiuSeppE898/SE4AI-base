@@ -29,7 +29,23 @@ def plot_pie_chart(counter, title, output_path=None, color_map=None):
     plt.axis("equal")
     if output_path:
         plt.savefig(output_path, dpi=150, bbox_inches="tight")
-    # plt.show()
+
+
+def extract_runners(job: dict) -> list[str]:
+    runs_on = job.get("runs-on", "")
+    strategy = job.get("strategy", {}) or {}
+    matrix = strategy.get("matrix", {}) if isinstance(strategy, dict) else {}
+    matrix = matrix if isinstance(matrix, dict) else {}
+    os_list = matrix.get("os", [])
+    os_list = os_list if isinstance(os_list, list) else []
+
+    if isinstance(runs_on, str):
+        if "matrix.os" in runs_on and os_list:
+            return [str(o).strip() for o in os_list if str(o).strip()]
+        return [runs_on.strip()] if runs_on.strip() else []
+    if isinstance(runs_on, list):
+        return [str(r).strip() for r in runs_on if str(r).strip()]
+    return []
 
 
 def run_dataset(label, dataset_path, workflows_path):
@@ -72,11 +88,14 @@ def run_dataset(label, dataset_path, workflows_path):
     total_uses_counter_unique = Counter()
     most_used_languages = Counter()
     most_used_languages_version = Counter()
+    total_runner_counter = Counter()
+    total_runner_counter_unique = Counter()
 
     for repo in repo_summary["repository"].unique():
         files = repo_summary[repo_summary["repository"]
                              == repo]["files"].values[0]
         repo_actions = Counter()
+        repo_runners = Counter()
 
         for file in files:
             path = workflows_path / repo / file
@@ -102,6 +121,12 @@ def run_dataset(label, dataset_path, workflows_path):
                                         repo_actions[unique_action] += 1
                                         total_uses_counter[action] += 1
                                         total_uses_counter_unique[unique_action] += 1
+                            runners = extract_runners(job)
+                            if runners:
+                                repo_runners.update(runners)
+                                total_runner_counter.update(runners)
+                                total_runner_counter_unique.update(
+                                    set(runners))
             except Exception:
                 continue
 
@@ -113,6 +138,10 @@ def run_dataset(label, dataset_path, workflows_path):
     text_lines.append(repr(total_uses_counter_unique.most_common()))
     text_lines.append("most_used_languages.most_common():")
     text_lines.append(repr(most_used_languages.most_common()))
+    text_lines.append("total_runner_counter.most_common():")
+    text_lines.append(repr(total_runner_counter.most_common()))
+    text_lines.append("total_runner_counter_unique.most_common():")
+    text_lines.append(repr(total_runner_counter_unique.most_common()))
     text_lines.append("stats_per_repo:")
     text_lines.append(repr(stats_per_repo))
 
@@ -123,6 +152,8 @@ def run_dataset(label, dataset_path, workflows_path):
         "total_uses_counter_unique": total_uses_counter_unique,
         "most_used_languages": most_used_languages,
         "most_used_languages_version": most_used_languages_version,
+        "total_runner_counter": total_runner_counter,
+        "total_runner_counter_unique": total_runner_counter_unique,
     }
 
 
@@ -187,6 +218,22 @@ def main() -> None:
     )
     language_version_colors = build_color_map(language_version_labels)
 
+    runner_labels = sorted(
+        set(
+            top_labels(results["A"]["total_runner_counter"]) +
+            top_labels(results["N.A."]["total_runner_counter"])
+        )
+    )
+    runner_colors = build_color_map(runner_labels)
+
+    runner_unique_labels = sorted(
+        set(
+            top_labels(results["A"]["total_runner_counter_unique"]) +
+            top_labels(results["N.A."]["total_runner_counter_unique"])
+        )
+    )
+    runner_unique_colors = build_color_map(runner_unique_labels)
+
     for label, data in results.items():
         plot_pie_chart(
             data["total_uses_counter_unique"],
@@ -211,6 +258,18 @@ def main() -> None:
             f"Top 10 Languages Used in GitHub AI Repos (with versions) ({label})",
             RESULTS_FOLDER / f"top_10_languages_versions_({label}).png",
             language_version_colors,
+        )
+        plot_pie_chart(
+            data["total_runner_counter"],
+            f"Top 10 Runners Used in GitHub AI Repos ({label})",
+            RESULTS_FOLDER / f"top_10_runners_({label}).png",
+            runner_colors,
+        )
+        plot_pie_chart(
+            data["total_runner_counter_unique"],
+            f"Top 10 Unique Runners Used in GitHub AI Repos (with versions) ({label})",
+            RESULTS_FOLDER / f"top_10_unique_runners_({label}).png",
+            runner_unique_colors,
         )
 
 

@@ -18,7 +18,7 @@ file_hash,job_name,job,SUGGESTED_WORKFLOW_TYPE,workflow_type,repository
       with: {days-before-stale: 60, stale-issue-message: This issue has been automatically
           marked as stale because it has not had recent activity. It will be closed
           if no further activity occurs.}}]}
-",['unknown'],lint_security,AntonOsika__gpt-engineer
+",['unknown'],no_ops,AntonOsika__gpt-engineer
 b49b58057bd39fccb7df78f7213d805bd534811a812b78b659219256fd74f513,build,"{runs-on: ubuntu-latest, steps: [{uses: actions/checkout@v3}, {uses: actions/setup-python@v4,
       with: {python-version: '${{ matrix.python-version }}'}}, {name: Install Poetry,
       run: 'curl -sSL https://install.python-poetry.org | python3 -
@@ -50,7 +50,7 @@ b49b58057bd39fccb7df78f7213d805bd534811a812b78b659219256fd74f513,publish,"{envir
           runner.os }}-cargo-'}}, {name: Rustfmt, run: cargo --locked fmt -p bloop
         -- --check}, {name: Clippy, run: cargo --locked clippy -p bloop}, {name: Tests,
       run: cargo --locked test -p bloop --release}]}
-",['unknown'],test,BloopAI__bloop
+",['unknown'],lint_security|test,BloopAI__bloop
 37b6bb9c0904d4a136da75fce3f6d7481158fd88e6403ab2dcd5b7f995a0a173,test,"{runs-on: ubuntu-latest, steps: [{run: 'echo ""No checks required"" '}]}
 ",['lint'],no_ops,BloopAI__bloop
 37b6bb9c0904d4a136da75fce3f6d7481158fd88e6403ab2dcd5b7f995a0a173,fmt-clippy-build,"{runs-on: ubuntu-latest, steps: [{run: 'echo ""No checks required"" '}]}
@@ -192,14 +192,10 @@ b49b58057bd39fccb7df78f7213d805bd534811a812b78b659219256fd74f513,publish,"{envir
       ', slackBuildWebhook: '${{ secrets.SLACK_BUILD_WEBHOOK }}'}, uses: BloopAI/workflows/.github/workflows/build-container.yml@main,
   with: {repository: bloop, runner: ubuntu-latest, tag: '${{ github.event.release.tag_name
       }}'}}
-",['unknown'],"
-
-
-
-deploy_release",BloopAI__bloop
+",['unknown'],"build|deploy_release",BloopAI__bloop
 cf4ca34801c11d7cecfbe94fcde8774de1f6e533575cfcfe9daa467c4277b694,debug,"{runs-on: ubuntu-latest, steps: [{env: {GITHUB_CONTEXT: '${{ toJson(github) }}'},
       name: $github, run: echo ""$GITHUB_CONTEXT""}]}
-",['unknown'],lint_security,BloopAI__bloop
+",['unknown'],no_ops,BloopAI__bloop
 cf4ca34801c11d7cecfbe94fcde8774de1f6e533575cfcfe9daa467c4277b694,permissions,"{if: 'github.event.issue.pull_request && contains(github.event.comment.body, ''/build'')',
   name: Validate user is the member of BloopAI organization, outputs: {is-member: '${{
       steps.membership.outputs.is-member }}'}, runs-on: ubuntu-latest, steps: [{env: {
@@ -252,7 +248,7 @@ cf4ca34801c11d7cecfbe94fcde8774de1f6e533575cfcfe9daa467c4277b694,report_status,"
           github.run_id }}
 
           ', pr_number: '${{ steps.pr.outputs.number }}'}}]}
-",['unknown'],deploy_release,BloopAI__bloop
+",['unknown'],no_ops,BloopAI__bloop
 e3663d18d528eba177f40a7d1ca8fff42987865a548155777b22726adeabc17a,clippy-test,"{runs-on: ubuntu-latest, steps: [{name: Checkout code, uses: actions/checkout@v4,
       with: {lfs: true, token: '${{ secrets.GITHUB_TOKEN }}'}}, {name: Install Rust
         stable, uses: dtolnay/rust-toolchain@stable, with: {components: 'rustfmt,
@@ -263,7 +259,7 @@ e3663d18d528eba177f40a7d1ca8fff42987865a548155777b22726adeabc17a,clippy-test,"{r
     {name: Rustfmt, run: cargo --locked fmt -p bleep -- --check}, {name: Clippy, run: cargo
         --locked clippy -p bleep}, {name: Tests, run: cargo --locked test -p bleep
         --release}]}
-",['unknown'],test,BloopAI__bloop
+",['unknown'],lint_security|test,BloopAI__bloop
 05d673f3f0818989c8f8e33d4736d3e4193080f6aeef873baaa8503026c34229,golangci,"{name: lint, runs-on: ubuntu-latest, steps: [{uses: actions/checkout@v4}, {uses: actions/setup-go@v5,
       with: {cache-dependency-path: wren-launcher/go.sum, go-version: '1.24'}}, {
       name: golangci-lint, uses: golangci/golangci-lint-action@v8, with: {version: v2.3.1,
